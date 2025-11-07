@@ -95,6 +95,13 @@
         }
         .message-success { background-color: #10b981; color: white; } 
         .message-error { background-color: #ef4444; color: white; } 
+        
+        /* Estilo específico para el logo del login */
+        #login-logo-img {
+            width: 150px; /* Ajusta el tamaño según sea necesario */
+            height: auto;
+            margin: 0 auto;
+        }
 
     </style>
     </head>
@@ -119,9 +126,12 @@
         <div class="p-8 md:p-12 w-full max-w-sm mx-auto rounded-2xl shadow-2xl bg-[#1a1a2e] border-t-2 border-sky-600/50">
             <div class="text-center mb-10">
                 <div class="text-center mb-10">
-                    <h1 class="text-4xl font-extrabold tracking-widest text-sky-200" style="text-shadow: 0 0 5px #0ea5e9;">GYMENEZ</h1>
-                    <p class="text-sm text-gray-400 mt-2">Acceso Exclusivo</p>
-                </div>
+                    <img id="login-logo-img"
+                         src="LOGIN_LOGO.png" 
+                         alt="Logo GYMENEZ" 
+                         class="mx-auto"
+                    >
+                    </div>
             </div>
 
             <form id="login-form">
