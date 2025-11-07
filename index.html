@@ -237,28 +237,13 @@
 
 
     <script>
-        // --- CONFIGURACIÓN DE SEGURIDAD Y SESIÓN (Mantenida) ---
+        // --- CONFIGURACIÓN DE SEGURIDAD Y SESIÓN ---
         const localDeviceId = crypto.randomUUID();
-        document.addEventListener('DOMContentLoaded', () => {
-             // Muestra el ID del dispositivo en la pantalla de login para referencia
-            const display = document.getElementById('device-id-display');
-            if (display) display.textContent = localDeviceId.substring(0, 8) + '...';
-        });
 
-        // --- CONFIGURACIÓN DE ENDPOINTS REALES PARA MONGODB ATLAS (VÍA API REST) (Mantenida) ---
-        
         // 🚀 URL BASE DE TU API. SIN LA BARRA FINAL (/)
         const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
 
-        // NOTA: En una aplicación real, esta sesión se mantendría en localStorage
-        let CURRENT_USER_SESSION = {
-            // Datos de prueba para simular un usuario logueado al navegar al perfil
-            _id: "667c293674620f381c15f913", 
-            id: "667c293674620f381c15f913",
-            email: "ejemplo@prueba.com",
-            name: "Juan",
-            // Se mantiene nulo si no está logueado
-        }; 
+        let CURRENT_USER_SESSION = null; 
 
         /**
          * Llama a la API REST para iniciar sesión y obtener el token/objeto de usuario.
@@ -282,7 +267,8 @@
                 }
 
                 CURRENT_USER_SESSION = data.user;
-                // Guardar la sesión para simular la persistencia
+                // Guardar la sesión en localStorage para que el perfil pueda acceder
+                // Dentro de funcionales v1.html, después de iniciar sesión con éxito:
                 localStorage.setItem('userSession', JSON.stringify(data.user)); 
                 return { success: true, user: data.user };
 
@@ -299,22 +285,32 @@
             console.log(`API: Llamada a ${API_BASE_URL}/api/logout`);
             
             try {
-                const response = await fetch(`${API_BASE_URL}/api/logout`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ userId: CURRENT_USER_SESSION._id || CURRENT_USER_SESSION.id })
-                });
+                // Si CURRENT_USER_SESSION es nulo, intenta recuperarlo del almacenamiento
+                let userId = (CURRENT_USER_SESSION && (CURRENT_USER_SESSION._id || CURRENT_USER_SESSION.id));
                 
-                CURRENT_USER_SESSION = null;
-                localStorage.removeItem('userSession'); // Limpiar sesión
-                return { success: true };
+                if (!userId) {
+                    const storedSession = localStorage.getItem('userSession');
+                    if (storedSession) {
+                        const storedUser = JSON.parse(storedSession);
+                        userId = storedUser._id || storedUser.id;
+                    }
+                }
 
+                if (userId) {
+                    await fetch(`${API_BASE_URL}/api/logout`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ userId: userId })
+                    });
+                }
+                
             } catch (e) {
-                console.error("Error en la conexión fetch:", e);
-                CURRENT_USER_SESSION = null; 
-                localStorage.removeItem('userSession'); // Limpiar sesión por precaución
+                console.error("Error al intentar cerrar sesión en el servidor:", e);
+            } finally {
+                CURRENT_USER_SESSION = null;
+                localStorage.removeItem('userSession'); // Limpiar sesión local siempre
                 return { success: true }; 
             }
         }
@@ -341,7 +337,7 @@
         }
 
 
-        // --- Variables y Utilidades Globales (Mantenidas) ---
+        // --- Variables y Utilidades Globales ---
         const SPLASH_DURATION_MS = 3000; 
         const screens = ['splash-screen', 'login-screen', 'dashboard-screen'];
         const messagebox = document.getElementById('message-box');
@@ -383,9 +379,8 @@
                 // Lógica para cambiar el fondo al entrar/salir del Dashboard (con transición)
                 if (targetId === 'dashboard-screen') {
                     body.classList.add('dashboard-background');
-                    // Intenta cargar la sesión del localStorage
                     const storedSession = localStorage.getItem('userSession');
-                    if (!CURRENT_USER_SESSION && storedSession) {
+                    if (storedSession) {
                         CURRENT_USER_SESSION = JSON.parse(storedSession);
                     }
 
@@ -413,9 +408,8 @@
             }, 1000); 
         }
 
-        /**
-         * Renderiza la lista de rutinas en la interfaz. (Función acortada para mantener el foco en la tarea)
-         */
+        // Lógica de Carga de Datos y Manejadores de UI (Abreviados)
+
         function renderRoutines(routines, profile) {
             const container = document.getElementById('routines-container');
             const loading = document.getElementById('routines-loading');
@@ -451,9 +445,6 @@
             `).join('');
         }
 
-        /**
-         * Carga todos los datos necesarios para el Dashboard. (Función acortada para mantener el foco en la tarea)
-         */
         async function loadDashboardData() {
             if (!CURRENT_USER_SESSION) return;
             const routinesContainer = document.getElementById('routines-container');
@@ -469,9 +460,6 @@
             }
         }
 
-        /**
-         * Maneja el inicio de sesión del usuario.
-         */
         async function handleLogin(e) {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
@@ -484,7 +472,7 @@
             const response = await apiLogin(email, password, localDeviceId);
 
             if (response.success) {
-                // Actualizar la sesión global aquí es suficiente, loadDashboardData la usará.
+                // CURRENT_USER_SESSION ya se actualizó en apiLogin, y se guardó en localStorage.
                 showMessage('¡Inicio de sesión exitoso!', 'success');
                 navigateTo('dashboard-screen');
             } else {
@@ -495,9 +483,6 @@
             btn.textContent = 'INGRESAR';
         }
 
-        /**
-         * Cierra la sesión del usuario.
-         */
         async function handleLogout() {
             const btn = document.getElementById('logout-button');
             const originalText = btn.textContent;
@@ -505,14 +490,10 @@
             btn.disabled = true;
             btn.textContent = 'Cerrando...';
 
-            const response = await apiLogout();
+            await apiLogout(); // La función apiLogout maneja la limpieza local y remota
             
-            if (response.success) {
-                showMessage('Sesión cerrada correctamente.', 'success');
-                navigateTo('login-screen');
-            } else {
-                showMessage('Error al cerrar sesión.', 'error');
-            }
+            showMessage('Sesión cerrada correctamente.', 'success');
+            navigateTo('login-screen');
 
             btn.disabled = false;
             btn.textContent = originalText;
@@ -520,15 +501,14 @@
 
         // --- Lógica de Inicialización ---
         window.onload = function() {
-            // Comprobar si hay una sesión guardada para evitar login si es posible
+            // Comprobar si hay una sesión guardada para evitar login
             const storedSession = localStorage.getItem('userSession');
             if (storedSession) {
-                CURRENT_USER_SESSION = JSON.parse(storedSession);
                 // Si hay sesión guardada, saltar el splash y navegar al dashboard
                 setTimeout(() => {
                     document.getElementById('splash-screen').style.display = 'none';
                     navigateTo('dashboard-screen');
-                }, 100); // Pequeño retraso para que los estilos carguen
+                }, 100); 
             } else {
                 // Si no hay sesión, iniciar la transición normal
                 setTimeout(transitionToLogin, SPLASH_DURATION_MS);
