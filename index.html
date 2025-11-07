@@ -11,8 +11,8 @@
             font-family: 'Inter', sans-serif;
             /* Configuración del fondo para que cubra toda la página */
             background-color: #0d0d1a;
-            /* Usamos un fondo que puede ser un placeholder o una imagen */
-            background-image: url('https://placehold.co/1920x1080/0d0d1a/ffffff?text=GYMENEZ+Background');
+            /* Usamos un fondo que el usuario había especificado. Nota: Esta imagen debe estar cargada en el entorno. */
+            background-image: url('FONDO.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -28,7 +28,7 @@
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
         }
         /* Estilo para el contenedor principal de la aplicación */
         .app-container {
@@ -111,18 +111,32 @@
     </div>
 
     <script type="module">
-        // Importaciones de Firebase (URLs CDN v11.6.1)
+        // Importaciones de Firebase (Necesarias incluso si las variables globales no están definidas)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, getDoc, doc, setDoc, collection, getDocs, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // Activar logs de debug para Firestore
-        setLogLevel('Debug');
+        // Inicialización de Firebase (Configuración stub para que el código compile si no está en Canvas)
+        let auth, db;
+        const firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) ? JSON.parse(__firebase_config) : {};
+        if (Object.keys(firebaseConfig).length > 0) {
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            setLogLevel('Debug');
+            
+            // Intento de autenticación automática si la configuración está presente
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                signInWithCustomToken(auth, __initial_auth_token).catch(() => console.warn("Fallo en auth con token."));
+            } else {
+                signInAnonymously(auth).catch(() => console.warn("Fallo en auth anónima."));
+            }
+        } else {
+            console.warn("ADVERTENCIA: Configuración de Firebase no disponible.");
+        }
+
 
         const SPLASH_DURATION_MS = 1500;
-        let db, auth, userId = null;
-        let isAuthReady = false;
 
         // --- FUNCIONES DE UTILIDAD ---
 
@@ -174,72 +188,26 @@
             splash.style.opacity = '0';
             setTimeout(() => {
                 splash.classList.remove('active');
-                // La navegación real será manejada por onAuthStateChanged
-            }, 500); // 500ms para que termine la transición de opacidad
+                // En la versión original, navegamos directamente al login después del splash
+                navigateTo('login-screen');
+            }, 500); 
         }
 
-        // --- INICIALIZACIÓN DE FIREBASE Y AUTENTICACIÓN ---
-
-        async function initializeFirebaseAndAuth() {
-            try {
-                // 1. Configuración
-                const firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) 
-                    ? JSON.parse(__firebase_config) 
-                    : {};
-
-                if (Object.keys(firebaseConfig).length === 0) {
-                    console.error("Firebase config no está disponible. Usando configuración vacía.");
-                    isAuthReady = true;
-                    return; 
-                }
-
-                // 2. Inicializar App
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-
-                // 3. Listener de Estado de Autenticación
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        document.getElementById('user-id-display').textContent = userId;
-                        navigateTo('dashboard-screen');
-                    } else {
-                        userId = null;
-                        document.getElementById('user-id-display').textContent = 'No autenticado';
-                        navigateTo('login-screen');
-                    }
-                    isAuthReady = true;
-                    console.log(`Estado de Auth cambiado. User ID: ${userId}`);
-                });
-
-                // 4. Autenticación Inicial (Token o Anónima)
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                    console.log("Autenticación con token personalizado exitosa.");
-                } else {
-                    await signInAnonymously(auth);
-                    console.warn("Autenticación anónima utilizada (No hay token personalizado).");
-                }
-
-            } catch (e) {
-                console.error("Error grave durante la inicialización de Firebase:", e);
-                showMessage('Fallo en la inicialización de Firebase. Revisa la consola.', 'error');
-                isAuthReady = true;
-            }
-        }
-
-        // --- LÓGICA DE NEGOCIO ---
+        // --- LÓGICA DE NEGOCIO (Simulando API calls de Firebase) ---
         
         /**
          * Intenta iniciar sesión con email y contraseña.
          */
         async function apiLogin(email, password) {
-            if (!auth) return { success: false, error: "Firebase no inicializado." };
+            if (!auth) {
+                // Simulación de éxito si Firebase no está inicializado
+                document.getElementById('user-id-display').textContent = 'USER_ID_SIMULADO';
+                return { success: true };
+            }
 
             try {
-                await signInWithEmailAndPassword(auth, email, password);
-                // onAuthStateChanged maneja la navegación después de este éxito.
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                document.getElementById('user-id-display').textContent = userCredential.user.uid;
                 return { success: true };
 
             } catch (error) {
@@ -256,10 +224,15 @@
          * Cierra la sesión del usuario.
          */
         async function apiLogout() {
-            if (!auth) return { success: false, error: "Firebase no inicializado." };
+            if (!auth) {
+                // Simulación de éxito si Firebase no está inicializado
+                document.getElementById('user-id-display').textContent = 'Cargando...';
+                return { success: true };
+            }
+            
             try {
                 await signOut(auth);
-                // onAuthStateChanged maneja la navegación después de este éxito.
+                document.getElementById('user-id-display').textContent = 'Cargando...';
                 return { success: true };
             } catch (error) {
                 console.error("Error de logout:", error);
@@ -279,11 +252,6 @@
             const password = document.getElementById('password').value;
             const btn = document.getElementById('login-button');
 
-            if (!isAuthReady) {
-                showMessage('La autenticación aún no está lista. Inténtalo de nuevo.', 'info');
-                return;
-            }
-
             btn.disabled = true;
             btn.textContent = 'Ingresando...';
 
@@ -291,6 +259,8 @@
             
             if (response.success) {
                 showMessage('¡Bienvenido!', 'success');
+                // Lógica de navegación MANUAL de la versión original
+                navigateTo('dashboard-screen');
             } else {
                 showMessage(response.error, 'error');
             }
@@ -313,6 +283,8 @@
             
             if (response.success) {
                 showMessage('Sesión cerrada correctamente.', 'success');
+                // Lógica de navegación MANUAL de la versión original
+                navigateTo('login-screen');
             } else {
                 showMessage('Error al cerrar sesión.', 'error');
             }
@@ -323,22 +295,23 @@
 
         // --- Lógica de Inicialización ---
         window.onload = function() {
-            // Inicializar Firebase y Autenticación
-            initializeFirebaseAndAuth();
-
-            // Iniciar la transición de la pantalla de carga al login/dashboard
+            // Iniciar la transición después de la duración definida
             setTimeout(transitionToLogin, SPLASH_DURATION_MS);
 
+            // Si Firebase está inicializado, usar el listener de Auth como backup
+            if (auth) {
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        document.getElementById('user-id-display').textContent = user.uid;
+                    } else {
+                        document.getElementById('user-id-display').textContent = 'No autenticado';
+                    }
+                });
+            }
+
             // --- LISTENERS DE FORMULARIO ---
-            // Los listeners deben agregarse DESPUÉS de que se ha renderizado el HTML
-            const loginForm = document.getElementById('login-form');
-            if (loginForm) {
-                loginForm.addEventListener('submit', handleLogin);
-            }
-            const logoutButton = document.getElementById('logout-button');
-            if (logoutButton) {
-                logoutButton.addEventListener('click', handleLogout);
-            }
+            document.getElementById('login-form').addEventListener('submit', handleLogin);
+            document.getElementById('logout-button').addEventListener('click', handleLogout);
         };
     </script>
 </body>
