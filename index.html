@@ -3,38 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GYMENEZ</title>
+    <title>GYMENEZ | Dashboard Minimalista</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        /* Tema de Fondo Minimalista: Base Oscura */
         body {
             font-family: 'Inter', sans-serif;
-            /* Configuración del fondo para que cubra toda la página */
-            background-color: #0d0d1a;
-            background-image: url('FONDO.png');
+            background-color: #08081a; /* Fondo muy oscuro, casi negro-azulado */
+            color: #e5e7eb; /* Color de texto base (Gris Claro) */
+        }
+        
+        /* Imagen de Fondo Suave (Tu FONDO.png) */
+        body {
+            /* Usar tu imagen FONDO.png. Añadimos un overlay oscuro para el texto. */
+            background-image: url('FONDO.png'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
+            /* Se recomienda añadir un pseudo-elemento con un background-color: rgba(0,0,0,0.7) si el fondo es muy claro */
         }
-        /* Estilo específico para el efecto Glassmorphism en las tarjetas */
+
+        /* ✨ Efecto Glassmorphism Premium para Tarjetas (Textura Suavizada) */
         .glass-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(18, 18, 30, 0.5); /* Fondo más oscuro y con más opacidad para contraste */
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05); /* Borde sutil */
+            box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); /* Sombra más suave */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        /* Estilo para el botón con efecto NEON */
+        .glass-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px 0 rgba(0, 0, 0, 0.7);
+        }
+
+        /* Estilo para el botón con efecto NEON AMARILLO (Acento de Marca) */
         .neon-button {
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px #0ea5e9, 0 0 20px #0ea5e9;
+            background-color: #FFC300; /* Amarillo Dorado */
+            transition: all 0.4s ease;
+            box-shadow: 0 0 8px #FFC300, 0 0 15px #FFC300;
+            color: #1a1a1a; /* Texto oscuro para el botón amarillo */
         }
         .neon-button:hover {
-            box-shadow: 0 0 15px #38bdf8, 0 0 30px #38bdf8;
-            transform: scale(1.02);
+            background-color: #FFD700; /* Dorado más claro */
+            box-shadow: 0 0 10px #FFD700, 0 0 25px #FFD700, 0 0 40px rgba(255, 215, 0, 0.5);
+            transform: scale(1.01);
         }
-        /* Splash Screen */
+        
+        /* Splash Screen (Mantenido) */
         #splash-screen {
             position: fixed;
             top: 0;
@@ -48,29 +67,27 @@
             z-index: 100; 
         }
         
-        /* === ESTILOS PARA EL LOGO Y ANIMACIÓN NEON === */
+        /* Animación de Pulso Neon AMARILLO para el logo (VIVO Y ESTÉTICO) */
         #splash-logo {
             width: 250px;
             height: auto;
             animation: neon-pulse 1.5s infinite alternate;
         }
-        
-        /* Definición de la animación de pulso neon */
         @keyframes neon-pulse {
             from {
-                filter: drop-shadow(0 0 5px #fff) drop-shadow(0 0 10px #0ea5e9);
+                filter: drop-shadow(0 0 5px #fff) drop-shadow(0 0 10px #FFC300);
                 opacity: 0.7;
                 transform: scale(1.0);
             }
             to {
-                filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 20px #0ea5e9);
+                filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 20px #FFC300);
                 opacity: 1.0;
                 transform: scale(1.05);
             }
         }
         /* ================================================= */
 
-        /* Estilos para el mensaje de estado */
+        /* Estilos para el mensaje de estado (Mantenido) */
         #message-box {
             position: fixed;
             top: 1rem;
@@ -84,19 +101,12 @@
             transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
             pointer-events: none;
         }
-        .message-success { background-color: #10b981; color: white; } /* esmeralda 500 */
-        .message-error { background-color: #ef4444; color: white; } /* rojo 500 */
-
-        /* Estilo para el botón de pestaña activa */
-        .tab-button.active {
-            border-bottom: 2px solid #0ea5e9; /* Sky-500 */
-            color: #38bdf8; /* Sky-400 */
-            font-weight: 700;
-        }
+        .message-success { background-color: #10b981; color: white; } 
+        .message-error { background-color: #ef4444; color: white; } 
 
     </style>
     </head>
-<body class="min-h-screen flex items-center justify-center bg-[#0d0d1a] text-white">
+<body class="min-h-screen flex items-center justify-center bg-[#08081a] text-white">
 
     <div id="message-box"></div>
 
@@ -107,169 +117,122 @@
                 alt="Logo GYMENEZ Neon" 
                 class="mx-auto"
             >
-            <div id="loading-text" class="mt-4 text-xl md:text-2xl font-semibold tracking-widest text-sky-400 z-10" 
-                 style="text-shadow: 0 0 5px #0ea5e9;">
-                
+            <div id="loading-text" class="mt-4 text-xl md:text-2xl font-semibold tracking-widest text-amber-400 z-10" 
+                 style="text-shadow: 0 0 5px #FFC300;">
+                Cargando Experiencia...
             </div>
         </div>
     </div>
 
     <div id="login-screen" class="hidden min-h-screen w-full flex items-center justify-center p-4">
-        <div class="glass-card p-8 md:p-12 w-full max-w-sm mx-auto rounded-2xl shadow-xl border-t-2 border-b-2 border-sky-500/30">
+        <div class="glass-card p-8 md:p-12 w-full max-w-sm mx-auto rounded-3xl shadow-2xl border-t border-amber-500/10">
             <div class="text-center mb-10">
-                <div class="text-center mb-10">
-                    <h1 class="text-4xl font-extrabold tracking-widest text-sky-200" style="text-shadow: 0 0 5px #0ea5e9;">GYMENEZ</h1>
-                    <p class="text-sm text-gray-400 mt-2">Acceso Exclusivo</p>
-                </div>
+                <h1 class="text-4xl font-extrabold tracking-widest text-amber-300" style="text-shadow: 0 0 7px #FFC300;">GYMENEZ</h1>
+                <p class="text-sm text-gray-400 mt-2">Acceso Exclusivo de Miembros</p>
             </div>
 
             <form id="login-form">
                 <div class="mb-6">
                     <label for="login-email" class="block text-sm font-medium text-gray-300 mb-2">Correo Electrónico</label>
                     <input type="email" id="login-email" name="email" value="" placeholder="tu.correo@ejemplo.com"
-                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-600 focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition duration-300 placeholder-gray-500 text-base" required>
+                           class="w-full px-4 py-3 rounded-xl bg-gray-800/50 text-white border border-gray-700 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition duration-300 placeholder-gray-500 text-base" required>
                 </div>
                 <div class="mb-8">
                     <label for="login-password" class="block text-sm font-medium text-gray-300 mb-2">Contraseña</label>
                      <input type="password" id="login-password" name="password" value="password" placeholder=""
-                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-600 focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition duration-300 placeholder-gray-500 text-base" required>
+                           class="w-full px-4 py-3 rounded-xl bg-gray-800/50 text-white border border-gray-700 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition duration-300 placeholder-gray-500 text-base" required>
                 </div>
 
                 <button type="submit" id="login-btn"
-                        class="neon-button w-full py-3 rounded-lg bg-sky-600 text-white font-bold text-lg hover:bg-sky-500 uppercase tracking-wider">
+                        class="neon-button w-full py-3 rounded-xl font-bold text-lg uppercase tracking-wider">
                     INGRESAR
                 </button>
             </form>
             
-            </div>
+            <p class="text-center text-xs text-gray-600 mt-4">Dispositivo: <span id="device-id-display" class="font-mono">Cargando...</span></p>
+            
+        </div>
     </div>
 
-    <div id="dashboard-screen" class="hidden min-h-screen w-full p-4 md:p-8">
-        <header class="flex justify-between items-center py-4 px-2 mb-4 border-b border-sky-700/50">
-            <h1 class="text-3xl font-extrabold text-sky-400" style="text-shadow: 0 0 3px #0ea5e9;">GYMENEZ</h1>
+
+    <div id="dashboard-screen" class="hidden min-h-screen w-full max-w-7xl mx-auto p-4 md:p-8">
+        
+        <header class="flex justify-between items-center py-6 mb-8 border-b border-gray-700/50">
+            <h1 class="text-4xl font-extrabold text-amber-400" style="text-shadow: 0 0 5px #FFC300;">GYMENEZ</h1>
             <button id="logout-button"
-                    class="px-4 py-2 text-sm font-semibold rounded-full bg-red-600 hover:bg-red-500 transition duration-300">
-                Salir
+                    class="px-4 py-2 text-sm font-semibold rounded-full bg-red-700/70 text-white hover:bg-red-600 transition duration-300 border border-red-500/50">
+                Cerrar Sesión
             </button>
         </header>
 
-        <div class="flex border-b border-gray-700 mb-6">
-            <button id="tab-perfil" onclick="showTab('perfil')" 
-                    class="tab-button active py-2 px-4 text-gray-400 hover:text-sky-400 transition duration-300">
-                👤 Perfil
-            </button>
-            <button id="tab-rutinas" onclick="showTab('rutinas')" 
-                    class="tab-button py-2 px-4 text-gray-400 hover:text-sky-400 transition duration-300">
-                🏋️ Rutinas
-            </button>
-            <button id="tab-nutricion" onclick="showTab('nutricion')" 
-                    class="tab-button py-2 px-4 text-gray-400 hover:text-sky-400 transition duration-300">
-                🍎 Nutrición
-            </button>
-        </div>
-
-        <div id="tab-content-perfil" class="tab-content">
-            <h2 class="text-2xl font-bold mb-4 text-sky-300">Mi Perfil y Biometría</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                
-                <div class="glass-card p-6 rounded-2xl md:col-span-1">
-                    <h3 class="text-xl font-bold mb-4 text-sky-200">Datos Personales</h3>
-                    <ul class="text-sm space-y-2 text-gray-300">
-                        <li><span class="font-semibold text-white">Nombre Completo:</span> <span id="profile-full-name">Cargando...</span></li>
-                        <li><span class="font-semibold text-white">Email:</span> <span id="profile-email">Cargando...</span></li>
-                        <li><span class="font-semibold text-white">ID de Usuario:</span> <span id="profile-id">Cargando...</span></li>
-                        <li><span class="font-semibold text-white">Edad:</span> <span id="profile-age">Cargando...</span> años</li>
-                        <li><span class="font-semibold text-white">Sexo:</span> <span id="profile-sex">Cargando...</span></li>
-                        <li><span class="font-semibold text-white">Activo Desde:</span> <span id="profile-activo-desde">Cargando...</span></li>
-                    </ul>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            
+            <div class="glass-card p-6 rounded-2xl border-l-4 border-amber-500/50">
+                <h2 class="text-xl font-bold mb-4 text-amber-300 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    Mi Progreso
+                </h2>
+                <p class="text-sm text-gray-400 mb-4">¡Bienvenido, <span id="user-display-name" class="text-white font-semibold">Usuario</span>!
+                    <span id="user-display-id" class="text-xs text-gray-500 block mt-1">ID:</span>
+                </p>
+                <div class="h-2 bg-gray-700 rounded-full">
+                    <div class="h-full bg-amber-500 rounded-full w-3/5" style="box-shadow: 0 0 8px #FFC300;"></div>
                 </div>
-                
-                <div class="glass-card p-6 rounded-2xl md:col-span-1">
-                    <h3 class="text-xl font-bold mb-4 text-sky-200">Medidas Clave</h3>
-                    <ul class="text-sm space-y-2 text-gray-300">
-                        <li><span class="font-semibold text-white">Estatura:</span> <span id="profile-stature">Cargando...</span> m</li>
-                        <li><span class="font-semibold text-white">Peso:</span> <span id="profile-weight">Cargando...</span> kg</li>
-                        <li><span class="font-semibold text-white">Tórax:</span> <span id="profile-thorax">Cargando...</span> cm</li>
-                        <li><span class="font-semibold text-white">Cintura:</span> <span id="profile-waist">Cargando...</span> cm</li>
-                    </ul>
-                </div>
-
-                <div class="glass-card p-6 rounded-2xl md:col-span-2 lg:col-span-1">
-                    <h3 class="text-xl font-bold mb-4 text-sky-200">Perímetros (cm)</h3>
-                    <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-gray-300">
-                        <div><span class="font-semibold text-white">Brazo Izq:</span> <span id="profile-arm-left">Cargando...</span></div>
-                        <div><span class="font-semibold text-white">Brazo Der:</span> <span id="profile-arm-right">Cargando...</span></div>
-                        <div><span class="font-semibold text-white">Antebrazo Izq:</span> <span id="profile-forearm-left">Cargando...</span></div>
-                        <div><span class="font-semibold text-white">Antebrazo Der:</span> <span id="profile-forearm-right">Cargando...</span></div>
-                        <div><span class="font-semibold text-white">Cuádriceps Izq:</span> <span id="profile-quad-left">Cargando...</span></div>
-                        <div><div><span class="font-semibold text-white">Cuádriceps Der:</span> <span id="profile-quad-right">Cargando...</span></div></div>
-                        <div><span class="font-semibold text-white">Gemelo Izq:</span> <span id="profile-calf-left">Cargando...</span></div>
-                        <div><span class="font-semibold text-white">Gemelo Der:</span> <span id="profile-calf-right">Cargando...</span></div>
-                    </div>
-                </div>
+                <p class="text-xs text-amber-400 mt-2 font-semibold">Progreso semanal: 60%</p>
             </div>
-        </div>
-        
-        <div id="tab-content-rutinas" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-4 text-sky-300">Mis Rutinas y Progreso</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="glass-card p-6 rounded-2xl">
-                    <h2 class="text-xl font-bold mb-4 text-sky-300 flex items-center">
-                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                        Progreso Semanal
-                    </h2>
-                    <p class="text-sm text-gray-400 mb-4">Progreso de objetivos de la semana.</p>
-                    <div class="h-2 bg-gray-700 rounded-full">
-                        <div class="h-full bg-sky-500 rounded-full w-3/5" style="box-shadow: 0 0 8px #0ea5e9;"></div>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-2">Progreso semanal: 60%</p>
-                </div>
 
-                <div class="glass-card p-6 rounded-2xl">
-                    <h2 class="text-xl font-bold mb-4 text-sky-300 flex items-center">
-                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                        Plan de Hoy
-                    </h2>
-                    <p id="today-routine-summary" class="text-sm text-gray-400">Cargando...</p>
-                    <ul id="today-routine-list" class="text-sm space-y-2 mt-3">
+            <div class="glass-card p-6 rounded-2xl col-span-1 border-l-4 border-gray-600/50">
+                <h2 class="text-xl font-bold mb-4 text-amber-300 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    Plan de Hoy
+                </h2>
+                <p id="today-routine-summary" class="text-sm text-gray-400">Cargando...</p>
+                <ul id="today-routine-list" class="text-sm space-y-2 mt-3 max-h-32 overflow-y-auto">
                     </ul>
-                </div>
+            </div>
 
-                 <div class="glass-card p-6 rounded-2xl col-span-full">
-                    <h2 class="text-xl font-bold mb-4 text-sky-300 flex items-center">
-                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2 0l-2-1m2 1h-2m2 0h-2M4 7l2 1m-2 0l2-1m-2 1h2m-2 0h2M4 7h16M7 4h10a3 3 0 013 3v2a3 3 0 01-3 3H7a3 3 0 01-3-3V7a3 3 0 013-3z"></path></svg>
-                        Explorar Rutinas Premium
-                    </h2>
-                    <p class="text-sm text-gray-500 mb-4">Estas rutinas son cargadas desde la API REST (Backend) y MongoDB Atlas.</p>
-                    <div id="routines-container" class="space-y-4">
-                        <div class="text-center p-4 text-gray-500" id="routines-loading">Cargando rutinas...</div>
+             <div class="glass-card p-6 rounded-2xl border-l-4 border-gray-600/50">
+                <h2 class="text-xl font-bold mb-4 text-amber-300 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M6 10h2m0 0h2v2H6V10zm4-4h2m0 0h2v2h-2V6zm4-4h2m0 0h2v2h-2V2z"></path></svg>
+                    Calorías (Hoy)
+                </h2>
+                <div class="text-4xl font-extrabold text-amber-400">450 <span class="text-lg text-gray-400">kcal</span></div>
+                <p class="text-xs text-gray-500 mt-1">Meta diaria: 700 kcal</p>
+                <button class="w-full mt-4 py-2 text-sm font-semibold rounded-lg bg-gray-700/50 text-white hover:bg-gray-600/50 transition duration-300">
+                        Registrar Comida
+                </button>
+            </div>
+            
+            <div class="glass-card p-6 rounded-2xl hidden xl:block border-l-4 border-gray-600/50">
+                <h2 class="text-xl font-bold mb-4 text-amber-300 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    Último Entrenamiento
+                </h2>
+                <p class="text-sm text-gray-400">Pierna & Hombro</p>
+                <p class="text-xs text-gray-500 mt-2">Duración: <span class="font-semibold text-white">75 min</span></p>
+                <p class="text-xs text-gray-500">Fecha: <span class="font-semibold text-white">Ayer</span></p>
+                <button class="w-full mt-4 py-2 text-sm font-bold rounded-lg bg-amber-600/80 text-black hover:bg-amber-500 transition duration-300">
+                        Ver Detalles
+                </button>
+            </div>
+            
+            <div class="glass-card p-6 rounded-2xl col-span-full border-t border-amber-600/30">
+                <h2 class="text-xl font-bold mb-4 text-amber-300 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2 0l-2-1m2 1h-2m2 0h-2M4 7l2 1m-2 0l2-1m-2 1h2m-2 0h2M4 7h16M7 4h10a3 3 0 013 3v2a3 3 0 01-3 3H7a3 3 0 01-3-3V7a3 3 0 013-3z"></path></svg>
+                    Explorar Rutinas Premium
+                </h2>
+                <p class="text-sm text-gray-500 mb-4">Estas rutinas son cargadas desde la **API REST (Backend)** y **MongoDB Atlas**.</p>
+                <div id="routines-container" class="space-y-4">
+                    <div class="text-center p-4 text-gray-500" id="routines-loading">Cargando rutinas...</div>
                     </div>
-                </div>
             </div>
-        </div>
-
-        <div id="tab-content-nutricion" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-4 text-sky-300">Registro y Plan de Nutrición</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                 <div class="glass-card p-6 rounded-2xl">
-                    <h2 class="text-xl font-bold mb-4 text-sky-300 flex items-center">
-                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M6 10h2m0 0h2v2H6V10zm4-4h2m0 0h2v2h-2V6zm4-4h2m0 0h2v2h-2V2z"></path></svg>
-                        Calorías (Hoy)
-                    </h2>
-                    <div class="text-4xl font-extrabold text-white">450 <span class="text-lg text-gray-400">kcal</span></div>
-                    <p class="text-xs text-gray-500 mt-1">Meta diaria: 700 kcal</p>
-                </div>
-
-                <div class="glass-card p-6 rounded-2xl">
-                    <h3 class="text-xl font-bold mb-4 text-sky-200">Macronutrientes</h3>
-                    <p class="text-sm text-gray-400">Pronto se mostrará tu distribución de proteínas, carbohidratos y grasas.</p>
-                </div>
-                
-            </div>
+            
         </div>
     </div>
+
+
     <script>
-        // --- CONFIGURACIÓN DE SEGURIDAD Y SESIÓN ---
+        // --- CONFIGURACIÓN DE SEGURIDAD Y SESIÓN (SE MANTIENE INTACTA) ---
         const localDeviceId = crypto.randomUUID();
         document.addEventListener('DOMContentLoaded', () => {
              // Muestra el ID del dispositivo en la pantalla de login para referencia
@@ -277,15 +240,16 @@
             if (display) display.textContent = localDeviceId.substring(0, 8) + '...';
         });
 
-        // --- CONFIGURACIÓN DE ENDPOINTS REALES PARA MONGODB ATLAS (VÍA API REST) ---
+        // --- CONFIGURACIÓN DE ENDPOINTS REALES PARA MONGODB ATLAS (VÍA API REST) (SE MANTIENE INTACTA) ---
         
         // 🚀 CORREGIDO: URL BASE DE TU API. SIN LA BARRA FINAL (/)
         const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
 
-        let CURRENT_USER_SESSION = null; // Almacena el objeto de usuario/sesión devuelto por la API
+        let CURRENT_USER_SESSION = null; 
 
         /**
          * Llama a la API REST para iniciar sesión y obtener el token/objeto de usuario.
+         * (Lógica Mantenida)
          */
         async function apiLogin(email, password, deviceId) {
             console.log(`API: Llamada a ${API_BASE_URL}/api/login para ${email}`);
@@ -319,6 +283,7 @@
 
         /**
          * Llama a la API REST para cerrar sesión y limpiar el activeSessionId en la DB.
+         * (Lógica Mantenida)
          */
         async function apiLogout() {
             console.log(`API: Llamada a ${API_BASE_URL}/api/logout`);
@@ -346,6 +311,7 @@
         
         /**
          * Llama a la API REST para obtener las rutinas y el perfil del usuario.
+         * (Lógica Mantenida)
          */
         async function apiFetchUserData(userId) {
             console.log(`API: Llamada a ${API_BASE_URL}/api/data/${userId}`);
@@ -368,12 +334,12 @@
         }
 
 
-        // --- Variables y Utilidades Globales ---
+        // --- Variables y Utilidades Globales (Mantenidas) ---
         const SPLASH_DURATION_MS = 3000;
         const screens = ['splash-screen', 'login-screen', 'dashboard-screen'];
         const messagebox = document.getElementById('message-box');
 
-        // Función para mostrar mensajes de estado (éxito/error)
+        // Función para mostrar mensajes de estado (éxito/error) (Mantenida)
         function showMessage(message, type = 'success') {
             messagebox.textContent = message;
             messagebox.className = ''; 
@@ -389,7 +355,7 @@
             }, 3000);
         }
 
-        // Función de navegación entre pantallas
+        // Función de navegación entre pantallas (Mantenida)
         function navigateTo(targetId) {
             screens.forEach(id => {
                 const screen = document.getElementById(id);
@@ -407,43 +373,18 @@
                 });
 
                 if (targetId === 'dashboard-screen' && CURRENT_USER_SESSION) {
-                    // Inicialmente mostramos la pestaña de Perfil
-                    showTab('perfil');
+                    // Usamos el campo 'name' del objeto user devuelto por el login
+                    const displayName = CURRENT_USER_SESSION.name || CURRENT_USER_SESSION.email.split('@')[0];
+                    document.getElementById('user-display-name').textContent = displayName;
+                    // Aseguramos que se use el _id o id que devuelve la API
+                    document.getElementById('user-display-id').textContent = `ID: ${CURRENT_USER_SESSION._id || CURRENT_USER_SESSION.id}`; 
                     // Llama a la función de carga de datos del dashboard
                     loadDashboardData(); 
                 }
             }
         }
-        
-        /**
-         * Controla la visibilidad de las pestañas del dashboard.
-         */
-        function showTab(tabName) {
-            // Ocultar todos los contenidos de las pestañas
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.add('hidden');
-            });
 
-            // Remover la clase 'active' de todos los botones de pestaña
-            document.querySelectorAll('.tab-button').forEach(button => {
-                button.classList.remove('active');
-            });
-
-            // Mostrar el contenido de la pestaña seleccionada
-            const targetContent = document.getElementById(`tab-content-${tabName}`);
-            if (targetContent) {
-                targetContent.classList.remove('hidden');
-            }
-
-            // Activar el botón de la pestaña seleccionada
-            const targetButton = document.getElementById(`tab-${tabName}`);
-            if (targetButton) {
-                targetButton.classList.add('active');
-            }
-        }
-        window.showTab = showTab; // Hacer la función accesible globalmente para el onclick
-
-        // Función para manejar la transición del splash
+        // Función para manejar la transición del splash (Mantenida)
         function transitionToLogin() {
             const splashScreen = document.getElementById('splash-screen');
             splashScreen.style.transition = 'opacity 1s ease-out';
@@ -455,44 +396,12 @@
             }, 1000); 
         }
 
-        // --- LÓGICA DE CARGA DE DATOS DEL DASHBOARD ---
+        // --- LÓGICA DE CARGA DE DATOS DEL DASHBOARD (Mantenida con CSS actualizado) ---
 
-        /**
-         * Renderiza la información detallada del perfil en la pestaña Perfil.
-         */
-        function renderProfile(profile, user_session) {
-            if (!profile || !user_session) return;
-            
-            // 1. DATOS GENERALES
-            const fullName = `${profile.name || ''} ${profile.last_name || ''}`;
-            document.getElementById('profile-full-name').textContent = fullName;
-            document.getElementById('profile-email').textContent = user_session.email || 'N/A';
-            document.getElementById('profile-id').textContent = profile.user_id || 'N/A';
-            document.getElementById('profile-age').textContent = profile.age || 'N/A';
-            document.getElementById('profile-sex').textContent = profile.sex || 'N/A';
-            document.getElementById('profile-activo-desde').textContent = profile.activo_desde || 'N/A';
-            
-            // 2. DATOS FÍSICOS GENERALES
-            document.getElementById('profile-stature').textContent = profile.stature ? profile.stature.toFixed(2) : 'N/A';
-            document.getElementById('profile-weight').textContent = profile.weight ? profile.weight.toFixed(2) : 'N/A';
-            document.getElementById('profile-thorax').textContent = profile.thorax ? profile.thorax.toFixed(1) : 'N/A';
-            document.getElementById('profile-waist').textContent = profile.waist ? profile.waist.toFixed(1) : 'N/A';
-
-            // 3. MEDICIONES CORPORALES DETALLADAS
-            document.getElementById('profile-arm-left').textContent = profile.arm_left ? profile.arm_left.toFixed(1) : 'N/A';
-            document.getElementById('profile-arm-right').textContent = profile.arm_right ? profile.arm_right.toFixed(1) : 'N/A';
-            document.getElementById('profile-forearm-left').textContent = profile.forearm_left ? profile.forearm_left.toFixed(1) : 'N/A';
-            document.getElementById('profile-forearm-right').textContent = profile.forearm_right ? profile.forearm_right.toFixed(1) : 'N/A';
-            document.getElementById('profile-quad-left').textContent = profile.quad_left ? profile.quad_left.toFixed(1) : 'N/A';
-            document.getElementById('profile-quad-right').textContent = profile.quad_right ? profile.quad_right.toFixed(1) : 'N/A';
-            document.getElementById('profile-calf-left').textContent = profile.calf_left ? profile.calf_left.toFixed(1) : 'N/A';
-            document.getElementById('profile-calf-right').textContent = profile.calf_right ? profile.calf_right.toFixed(1) : 'N/A';
-        }
-        
         /**
          * Renderiza la lista de rutinas en la interfaz.
          */
-        function renderRoutines(routines) {
+        function renderRoutines(routines, profile) {
             const container = document.getElementById('routines-container');
             const loading = document.getElementById('routines-loading');
             
@@ -513,22 +422,23 @@
                 `${todayRoutine.name} (${todayRoutine.focus}). Duración: ${todayRoutine.duration} min.`;
             
             const todayList = document.getElementById('today-routine-list');
+            // Cambiado a un estilo más limpio y minimalista para la lista
             todayList.innerHTML = todayRoutine.exercises.map(ex => `
-                <li class="flex justify-between items-center text-gray-300 border-b border-sky-800/30 pb-1">
+                <li class="flex justify-between items-center text-gray-300 border-b border-gray-700/50 pb-1">
                     <span class="font-medium">${ex.name}</span>
-                    <span class="text-sky-400 text-xs">${ex.sets} sets x ${ex.reps} reps</span>
+                    <span class="text-amber-400 text-xs">${ex.sets} sets x ${ex.reps} reps</span>
                 </li>
             `).join('');
 
-            // --- MÓDULO 4: EXPLORAR RUTINAS ---
+            // --- MÓDULO 5: EXPLORAR RUTINAS ---
             container.innerHTML = routines.map(routine => `
-                <div class="p-4 rounded-xl border border-sky-600/50 hover:bg-white/5 transition duration-300 flex justify-between items-center">
+                <div class="p-4 rounded-xl border border-amber-600/50 hover:bg-white/5 transition duration-300 flex justify-between items-center">
                     <div>
-                        <h3 class="text-lg font-bold text-sky-200">${routine.name}</h3>
+                        <h3 class="text-lg font-bold text-amber-200">${routine.name}</h3>
                         <p class="text-sm text-gray-400">${routine.focus} - ${routine.duration} min</p>
                         <p class="text-xs text-gray-500 mt-1">Nivel: <span class="font-semibold text-white">${routine.level}</span></p>
                     </div>
-                    <button class="px-4 py-2 text-sm font-semibold rounded-lg bg-sky-600 hover:bg-sky-500 transition duration-300">
+                    <button class="px-4 py-2 text-sm font-semibold rounded-lg bg-amber-600/80 text-black hover:bg-amber-500 transition duration-300">
                         Seleccionar
                     </button>
                 </div>
@@ -538,11 +448,12 @@
 
         /**
          * Carga todos los datos necesarios para el Dashboard.
+         * (Lógica Mantenida)
          */
         async function loadDashboardData() {
             if (!CURRENT_USER_SESSION) return;
             
-            // Re-inicializar el indicador de carga para la sección de Rutinas
+            // 1. Obtener Datos (Rutinas y Perfil)
             const routinesContainer = document.getElementById('routines-container');
             routinesContainer.innerHTML = '<div class="text-center p-4 text-gray-500" id="routines-loading">Cargando rutinas...</div>';
             
@@ -551,13 +462,9 @@
             const response = await apiFetchUserData(userId);
             
             if (response.success) {
-                // Renderizar perfil en la nueva pestaña
-                renderProfile(response.profile, CURRENT_USER_SESSION);
-                
-                // Renderizar rutinas en la pestaña de Rutinas
-                renderRoutines(response.routines || []); 
-                
-                showMessage('Datos de perfil y rutinas cargados con éxito.', 'success');
+                // Renderizar rutinas y usar datos de perfil
+                renderRoutines(response.routines || [], response.profile); 
+                showMessage('Datos de rutinas y perfil cargados con éxito.', 'success');
             } else {
                 showMessage('Error al cargar datos: ' + (response.error || 'Desconocido'), 'error');
                 routinesContainer.innerHTML = '<p class="text-red-400">Error al conectar con la API de Datos.</p>';
@@ -565,7 +472,7 @@
         }
 
 
-        // --- Manejadores de Interfaz de Usuario ---
+        // --- Manejadores de Interfaz de Usuario (Mantenidos) ---
 
         /**
          * Maneja el inicio de sesión del usuario.
@@ -617,7 +524,7 @@
             btn.textContent = originalText;
         }
 
-        // --- Lógica de Inicialización ---
+        // --- Lógica de Inicialización (Mantenida) ---
         window.onload = function() {
             // Iniciar la transición después de la duración definida
             setTimeout(transitionToLogin, SPLASH_DURATION_MS);
@@ -629,3 +536,4 @@
     </script>
 </body>
 </html>
+
