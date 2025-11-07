@@ -24,7 +24,7 @@
             /* Transición para un cambio de fondo suave */
             transition: background-image 1s ease-in-out; 
             
-            /* === MANTENIDO: Borde negro para todas las letras (Text Stroke Effect) === */
+            /* === APLICADO: Borde negro para todas las letras (Text Stroke Effect) === */
             text-shadow: 
                 -0.5px -0.5px 0 #000,  
                  0.5px -0.5px 0 #000,
@@ -195,64 +195,20 @@
             </div>
             </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 gap-6">
             
-            <a href="routines.html" class="col-span-full xl:col-span-4 block">
-                <div class="glass-card p-6 md:p-8 rounded-2xl flex flex-col items-center justify-center text-center h-48 cursor-pointer border-t-2 border-amber-400/50 hover:border-amber-400">
-                    <svg class="w-12 h-12 mb-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href="routines.html" class="col-span-1 block"> 
+                <div class="glass-card p-6 md:p-8 w-full max-w-lg mx-auto rounded-2xl flex flex-col items-center justify-center text-center h-64 cursor-pointer border-t-2 border-amber-400/50 hover:border-amber-400">
+                    <svg class="w-16 h-16 mb-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2 0l-2-1m2 1h-2m2 0h-2M4 7l2 1m-2 0l2-1m-2 1h2m-2 0h2M4 7h16M7 4h10a3 3 0 013 3v2a3 3 0 01-3 3H7a3 3 0 01-3-3V7a3 3 0 013-3z"></path>
                     </svg>
-                    <h2 class="text-3xl font-extrabold uppercase tracking-widest">
+                    <h2 class="text-4xl font-extrabold uppercase tracking-widest">
                         <span class="text-amber-400">WORK</span><span class="text-white">OUT</span>
                     </h2>
-                    <p class="text-sm text-white mt-2">Explora y selecciona tus rutinas de entrenamiento.</p>
+                    <p class="text-base text-white mt-4">Comienza tu entrenamiento o explora tus rutinas.</p>
                 </div>
             </a>
-            <div class="glass-card p-6 rounded-2xl">
-                <h2 class="text-xl font-bold mb-4 text-sky-300 flex items-center">
-                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                    Mi Progreso
-                </h2>
-                <p class="text-sm text-gray-400 mb-4">¡Bienvenido, <span id="user-display-name" class="text-white font-semibold">Usuario</span>!
-                    <span id="user-display-id" class="text-xs text-gray-500 block mt-1">ID:</span>
-                </p>
-                <div class="h-2 bg-gray-700 rounded-full">
-                    <div class="h-full bg-sky-500 rounded-full w-3/5" style="box-shadow: 0 0 8px #0ea5e9;"></div>
-                </div>
-                <p class="text-xs text-gray-400 mt-2">Progreso semanal: 60%</p>
             </div>
-
-            <div class="glass-card p-6 rounded-2xl col-span-1">
-                <h2 class="text-xl font-bold mb-4 text-sky-300 flex items-center">
-                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                    Plan de Hoy
-                </h2>
-                <p id="today-routine-summary" class="text-sm text-gray-400">Cargando...</p>
-                <ul id="today-routine-list" class="text-sm space-y-2 mt-3">
-                    </ul>
-            </div>
-
-             <div class="glass-card p-6 rounded-2xl">
-                <h2 class="text-xl font-bold mb-4 text-sky-300 flex items-center">
-                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M6 10h2m0 0h2v2H6V10zm4-4h2m0 0h2v2h-2V6zm4-4h2m0 0h2v2h-2V2z"></path></svg>
-                    Calorías (Hoy)
-                </h2>
-                <div class="text-4xl font-extrabold text-white">450 <span class="text-lg text-gray-400">kcal</span></div>
-                <p class="text-xs text-gray-500 mt-1">Meta diaria: 700 kcal</p>
-            </div>
-            
-            <div class="glass-card p-6 rounded-2xl col-span-full md:col-span-2 xl:col-span-4">
-                <h2 class="text-xl font-bold mb-4 text-sky-300 flex items-center">
-                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2 0l-2-1m2 1h-2m2 0h-2M4 7l2 1m-2 0l2-1m-2 1h2m-2 0h2M4 7h16M7 4h10a3 3 0 013 3v2a3 3 0 01-3 3H7a3 3 0 01-3-3V7a3 3 0 013-3z"></path></svg>
-                    Explorar Rutinas Premium (MongoDB)
-                </h2>
-                <p class="text-sm text-gray-300 mb-4">Estas rutinas son cargadas desde la API REST (Backend) y MongoDB Atlas.</p>
-                <div id="routines-container" class="space-y-4">
-                    <div class="text-center p-4 text-gray-300" id="routines-loading">Cargando rutinas...</div>
-                </div>
-            </div>
-            
-        </div>
     </div>
 
 
@@ -288,7 +244,6 @@
 
                 CURRENT_USER_SESSION = data.user;
                 // Guardar la sesión en localStorage para que el perfil pueda acceder
-                // Dentro de funcionales v1.html, después de iniciar sesión con éxito:
                 localStorage.setItem('userSession', JSON.stringify(data.user)); 
                 return { success: true, user: data.user };
 
@@ -335,25 +290,10 @@
             }
         }
         
-        /**
-         * Llama a la API REST para obtener las rutinas y el perfil del usuario.
-         */
-        async function apiFetchUserData(userId) {
-            console.log(`API: Llamada a ${API_BASE_URL}/api/data/${userId}`);
-            
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/data/${userId}`); 
-                const data = await response.json();
-                
-                if (!response.ok || !data.success) {
-                    return { success: false, error: data.error || 'Error al obtener datos del dashboard.' };
-                }
-                
-                return { success: true, routines: data.routines, profile: data.profile };
-            } catch (e) {
-                console.error("Error en la conexión fetch:", e);
-                return { success: false, error: 'No se pudo conectar con el servidor API para obtener datos.' };
-            }
+        // Función simplificada, ya que no se necesita la data de rutinas para el dashboard.
+        async function loadDashboardData() {
+            if (!CURRENT_USER_SESSION) return;
+            console.log("Dashboard cargado solo con el acceso a WORKOUT.");
         }
 
 
@@ -405,9 +345,6 @@
                     }
 
                     if (CURRENT_USER_SESSION) {
-                        const displayName = CURRENT_USER_SESSION.name || CURRENT_USER_SESSION.email.split('@')[0];
-                        document.getElementById('user-display-name').textContent = displayName;
-                        document.getElementById('user-display-id').textContent = `ID: ${CURRENT_USER_SESSION._id || CURRENT_USER_SESSION.id}`; 
                         loadDashboardData(); 
                     }
                 } else {
@@ -428,60 +365,6 @@
             }, 1000); 
         }
 
-        // Lógica de Carga de Datos y Manejadores de UI (Abreviados)
-
-        function renderRoutines(routines, profile) {
-            const container = document.getElementById('routines-container');
-            const loading = document.getElementById('routines-loading');
-            if (loading) loading.remove(); 
-            if (routines.length === 0) {
-                // Alto Contraste: text-gray-500 a text-gray-300
-                container.innerHTML = '<p class="text-gray-300">No hay rutinas disponibles.</p>';
-                document.getElementById('today-routine-summary').textContent = 'No tienes rutinas asignadas para hoy.';
-                document.getElementById('today-routine-list').innerHTML = '';
-                return;
-            }
-            const todayRoutine = routines[0]; 
-            document.getElementById('today-routine-summary').textContent = 
-                `${todayRoutine.name} (${todayRoutine.focus}). Duración: ${todayRoutine.duration} min.`;
-            const todayList = document.getElementById('today-routine-list');
-            todayList.innerHTML = todayRoutine.exercises.map(ex => `
-                <li class="flex justify-between items-center text-gray-300 border-b border-sky-800/30 pb-1">
-                    <span class="font-medium">${ex.name}</span>
-                    <span class="text-sky-400 text-xs">${ex.sets} sets x ${ex.reps} reps</span>
-                </li>
-            `).join('');
-
-            container.innerHTML = routines.map(routine => `
-                <div class="p-4 rounded-xl border border-sky-600/50 hover:bg-white/5 transition duration-300 flex justify-between items-center">
-                    <div>
-                        <h3 class="text-lg font-bold text-sky-200">${routine.name}</h3>
-                        <p class="text-sm text-white">${routine.focus} - ${routine.duration} min</p>
-                        <p class="text-xs text-gray-300 mt-1">Nivel: <span class="font-semibold text-white">${routine.level}</span></p>
-                    </div>
-                    <button class="px-4 py-2 text-sm font-semibold rounded-lg bg-sky-600 hover:bg-sky-500 transition duration-300">
-                        Seleccionar
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        async function loadDashboardData() {
-            if (!CURRENT_USER_SESSION) return;
-            const routinesContainer = document.getElementById('routines-container');
-            // Alto Contraste: text-gray-500 a text-gray-300
-            routinesContainer.innerHTML = '<div class="text-center p-4 text-gray-300" id="routines-loading">Cargando rutinas...</div>';
-            const userId = CURRENT_USER_SESSION._id || CURRENT_USER_SESSION.id;
-            const response = await apiFetchUserData(userId);
-            
-            if (response.success) {
-                renderRoutines(response.routines || [], response.profile); 
-            } else {
-                showMessage('Error al cargar datos: ' + (response.error || 'Desconocido'), 'error');
-                routinesContainer.innerHTML = '<p class="text-red-400">Error al conectar con la API de Datos.</p>';
-            }
-        }
-
         async function handleLogin(e) {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
@@ -494,7 +377,6 @@
             const response = await apiLogin(email, password, localDeviceId);
 
             if (response.success) {
-                // CURRENT_USER_SESSION ya se actualizó en apiLogin, y se guardó en localStorage.
                 showMessage('¡Inicio de sesión exitoso!', 'success');
                 navigateTo('dashboard-screen');
             } else {
