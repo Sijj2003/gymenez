@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,7 +14,7 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0d0d1a;
-            /* Fondo de perfil */
+            /* Fondo de perfil (usando el mismo que el dashboard) */
             background-image: url('PROFILE_FONDO.png');
             background-size: cover;
             background-position: center;
@@ -163,26 +165,44 @@
         
         /**
          * Llama a la API para obtener el perfil y las mediciones del usuario.
-         * Se asume un endpoint que devuelve toda la data combinada.
          */
         async function apiFetchProfileData(userId) {
-            console.log(`API: Llamada a ${API_BASE_URL}/api/profile/${userId}`);
+            console.log(`API: Intentando conectar a: ${API_BASE_URL}/api/profile/${userId}`);
             
             try {
-                // Endpoint asumido para obtener datos de perfil + mediciones
+                // 1. Intentar la conexión
                 const response = await fetch(`${API_BASE_URL}/api/profile/${userId}`); 
+                
+                // 2. Verificar el estado HTTP
+                if (!response.ok) {
+                    const errorText = await response.text().catch(() => 'No hay cuerpo de respuesta');
+                    console.error(`Error HTTP: ${response.status} - ${response.statusText}`, errorText);
+                    
+                    // Error específico para el usuario
+                    return { 
+                        success: false, 
+                        error: `Error del servidor (HTTP ${response.status} - ${response.statusText}). Revisa tu backend.`,
+                        isServerError: true
+                    };
+                }
+
+                // 3. Procesar la respuesta JSON
                 const data = await response.json();
                 
-                if (!response.ok || !data.success) {
-                    return { success: false, error: data.error || 'Error al obtener datos del perfil.' };
+                if (!data.success) {
+                    return { success: false, error: data.error || 'Error al obtener datos del perfil (API).' };
                 }
                 
-                // data.profile debe contener todos los campos de PERFIL, GENERALES y CORPORALES
                 return { success: true, profile: data.profile };
 
             } catch (e) {
-                console.error("Error en la conexión fetch:", e);
-                return { success: false, error: 'No se pudo conectar con el servidor API REST para obtener el perfil.' };
+                // 4. Capturar errores de red (CORS, servidor inactivo, URL incorrecta)
+                console.error("Error en la conexión fetch (Network/CORS):", e);
+                return { 
+                    success: false, 
+                    error: `❌ Error de Conexión: ${e.message}. Revisa la URL, el estado del servidor y la configuración CORS.`,
+                    isNetworkError: true
+                };
             }
         }
 
@@ -213,7 +233,7 @@
             // --- 3. TABLA MEDICIONES CORPORALES ---
             const bodyTable = document.getElementById('body-measurements-table');
             
-            // Mapeo de claves de la DB a etiquetas amigables
+            // Mapeo de claves de la DB (se asume snake_case) a etiquetas amigables
             const labels = {
                 brazo_izquierdo: "Brazo Izquierdo",
                 brazo_derecho: "Brazo Derecho",
@@ -246,19 +266,18 @@
          * Función principal para cargar y mostrar los datos del perfil.
          */
         async function loadProfileData() {
-            // 1. Obtener el ID de usuario de localStorage (establecido al loguearse en funcional v1.html)
+            // 1. Obtener el ID de usuario de localStorage
             const storedSession = localStorage.getItem('userSession');
             
             if (!storedSession) {
-                loadingSpinner.textContent = '❌ Error: No hay sesión activa. Por favor, inicia sesión.';
-                // Redirigir al login si no hay sesión
+                loadingSpinner.textContent = '❌ Error: No hay sesión activa. Redirigiendo a Login...';
+                showMessage('No hay sesión activa.', 'error');
                 setTimeout(() => window.location.href = 'funcional v1.html', 3000); 
                 return;
             }
             
             try {
                 const userSession = JSON.parse(storedSession);
-                // Usamos _id para MongoDB o id para alternativas (dependiendo del backend)
                 const userId = userSession._id || userSession.id; 
                 
                 if (!userId) {
@@ -275,7 +294,8 @@
                     loadingSpinner.classList.add('hidden');
                     showMessage('Datos de perfil cargados con éxito.', 'success');
                 } else {
-                    loadingSpinner.textContent = '❌ Error al cargar datos: ' + (response.error || 'Datos incompletos.');
+                    // Muestra el error más específico devuelto por apiFetchProfileData
+                    loadingSpinner.textContent = '❌ ' + (response.error || 'Error al cargar datos.');
                     showMessage('Error al cargar datos del perfil.', 'error');
                 }
 
