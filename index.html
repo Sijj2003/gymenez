@@ -3,576 +3,343 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gymenez App - Acceso y Perfil</title>
-    <!-- Tailwind CSS CDN -->
+    <title>GYMENEZ</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons CDN -->
-    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* Estilos CSS simplificados para el entorno de Canvas */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            color: #E2E8F0;
-            background-color: #0F172A;
-            overflow-y: auto;
+            /* Configuración del fondo para que cubra toda la página */
+            background-color: #0d0d1a;
+            /* Usamos un fondo que puede ser un placeholder o una imagen */
+            background-image: url('https://placehold.co/1920x1080/0d0d1a/ffffff?text=GYMENEZ+Background');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        
-        .animated-background {
-            position: fixed;
+        /* Estilo específico para el efecto Glassmorphism en las tarjetas */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        }
+        /* Estilo para el contenedor principal de la aplicación */
+        .app-container {
             width: 100%;
-            height: 100%;
-            background: linear-gradient(-45deg, #1E3A8A, #0F172A, #3730A3, #0F172A);
-            background-size: 400% 400%;
-            animation: gradient-animation 15s ease infinite;
-            z-index: 0;
+            max-width: 400px;
+            padding: 2rem;
+            margin: 1rem;
         }
 
-        @keyframes gradient-animation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        /* Ocultar pantallas */
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        /* Animación de splash */
+        #splash-screen {
+            transition: opacity 0.5s ease-out;
         }
 
-        .login-panel {
-            backdrop-filter: blur(10px);
-            background-color: rgba(30, 41, 59, 0.8);
-            border: 1px solid rgba(59, 130, 246, 0.4);
+        /* Estilo del botón de logout para mejor visibilidad */
+        #logout-button {
+            transition: background-color 0.3s, transform 0.1s;
         }
-
-        .input-minimal {
-            background-color: rgba(30, 41, 59, 0.6);
-            border: 1px solid transparent;
-            transition: all 0.3s ease;
-        }
-        .input-minimal:focus {
-            border-color: #3B82F6;
-            background-color: rgba(30, 41, 59, 0.8);
+        #logout-button:hover {
+            transform: translateY(-1px);
         }
     </style>
 </head>
-<body class="flex items-center justify-center">
+<body class="text-white">
 
-    <div class="animated-background"></div>
-
-    <!-- Contenedor Principal de la Aplicación -->
-    <div id="app" class="relative z-10 w-full h-full flex flex-col items-center justify-center">
-        <!-- El contenido se inyectará aquí -->
+    <!-- Mensaje de Notificación Global (No usamos alert()) -->
+    <div id="message-container" class="fixed top-4 right-4 z-50">
+        <!-- Los mensajes se inyectan aquí -->
     </div>
 
-    <!-- Firebase Imports y Lógica -->
+    <div class="app-container">
+        <!-- 1. PANTALLA DE CARGA (SPLASH) -->
+        <div id="splash-screen" class="screen active text-center">
+            <h1 class="text-5xl font-extrabold text-indigo-400 animate-pulse">GYMENEZ</h1>
+            <p class="mt-4 text-xl text-gray-300">Cargando experiencia...</p>
+        </div>
+
+        <!-- 2. PANTALLA DE LOGIN -->
+        <div id="login-screen" class="screen">
+            <div class="glass-card p-6 rounded-xl shadow-2xl">
+                <h2 class="text-3xl font-bold text-center mb-6 text-indigo-300">Iniciar Sesión</h2>
+                <form id="login-form">
+                    <div class="mb-4">
+                        <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Correo Electrónico</label>
+                        <input type="email" id="email" name="email" required placeholder="ejemplo@gymenez.com"
+                               class="w-full px-4 py-2 rounded-lg bg-gray-700/50 border border-gray-600 focus:border-indigo-400 focus:outline-none transition duration-150">
+                    </div>
+                    <div class="mb-6">
+                        <label for="password" class="block text-sm font-medium text-gray-300 mb-2">Contraseña</label>
+                        <input type="password" id="password" name="password" required placeholder="••••••••"
+                               class="w-full px-4 py-2 rounded-lg bg-gray-700/50 border border-gray-600 focus:border-indigo-400 focus:outline-none transition duration-150">
+                    </div>
+                    <button id="login-button" type="submit"
+                            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition duration-200 disabled:opacity-50">
+                        INGRESAR
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 3. PANTALLA DE DASHBOARD -->
+        <div id="dashboard-screen" class="screen">
+            <div class="glass-card p-6 rounded-xl shadow-2xl text-center">
+                <h2 class="text-3xl font-bold mb-4 text-green-400">¡Bienvenido!</h2>
+                <p class="text-lg mb-6">Estás en el Dashboard. Aquí va el contenido de tu aplicación.</p>
+                <div class="mb-4 p-3 bg-gray-700/50 rounded-lg">
+                    <p class="text-sm font-semibold text-gray-300">ID de Usuario (UID):</p>
+                    <p id="user-id-display" class="text-sm break-all text-indigo-300">Cargando...</p>
+                </div>
+                <button id="logout-button"
+                        class="mt-4 w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition duration-200">
+                    CERRAR SESIÓN
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
+        // Importaciones de Firebase (URLs CDN v11.6.1)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, where, getDocs, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Activamos los logs de depuración para facilitar el diagnóstico.
-        setLogLevel('debug');
-
-        // ====================================================================
-        // MANEJO DE CONFIGURACIÓN DE CONTINGENCIA
-        // ====================================================================
-        let firebaseConfig = {};
-        let environmentWarning = null;
-
-        try {
-            // Intentamos acceder a las variables. Si fallan, usamos un objeto vacío y registramos el error.
-            if (typeof __firebase_config === 'undefined') {
-                 environmentWarning = "⚠ ADVERTENCIA: La variable '__firebase_config' no está definida. Se usará una configuración vacía. El login automático fallará.";
-                 console.warn(environmentWarning);
-                 firebaseConfig = {}; // Configuración de fallback vacía
-            } else {
-                firebaseConfig = JSON.parse(__firebase_config);
-            }
-        } catch (e) {
-            environmentWarning = `⚠ ADVERTENCIA: Fallo al parsear el JSON de la configuración: ${e.message}. El login automático fallará.`;
-            console.error("ERROR CRÍTICO EN PARSEO DE CONFIG:", e);
-            firebaseConfig = {}; // Configuración de fallback vacía
-        }
-
-        // Acceso al ID de la aplicación y al token de autenticación (que probablemente será nulo)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        let db, auth;
-        let currentUserId = null;
-
-        const APP_STATE = {
-            LOGIN: 'login',
-            PROFILE: 'profile',
-            LOADING: 'loading',
-            ERROR: 'error'
-        };
-
-        let currentState = APP_STATE.LOADING;
-
-        // --- Función de Manejo de Errores Global ---
-        function displayAppError(message) {
-            console.error(message);
-            renderState(APP_STATE.ERROR, message);
-        }
-
-        // --- Inicialización y Autenticación de Firebase ---
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, getDoc, doc, setDoc, collection, getDocs, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        async function initializeFirebase() {
-            // Si la configuración está vacía, procedemos al login manual con el warning
-            if (Object.keys(firebaseConfig).length === 0) {
-                 if (environmentWarning) {
-                    renderState(APP_STATE.LOGIN, environmentWarning); // Intentar ir al login
-                    return;
-                 } else {
-                    displayAppError("Error: La configuración de Firebase es inválida o vacía.");
-                    return;
-                 }
-            }
+        // Activar logs de debug para Firestore
+        setLogLevel('Debug');
+
+        const SPLASH_DURATION_MS = 1500;
+        let db, auth, userId = null;
+        let isAuthReady = false;
+
+        // --- FUNCIONES DE UTILIDAD ---
+
+        /**
+         * Muestra un mensaje temporal de notificación.
+         * @param {string} message - El texto del mensaje.
+         * @param {'success'|'error'|'info'} type - El tipo de mensaje.
+         */
+        function showMessage(message, type) {
+            const container = document.getElementById('message-container');
+            const colorMap = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500'
+            };
             
+            const element = document.createElement('div');
+            element.className = `${colorMap[type]} text-white p-3 rounded-lg shadow-xl mb-2 transition-opacity duration-300 opacity-0`;
+            element.textContent = message;
+            
+            container.appendChild(element);
+
+            // Iniciar fade in
+            setTimeout(() => element.style.opacity = '1', 10); 
+
+            // Iniciar fade out y remover
+            setTimeout(() => {
+                element.style.opacity = '0';
+                setTimeout(() => element.remove(), 300);
+            }, 5000);
+        }
+
+        /**
+         * Navega a una pantalla específica.
+         * @param {string} targetId - El ID de la pantalla a mostrar.
+         */
+        function navigateTo(targetId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(targetId).classList.add('active');
+        }
+
+        /**
+         * Transiciona de la pantalla de splash al login.
+         */
+        function transitionToLogin() {
+            const splash = document.getElementById('splash-screen');
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                splash.classList.remove('active');
+                // La navegación real será manejada por onAuthStateChanged
+            }, 500); // 500ms para que termine la transición de opacidad
+        }
+
+        // --- INICIALIZACIÓN DE FIREBASE Y AUTENTICACIÓN ---
+
+        async function initializeFirebaseAndAuth() {
             try {
-                // Si llegamos aquí, tenemos una configuración y podemos inicializar
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                
-                await setPersistence(auth, browserSessionPersistence);
+                // 1. Configuración
+                const firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) 
+                    ? JSON.parse(__firebase_config) 
+                    : {};
 
-                let initialAuthAttempted = false;
-
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken).catch(e => {
-                        console.warn("Fallo el login con token. Esto es esperado si las variables de entorno están ausentes.", e);
-                    });
-                    initialAuthAttempted = true;
+                if (Object.keys(firebaseConfig).length === 0) {
+                    console.error("Firebase config no está disponible. Usando configuración vacía.");
+                    isAuthReady = true;
+                    return; 
                 }
-                
-                onAuthStateChanged(auth, (user) => {
+
+                // 2. Inicializar App
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                // 3. Listener de Estado de Autenticación
+                onAuthStateChanged(auth, async (user) => {
                     if (user) {
-                        currentUserId = user.uid;
-                        if (currentState !== APP_STATE.PROFILE) {
-                             renderState(APP_STATE.PROFILE);
-                        }
+                        userId = user.uid;
+                        document.getElementById('user-id-display').textContent = userId;
+                        navigateTo('dashboard-screen');
                     } else {
-                        currentUserId = null;
-                        if (currentState === APP_STATE.LOADING || initialAuthAttempted) {
-                            renderState(APP_STATE.LOGIN); 
-                        } else {
-                             signInAnonymously(auth).catch(e => {
-                                 console.error("Fallo el login anónimo:", e);
-                                 renderState(APP_STATE.LOGIN);
-                             });
-                        }
+                        userId = null;
+                        document.getElementById('user-id-display').textContent = 'No autenticado';
+                        navigateTo('login-screen');
                     }
+                    isAuthReady = true;
+                    console.log(`Estado de Auth cambiado. User ID: ${userId}`);
                 });
 
+                // 4. Autenticación Inicial (Token o Anónima)
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                    console.log("Autenticación con token personalizado exitosa.");
+                } else {
+                    await signInAnonymously(auth);
+                    console.warn("Autenticación anónima utilizada (No hay token personalizado).");
+                }
+
+            } catch (e) {
+                console.error("Error grave durante la inicialización de Firebase:", e);
+                showMessage('Fallo en la inicialización de Firebase. Revisa la consola.', 'error');
+                isAuthReady = true;
+            }
+        }
+
+        // --- LÓGICA DE NEGOCIO ---
+        
+        /**
+         * Intenta iniciar sesión con email y contraseña.
+         */
+        async function apiLogin(email, password) {
+            if (!auth) return { success: false, error: "Firebase no inicializado." };
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                // onAuthStateChanged maneja la navegación después de este éxito.
+                return { success: true };
+
             } catch (error) {
-                // Este catch atrapa errores durante initializeApp si la configuración es incorrecta.
-                displayAppError(`Fallo al inicializar o autenticar Firebase (Configuración Incorrecta): ${error.message}`);
+                console.error("Error de login:", error.code, error.message);
+                let errorMessage = "Credenciales incorrectas o error desconocido.";
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                    errorMessage = "Email o contraseña incorrectos.";
+                }
+                return { success: false, error: errorMessage };
             }
         }
 
-        // --- Vistas (Templates HTML) ---
-
-        function renderState(state, message = null) {
-            currentState = state;
-            const appContainer = document.getElementById('app');
-            appContainer.innerHTML = ''; // Limpiar el contenedor
-            
-            // Ajustar clases del body y el contenedor principal para el scroll
-            const isProfile = state === APP_STATE.PROFILE;
-            document.body.style.overflowY = isProfile ? 'auto' : 'hidden';
-            if (isProfile) {
-                 appContainer.classList.remove('justify-center');
-                 appContainer.classList.add('justify-start', 'pt-10', 'pb-20');
-            } else {
-                appContainer.classList.remove('justify-start', 'pt-10', 'pb-20');
-                appContainer.classList.add('justify-center');
+        /**
+         * Cierra la sesión del usuario.
+         */
+        async function apiLogout() {
+            if (!auth) return { success: false, error: "Firebase no inicializado." };
+            try {
+                await signOut(auth);
+                // onAuthStateChanged maneja la navegación después de este éxito.
+                return { success: true };
+            } catch (error) {
+                console.error("Error de logout:", error);
+                return { success: false, error: "Error al cerrar sesión." };
             }
-
-
-            switch (state) {
-                case APP_STATE.LOADING:
-                    appContainer.innerHTML = createLoadingScreen(message || "Inicializando la aplicación...");
-                    break;
-                case APP_STATE.LOGIN:
-                    appContainer.innerHTML = createLoginView(message);
-                    setupLoginListeners();
-                    break;
-                case APP_STATE.PROFILE:
-                    appContainer.innerHTML = createProfileView();
-                    loadUserProfile();
-                    break;
-                case APP_STATE.ERROR:
-                     appContainer.innerHTML = createErrorScreen(message || "Ha ocurrido un error inesperado.");
-                     break;
-            }
-            // Inicializar iconos de Lucide
-            lucide.createIcons();
         }
 
-        function createLoadingScreen(message) {
-             return `
-                <div class="p-8 text-center bg-gray-900 bg-opacity-70 rounded-xl shadow-2xl">
-                    <svg class="animate-spin h-8 w-8 text-blue-400 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <p class="text-lg font-semibold text-gray-300">${message}</p>
-                </div>
-            `;
-        }
-        
-        function createErrorScreen(message) {
-             const isWarning = message.includes('ADVERTENCIA');
-             return `
-                <div class="login-panel p-8 w-full max-w-sm rounded-xl shadow-2xl border-red-500 border-2">
-                    <div class="flex flex-col items-center mb-6">
-                        <i data-lucide="alert-triangle" class="w-12 h-12 text-${isWarning ? 'yellow' : 'red'}-400 mb-2"></i>
-                        <h1 class="text-3xl font-extrabold text-white">${isWarning ? 'Problema de Entorno' : 'Error Fatal'}</h1>
-                    </div>
-                    <p class="text-center text-${isWarning ? 'yellow' : 'red'}-300 mb-6 whitespace-pre-wrap">${message}</p>
-                    ${!isWarning ? `
-                    <button onclick="window.location.reload()" 
-                        class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition duration-200">
-                        Intentar Recargar
-                    </button>
-                    ` : `<button onclick="renderState(APP_STATE.LOGIN)" 
-                        class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition duration-200">
-                        Ir al Login Manual
-                    </button>`}
-                </div>
-            `;
-        }
 
-        function createLoginView(warningMessage) {
-            // Mostrar la advertencia si se recibió un mensaje (de la contingencia)
-            const warningHtml = warningMessage ? `
-                <div class="p-3 mb-4 bg-yellow-900 border border-yellow-700 rounded-lg text-yellow-300 text-xs font-medium">
-                    ${warningMessage.replace('⚠ ADVERTENCIA: ', '').replace('. El login automático fallará.', '. Solo se permite el login manual con credenciales de Firestore.')}
-                </div>
-            ` : '';
+        // --- MANEJADORES DE EVENTOS ---
 
-            return `
-                <div id="login-form-container" class="login-panel p-8 sm:p-12 w-full max-w-sm rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition duration-500 hover:shadow-[0_25px_60px_rgba(59,130,246,0.3)]">
-                    <div class="flex flex-col items-center mb-8">
-                        <i data-lucide="dumbbell" class="w-12 h-12 text-blue-400 mb-2"></i>
-                        <h1 class="text-3xl font-extrabold text-white">Gymenez Acceso</h1>
-                        <p class="text-sm text-gray-400 mt-1">Ingresa tu cuenta de administrador</p>
-                    </div>
+        /**
+         * Maneja el evento de envío del formulario de login.
+         */
+        async function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('login-button');
 
-                    ${warningHtml}
-
-                    <form id="login-form" class="space-y-6">
-                        <div>
-                            <label for="email" class="text-sm font-medium text-gray-300 flex items-center mb-1">
-                                <i data-lucide="mail" class="w-4 h-4 mr-2"></i>
-                                Email
-                            </label>
-                            <input type="email" id="email" placeholder="tu.email@dominio.com" required
-                                class="input-minimal w-full p-3 rounded-lg text-sm text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 outline-none transition duration-200">
-                        </div>
-                        
-                        <div>
-                            <label for="password" class="text-sm font-medium text-gray-300 flex items-center mb-1">
-                                <i data-lucide="lock" class="w-4 h-4 mr-2"></i>
-                                Contraseña
-                            </label>
-                            <input type="password" id="password" placeholder="••••••••" required
-                                class="input-minimal w-full p-3 rounded-lg text-sm text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 outline-none transition duration-200">
-                        </div>
-                        
-                        <button type="submit" id="login-button"
-                            class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg transition duration-200 ease-in-out transform hover:scale-[1.01]">
-                            Iniciar Sesión
-                        </button>
-                    </form>
-                    <p id="error-message" class="text-center text-red-400 mt-4 text-sm font-medium transition duration-300 opacity-0"></p>
-                </div>
-            `;
-        }
-
-        function createProfileView() {
-            return `
-                <div class="w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-                    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-6 border-b border-gray-700 mb-8">
-                        <h1 class="text-3xl font-extrabold text-white flex items-center mb-4 sm:mb-0">
-                            <i data-lucide="user-circle" class="w-8 h-8 mr-3 text-blue-400"></i>
-                            Mi Perfil de Cliente
-                        </h1>
-                        <div class="flex items-center space-x-4">
-                            <p class="text-sm text-gray-400">ID: <code class="bg-gray-700 px-2 py-1 rounded text-xs text-yellow-300">${currentUserId || 'N/A'}</code></p>
-                            <button id="logout-button" class="flex items-center text-red-400 hover:text-red-500 transition duration-200 text-sm font-semibold p-2 rounded-lg bg-gray-800 hover:bg-gray-700">
-                                <i data-lucide="log-out" class="w-4 h-4 mr-2"></i>
-                                Cerrar Sesión
-                            </button>
-                        </div>
-                    </header>
-
-                    <div id="profile-content" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        
-                        <!-- Columna 1: Información Básica -->
-                        <div class="lg:col-span-1 bg-gray-800 p-6 rounded-xl shadow-xl border border-gray-700 h-fit sticky top-10">
-                            <h2 class="text-xl font-bold mb-4 border-b border-gray-700 pb-2 text-blue-400 flex items-center">
-                                <i data-lucide="clipboard-list" class="w-5 h-5 mr-2"></i>
-                                Datos Básicos
-                            </h2>
-                            <dl class="space-y-3">
-                                ${createDetailRow('profile-name', 'Nombre Completo:')}
-                                ${createDetailRow('profile-email', 'Email:')}
-                                ${createDetailRow('profile-age', 'Edad:')}
-                                ${createDetailRow('profile-sex', 'Sexo:')}
-                                ${createDetailRow('profile-dob', 'Fecha de Nacimiento:')}
-                                ${createDetailRow('profile-active-since', 'Activo Desde:')}
-                            </dl>
-                        </div>
-
-                        <!-- Columna 2 & 3: Métricas Físicas y Corporales -->
-                        <div class="lg:col-span-2 space-y-8">
-                             <!-- Card de Métricas Generales -->
-                            <div class="bg-gray-800 p-6 rounded-xl shadow-xl border border-gray-700">
-                                <h2 class="text-xl font-bold mb-4 border-b border-gray-700 pb-2 text-blue-400 flex items-center">
-                                    <i data-lucide="scale" class="w-5 h-5 mr-2"></i>
-                                    Métricas Generales
-                                </h2>
-                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                    ${createMetricBox('profile-weight', 'Peso', 'kg', 'barbell')}
-                                    ${createMetricBox('profile-stature', 'Estatura', 'm', 'ruler')}
-                                    ${createMetricBox('profile-bmi', 'IMC (BMI)', 'kg/m²', 'activity')}
-                                </div>
-                            </div>
-
-                            <!-- Card de Mediciones Corporales (Todos los parámetros requeridos) -->
-                            <div class="bg-gray-800 p-6 rounded-xl shadow-xl border border-gray-700">
-                                <h2 class="text-xl font-bold mb-4 border-b border-gray-700 pb-2 text-blue-400 flex items-center">
-                                    <i data-lucide="tape-measure" class="w-5 h-5 mr-2"></i>
-                                    Mediciones Corporales (cm)
-                                </h2>
-                                
-                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
-                                    <!-- Tronco -->
-                                    <div class="sm:col-span-3 lg:col-span-3"><p class="text-sm text-gray-500 font-bold mb-2 mt-2 border-t border-gray-700 pt-2">Tronco:</p></div>
-                                    ${createDetailRow('profile-thorax', 'Tórax:')}
-                                    ${createDetailRow('profile-waist', 'Cintura:')}
-                                    
-                                    <!-- Brazos -->
-                                    <div class="sm:col-span-3 lg:col-span-3"><p class="text-sm text-gray-500 font-bold mt-4 mb-2 border-t border-gray-700 pt-2">Brazos:</p></div>
-                                    ${createDetailRow('profile-arm-left', 'Brazo Izquierdo:')}
-                                    ${createDetailRow('profile-arm-right', 'Brazo Derecho:')}
-                                    ${createDetailRow('profile-forearm-left', 'Antebrazo Izquierdo:')}
-                                    ${createDetailRow('profile-forearm-right', 'Antebrazo Derecho:')}
-                                    
-                                    <!-- Piernas -->
-                                    <div class="sm:col-span-3 lg:col-span-3"><p class="text-sm text-gray-500 font-bold mt-4 mb-2 border-t border-gray-700 pt-2">Piernas:</p></div>
-                                    ${createDetailRow('profile-quad-left', 'Cuádriceps Izquierdo:')}
-                                    ${createDetailRow('profile-quad-right', 'Cuádriceps Derecho:')}
-                                    ${createDetailRow('profile-calf-left', 'Gemelo Izquierdo:')}
-                                    ${createDetailRow('profile-calf-right', 'Gemelo Derecho:')}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="profile-message" class="mt-6 p-4 bg-red-800 rounded-xl hidden text-white font-medium shadow-lg"></div>
-                </div>
-            `;
-        }
-        
-        // Helper para filas de detalle
-        function createDetailRow(id, label) {
-            return `
-                <div class="flex justify-between items-center border-b border-gray-700 pb-1">
-                    <dt class="text-gray-400">${label}</dt>
-                    <dd id="${id}" class="font-semibold text-white">Cargando...</dd>
-                </div>
-            `;
-        }
-
-        // Helper para cajas de métricas principales
-        function createMetricBox(id, label, unit, icon) {
-            return `
-                <div class="p-4 bg-gray-900 rounded-lg flex flex-col items-center justify-center text-center shadow-inner border border-gray-700">
-                    <i data-lucide="${icon}" class="w-6 h-6 text-blue-300 mb-1"></i>
-                    <p class="text-xs font-medium text-gray-400 uppercase">${label}</p>
-                    <p id="${id}" class="text-2xl font-extrabold text-blue-400 mt-1">N/A</p>
-                    <p class="text-sm text-gray-500">${unit}</p>
-                </div>
-            `;
-        }
-
-        // --- Manejadores de Eventos y Lógica ---
-
-        function setupLoginListeners() {
-            const form = document.getElementById('login-form');
-            const errorMessage = document.getElementById('error-message');
-            const loginButton = document.getElementById('login-button');
-
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                // Verificamos que Firebase esté inicializado antes de buscar en la DB
-                if (!db) {
-                     displayError("Error: Conexión a la base de datos no disponible.", errorMessage);
-                     return;
-                }
-                
-                const email = document.getElementById('email').value.trim();
-                const password = document.getElementById('password').value;
-                
-                if (!email || !password) {
-                    displayError("Por favor, ingresa email y contraseña.", errorMessage);
-                    return;
-                }
-
-                loginButton.disabled = true;
-                loginButton.textContent = 'Verificando...';
-                displayError("", errorMessage, false); 
-
-                let success = false;
-                
-                try {
-                    // 1. Buscar usuario por email en la colección 'users'
-                    // Utilizamos la ruta pública requerida por el entorno
-                    const usersCollectionPath = `artifacts/${appId}/public/data/users`;
-                    const q = query(collection(db, usersCollectionPath), where('email', '==', email));
-                    const querySnapshot = await getDocs(q);
-                    
-                    if (querySnapshot.empty) {
-                        displayError("Usuario no encontrado.", errorMessage);
-                        return;
-                    }
-
-                    const userDoc = querySnapshot.docs[0];
-                    const finalUserId = userDoc.id;
-                    const userData = userDoc.data();
-
-                    // 2. Verificar la Contraseña 
-                    // NOTA: 'password_hash' es el campo esperado en el documento de usuario
-                    if (userData.password_hash === password) {
-                        currentUserId = finalUserId;
-                        success = true;
-                    } else {
-                        displayError("Contraseña incorrecta.", errorMessage);
-                    }
-
-                } catch (error) {
-                    console.error("Error en el proceso de login:", error);
-                    displayError(`Error al conectar con Firestore: ${error.message}`, errorMessage);
-                } finally {
-                    loginButton.disabled = false;
-                    loginButton.textContent = 'Iniciar Sesión';
-                }
-
-                if (success) {
-                    renderState(APP_STATE.PROFILE); 
-                }
-            });
-        }
-
-        function displayError(message, element, show = true) {
-            element.textContent = message;
-            element.style.opacity = show ? '1' : '0';
-        }
-
-        function setupProfileListeners() {
-            document.getElementById('logout-button').addEventListener('click', async () => {
-                try {
-                    if (auth) {
-                        await auth.signOut();
-                    }
-                    renderState(APP_STATE.LOGIN); 
-                } catch (error) {
-                    console.error("Error al cerrar sesión:", error);
-                    renderState(APP_STATE.LOGIN); 
-                }
-            });
-        }
-        
-        async function loadUserProfile() {
-            if (!currentUserId || !db) {
-                document.getElementById('profile-message').textContent = "Error: No se pudo cargar el perfil. ID de usuario o conexión DB faltante.";
-                document.getElementById('profile-message').classList.remove('hidden');
+            if (!isAuthReady) {
+                showMessage('La autenticación aún no está lista. Inténtalo de nuevo.', 'info');
                 return;
             }
 
-            const messageElement = document.getElementById('profile-message');
-            messageElement.classList.add('hidden');
+            btn.disabled = true;
+            btn.textContent = 'Ingresando...';
+
+            const response = await apiLogin(email, password);
             
-            // Cargar datos del perfil usando las rutas de colección públicas del entorno
-            try {
-                const profilePath = `artifacts/${appId}/public/data/profiles`;
-                const userPath = `artifacts/${appId}/public/data/users`;
-
-                const profileRef = doc(db, profilePath, currentUserId);
-                const userRef = doc(db, userPath, currentUserId);
-
-                const [profileSnap, userSnap] = await Promise.all([
-                    getDoc(profileRef),
-                    getDoc(userRef)
-                ]);
-
-                if (!profileSnap.exists()) {
-                    messageElement.textContent = `Error: No se encontró perfil para el ID: ${currentUserId} en ${profilePath}. Asegúrate de crearlo en la App Admin.`;
-                    messageElement.classList.remove('hidden');
-                    return;
-                }
-
-                const profileData = profileSnap.data();
-                const userData = userSnap.data() || {};
-                
-                // Rellenar DATOS BÁSICOS
-                document.getElementById('profile-name').textContent = `${profileData.name || 'N/A'} ${profileData.last_name || ''}`;
-                document.getElementById('profile-email').textContent = userData.email || 'N/A';
-                document.getElementById('profile-age').textContent = `${profileData.age || 'N/A'} años`;
-                document.getElementById('profile-sex').textContent = profileData.sex || 'N/A';
-                document.getElementById('profile-dob').textContent = profileData.dob || 'N/A';
-                document.getElementById('profile-active-since').textContent = profileData.activo_desde || 'N/A';
-                
-                // Rellenar MÉTRICAS GENERALES
-                const weight = parseFloat(profileData.weight);
-                const stature = parseFloat(profileData.stature); // en metros
-                
-                document.getElementById('profile-weight').textContent = isNaN(weight) ? 'N/A' : `${weight.toFixed(1)} kg`;
-                document.getElementById('profile-stature').textContent = isNaN(stature) ? 'N/A' : `${stature.toFixed(2)} m`;
-                
-                // Calcular y mostrar IMC (BMI)
-                if (!isNaN(weight) && !isNaN(stature) && stature > 0) {
-                    const bmi = weight / (stature * stature);
-                    document.getElementById('profile-bmi').textContent = bmi.toFixed(1);
-                } else {
-                    document.getElementById('profile-bmi').textContent = 'N/A';
-                }
-
-                // Rellenar MEDICIONES CORPORALES
-                // Mapeo entre el ID del elemento HTML y la clave de Firestore
-                const bodyMeasurements = {
-                    // Tronco
-                    'profile-thorax': 'thorax',
-                    'profile-waist': 'waist',
-                    // Brazos
-                    'profile-arm-left': 'arm_left', 'profile-arm-right': 'arm_right',
-                    'profile-forearm-left': 'forearm_left', 'profile-forearm-right': 'forearm_right',
-                    // Piernas
-                    'profile-quad-left': 'quad_left', 'profile-quad-right': 'quad_right',
-                    'profile-calf-left': 'calf_left', 'profile-calf-right': 'calf_right',
-                };
-                
-                for (const [elementId, fieldKey] of Object.entries(bodyMeasurements)) {
-                    let value = profileData[fieldKey];
-                    // Aseguramos que la unidad se muestre solo si hay un valor numérico
-                    const formattedValue = (value !== undefined && value !== null && !isNaN(parseFloat(value))) ? `${parseFloat(value).toFixed(1)} cm` : 'N/A';
-                    document.getElementById(elementId).textContent = formattedValue;
-                }
-
-                setupProfileListeners();
-                
-            } catch (error) {
-                console.error("Error al cargar el perfil:", error);
-                messageElement.textContent = `Error al cargar los datos: ${error.message}`;
-                messageElement.classList.remove('hidden');
+            if (response.success) {
+                showMessage('¡Bienvenido!', 'success');
+            } else {
+                showMessage(response.error, 'error');
             }
+            
+            btn.disabled = false;
+            btn.textContent = 'INGRESAR';
         }
 
-        // --- Inicio de la Aplicación ---
-        initializeFirebase();
+        /**
+         * Cierra la sesión del usuario.
+         */
+        async function handleLogout() {
+            const btn = document.getElementById('logout-button');
+            const originalText = btn.textContent;
+            
+            btn.disabled = true;
+            btn.textContent = 'Cerrando...';
 
+            const response = await apiLogout();
+            
+            if (response.success) {
+                showMessage('Sesión cerrada correctamente.', 'success');
+            } else {
+                showMessage('Error al cerrar sesión.', 'error');
+            }
+
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
+
+        // --- Lógica de Inicialización ---
+        window.onload = function() {
+            // Inicializar Firebase y Autenticación
+            initializeFirebaseAndAuth();
+
+            // Iniciar la transición de la pantalla de carga al login/dashboard
+            setTimeout(transitionToLogin, SPLASH_DURATION_MS);
+
+            // --- LISTENERS DE FORMULARIO ---
+            // Los listeners deben agregarse DESPUÉS de que se ha renderizado el HTML
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
+            const logoutButton = document.getElementById('logout-button');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', handleLogout);
+            }
+        };
     </script>
 </body>
 </html>
