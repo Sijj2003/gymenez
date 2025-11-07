@@ -23,6 +23,13 @@
             color: #e5e7eb; 
             /* Transición para un cambio de fondo suave */
             transition: background-image 1s ease-in-out; 
+            
+            /* === NUEVO: Borde negro para todas las letras (Text Stroke Effect) === */
+            text-shadow: 
+                -0.5px -0.5px 0 #000,  
+                 0.5px -0.5px 0 #000,
+                -0.5px  0.5px 0 #000,
+                 0.5px  0.5px 0 #000;
         }
         
         /* Estilo específico para el efecto Glassmorphism en las tarjetas */
@@ -113,6 +120,7 @@
         }
 
         /* === ESTILO: Sombra/Borde para el texto del Header (Gris) === */
+        /* Esta sombra se mantiene y se suma al nuevo borde negro */
         .text-border-gray {
             text-shadow: 0 0 3px #4b5563; 
         }
@@ -394,7 +402,6 @@
             if (loading) loading.remove(); 
 
             if (routines.length === 0) {
-                // Modificado: text-gray-500 a text-gray-300
                 container.innerHTML = '<p class="text-gray-300">No hay rutinas disponibles.</p>';
                 return;
             }
@@ -417,7 +424,6 @@
         async function loadDashboardData() {
             if (!CURRENT_USER_SESSION) return;
             const routinesContainer = document.getElementById('routines-container');
-            // Modificado: text-gray-500 a text-gray-300
             routinesContainer.innerHTML = '<div class="text-center p-4 text-gray-300" id="routines-loading">Cargando rutinas...</div>';
             const userId = CURRENT_USER_SESSION._id || CURRENT_USER_SESSION.id;
             const response = await apiFetchUserData(userId);
