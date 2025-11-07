@@ -68,35 +68,46 @@
     <!-- Firebase Imports -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, where, getDocs, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Globales de Configuración (MANDATORIAS DEL ENTORNO)
+        // Activamos los logs de depuración para facilitar el diagnóstico.
+        setLogLevel('debug');
+
+        // ====================================================================
+        // PASO CLAVE 1: Acceder a las variables globales de configuración
+        // Aseguramos que el acceso a las variables globales sea a prueba de fallos.
+        // ====================================================================
+        let firebaseConfig = {};
+        try {
+            // Intentamos parsear la configuración. Si no existe, usamos un objeto vacío.
+            firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        } catch (e) {
+            console.error("ERROR CRÍTICO: No se pudo parsear __firebase_config.", e);
+        }
+
+        // Acceso al ID de la aplicación y al token de autenticación
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
 
         let db, auth;
         let currentUserId = null;
 
-        // --- Utilidades ---
-
         const APP_STATE = {
             LOGIN: 'login',
             PROFILE: 'profile',
-            LOADING: 'loading'
+            LOADING: 'loading',
+            ERROR: 'error'
         };
 
         let currentState = APP_STATE.LOADING;
-
-        // Función de retraso con backoff (para el login)
-        const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
         // --- Inicialización y Autenticación de Firebase ---
         
         async function initializeFirebase() {
             if (Object.keys(firebaseConfig).length === 0) {
-                renderState(APP_STATE.LOADING, "Error: Configuración de Firebase no disponible.");
+                renderState(APP_STATE.ERROR, "Error: Configuración de Firebase no disponible o inválida.");
                 return;
             }
             
@@ -105,36 +116,46 @@
                 db = getFirestore(app);
                 auth = getAuth(app);
                 
+                // Establecer la persistencia de la sesión
+                await setPersistence(auth, browserSessionPersistence);
+
+                let initialAuthAttempted = false;
+
                 // 1. Manejo del Token de Autenticación
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
+                    initialAuthAttempted = true;
                 } else {
-                    await signInAnonymously(auth);
+                    // Si no hay token inicial, intentamos el login anónimo, o dejamos que el listener se encargue
+                    // Ya que la persistencia está activa, onAuthStateChanged puede recoger una sesión anterior.
                 }
 
                 // 2. Establecer el listener de estado de autenticación
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         currentUserId = user.uid;
-                        // Si estamos en Canvas (token), vamos directo al perfil. 
-                        // Si no, forzamos el login (solo si no es el primer chequeo).
-                        if (initialAuthToken && user.uid) {
-                            renderState(APP_STATE.PROFILE);
-                        } else if (currentState === APP_STATE.LOADING) {
-                            renderState(APP_STATE.LOGIN); 
-                        } else if (currentState === APP_STATE.LOGIN && user.uid) {
-                             // Esto maneja el flujo de login manual exitoso
-                            renderState(APP_STATE.PROFILE);
+                        // Si el usuario se autentica (por token o sesión previa), mostramos el perfil
+                        if (currentState !== APP_STATE.PROFILE) {
+                             renderState(APP_STATE.PROFILE);
                         }
                     } else {
+                        // Si no hay usuario y ya intentamos el auth inicial, mostramos la pantalla de login
                         currentUserId = null;
-                        renderState(APP_STATE.LOGIN);
+                        if (currentState === APP_STATE.LOADING || initialAuthAttempted) {
+                            renderState(APP_STATE.LOGIN); 
+                        } else {
+                             // Si no se intentó con token, forzar login anónimo (como fallback)
+                             signInAnonymously(auth).catch(e => {
+                                 console.error("Fallo el login anónimo:", e);
+                                 renderState(APP_STATE.LOGIN);
+                             });
+                        }
                     }
                 });
 
             } catch (error) {
                 console.error("Error al inicializar o autenticar Firebase:", error);
-                renderState(APP_STATE.LOADING, `Error de conexión: ${error.message}`);
+                renderState(APP_STATE.ERROR, `Error de conexión/inicialización: ${error.message}`);
             }
         }
 
@@ -146,12 +167,12 @@
             appContainer.innerHTML = ''; // Limpiar el contenedor
             
             // Ajustar clases del body y el contenedor principal para el scroll
-            if (state === APP_STATE.PROFILE) {
-                 document.body.style.overflowY = 'auto';
+            const isProfile = state === APP_STATE.PROFILE;
+            document.body.style.overflowY = isProfile ? 'auto' : 'hidden';
+            if (isProfile) {
                  appContainer.classList.remove('justify-center');
                  appContainer.classList.add('justify-start', 'pt-10', 'pb-20');
             } else {
-                document.body.style.overflowY = 'hidden';
                 appContainer.classList.remove('justify-start', 'pt-10', 'pb-20');
                 appContainer.classList.add('justify-center');
             }
@@ -169,6 +190,9 @@
                     appContainer.innerHTML = createProfileView();
                     loadUserProfile();
                     break;
+                case APP_STATE.ERROR:
+                     appContainer.innerHTML = createErrorScreen(message || "Ha ocurrido un error inesperado.");
+                     break;
             }
             // Inicializar iconos de Lucide
             lucide.createIcons();
@@ -188,6 +212,22 @@
             `;
         }
         
+        function createErrorScreen(message) {
+             return `
+                <div class="login-panel p-8 w-full max-w-sm rounded-xl shadow-2xl border-red-500 border-2">
+                    <div class="flex flex-col items-center mb-6">
+                        <i data-lucide="alert-triangle" class="w-12 h-12 text-red-400 mb-2"></i>
+                        <h1 class="text-3xl font-extrabold text-white">Error Fatal</h1>
+                    </div>
+                    <p class="text-center text-red-300 mb-6">${message}</p>
+                    <button onclick="window.location.reload()" 
+                        class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition duration-200">
+                        Intentar Recargar
+                    </button>
+                </div>
+            `;
+        }
+
         function createLoginView() {
             return `
                 <div id="login-form-container" class="login-panel p-8 sm:p-12 w-full max-w-sm rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition duration-500 hover:shadow-[0_25px_60px_rgba(59,130,246,0.3)]">
@@ -347,8 +387,6 @@
                 loginButton.textContent = 'Verificando...';
                 displayError("", errorMessage, false); 
 
-                let userDoc = null;
-                let finalUserId = null;
                 let success = false;
                 
                 try {
@@ -361,16 +399,14 @@
                         return;
                     }
 
-                    userDoc = querySnapshot.docs[0];
-                    finalUserId = userDoc.id;
+                    const userDoc = querySnapshot.docs[0];
+                    const finalUserId = userDoc.id;
                     const userData = userDoc.data();
 
-                    // 2. Verificar la Contraseña
+                    // 2. Verificar la Contraseña (simple hash/password_hash check)
                     if (userData.password_hash === password) {
                         currentUserId = finalUserId;
                         success = true;
-                        // Forzar una autenticación de Firebase si no estamos en Canvas
-                        // (Aunque para este ejercicio, solo establecemos el ID y navegamos)
                     } else {
                         displayError("Contraseña incorrecta.", errorMessage);
                     }
@@ -384,8 +420,7 @@
                 }
 
                 if (success) {
-                    // El listener onAuthStateChanged no se activará si no usamos signInWithEmailAndPassword, 
-                    // así que navegamos manualmente al perfil
+                    // Forzamos la navegación al perfil tras el login manual
                     renderState(APP_STATE.PROFILE); 
                 }
             });
@@ -446,8 +481,8 @@
                 const weight = profileData.weight;
                 const stature = profileData.stature; // en metros
                 
-                document.getElementById('profile-weight').textContent = weight ? `${weight}` : 'N/A';
-                document.getElementById('profile-stature').textContent = stature ? `${stature}` : 'N/A';
+                document.getElementById('profile-weight').textContent = weight ? `${weight} kg` : 'N/A';
+                document.getElementById('profile-stature').textContent = stature ? `${stature} m` : 'N/A';
                 
                 // Calcular y mostrar IMC (BMI)
                 if (weight && stature && stature > 0) {
@@ -473,7 +508,9 @@
                 
                 for (const [elementId, [fieldKey, unit]] of Object.entries(bodyMeasurements)) {
                     const value = profileData[fieldKey];
-                    document.getElementById(elementId).textContent = value !== undefined ? `${value} ${unit}` : 'N/A';
+                    // Aseguramos que la unidad se muestre solo si hay un valor numérico
+                    const formattedValue = (value !== undefined && value !== null) ? `${parseFloat(value).toFixed(1)} ${unit}` : 'N/A';
+                    document.getElementById(elementId).textContent = formattedValue;
                 }
 
                 setupProfileListeners();
