@@ -4,24 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GYMENEZ</title>
-    <!-- FAVICON AGREGADO AQUÍ -->
     <link rel="icon" type="image/png" href="mini_logo.png">
     <link rel="shortcut icon" type="image/png" href="mini_logo.png">
-
+    <!-- Carga de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        /* Tema de Fondo Minimalista: Base Oscura (DEFAULT/LOGIN) */
         body {
             font-family: 'Inter', sans-serif;
-            /* Configuración del fondo para que cubra toda la página */
             background-color: #0d0d1a;
-            /* Asegúrate de que 'FONDO.png' esté subido a Vercel */
-            background-image: url('FONDO.png'); 
+            /* Fondo Inicial (LOGIN) */
+            background-image: url('FONDO.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
+            color: #e5e7eb; 
+            /* Transición para un cambio de fondo suave */
+            transition: background-image 1s ease-in-out; 
         }
+        
         /* Estilo específico para el efecto Glassmorphism en las tarjetas */
         .glass-card {
             background: rgba(255, 255, 255, 0.05);
@@ -30,275 +34,358 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
         }
-        /* Estilo para el botón de video */
-        .video-btn {
-            transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-        .video-btn:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-            transform: translateY(-1px);
+
+        /* Estilo para mensajes (Toast/Alerta) */
+        #message-box {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s, transform 0.5s;
+            transform: translateY(-50px);
         }
 
-        /* Estilo para las pantallas */
-        .screen {
-            display: none;
-            min-height: 100vh;
+        #message-box.show {
+            opacity: 1;
+            transform: translateY(0);
         }
-        /* Mostrar solo la pantalla activa */
-        .screen.active {
-            display: flex;
+        
+        /* Estilo para el botón de login */
+        #login-button {
+            transition: all 0.3s ease;
         }
+
+        /* Colores para estados del mensaje */
+        .msg-success { background-color: #10b981; } /* Emerald-500 */
+        .msg-error { background-color: #ef4444; } /* Red-500 */
     </style>
 </head>
-<body class="text-white">
-    <div id="message-box" class="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-sm p-4 z-50 transition-all duration-300 opacity-0 hidden">
-        <div id="message-content" class="rounded-lg shadow-xl p-4 text-sm font-semibold"></div>
+<body class="selection:bg-purple-600 selection:text-white">
+
+    <!-- Mensaje de Alerta/Toast -->
+    <div id="message-box" class="p-4 rounded-lg text-white font-semibold shadow-2xl"></div>
+
+    <!-- PANTALLA DE SPLASH -->
+    <div id="splash-screen" class="flex flex-col items-center justify-center min-h-screen transition-opacity duration-1000 bg-[#0d0d1a]">
+        <img id="splash-logo" src="LOADING.png" alt="Loading" class="w-24 h-24 object-contain animate-pulse">
+        <p class="text-xl mt-4 text-gray-400">Cargando GYMENEZ...</p>
     </div>
 
-    <!-- 1. PANTALLA DE SPLASH -->
-    <div id="splash-screen" class="screen active justify-center items-center flex-col">
-        <img src="LOADING.png" alt="Logo de Carga" class="w-24 h-24 mb-4 animate-pulse">
-        <p class="text-xl font-bold">Cargando GYMENEZ...</p>
-    </div>
-
-    <!-- 2. PANTALLA DE LOGIN -->
-    <div id="login-screen" class="screen justify-center items-center p-4">
-        <div class="glass-card w-full max-w-md p-8 rounded-xl">
-            <h1 class="text-3xl font-extrabold text-center mb-6">GYMENEZ</h1>
-            <p class="text-center text-gray-400 mb-8">Ingresa tus credenciales para acceder a tu rutina.</p>
-
-            <form id="login-form">
-                <div class="mb-4">
-                    <label for="email" class="block text-sm font-medium mb-2">Email:</label>
-                    <input type="email" id="email" name="email" required class="w-full p-3 rounded-lg bg-white/10 border border-white/15 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-gray-500" placeholder="tu_email@ejemplo.com">
+    <!-- PANTALLA DE LOGIN -->
+    <div id="login-screen" class="hidden flex items-center justify-center min-h-screen">
+        <div class="glass-card p-8 w-full max-w-md mx-auto rounded-3xl text-center">
+            <img src="logo gymenez sin fondo.png" alt="GYMENEZ Logo" class="w-48 mx-auto mb-6">
+            <h1 class="text-3xl font-bold mb-6 text-purple-400">BIENVENIDO</h1>
+            
+            <form id="login-form" class="space-y-6">
+                <!-- Campo ID de Usuario -->
+                <div>
+                    <input type="text" id="user-id" placeholder="ID de Usuario" required
+                           class="w-full px-4 py-3 rounded-xl bg-white bg-opacity-10 border border-gray-700 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 text-white placeholder-gray-400 outline-none transition duration-200"
+                           value="12345">
                 </div>
-                <div class="mb-6">
-                    <label for="password" class="block text-sm font-medium mb-2">Contraseña:</label>
-                    <input type="password" id="password" name="password" required class="w-full p-3 rounded-lg bg-white/10 border border-white/15 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-gray-500" placeholder="••••••••">
+                
+                <!-- Campo Contraseña -->
+                <div>
+                    <input type="password" id="password" placeholder="Contraseña" required
+                           class="w-full px-4 py-3 rounded-xl bg-white bg-opacity-10 border border-gray-700 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 text-white placeholder-gray-400 outline-none transition duration-200"
+                           value="password">
                 </div>
-                <button type="submit" id="login-button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition duration-200 shadow-md">
+                
+                <!-- Botón de Ingreso -->
+                <button type="submit" id="login-button"
+                        class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl shadow-lg hover:shadow-purple-500/50 transform hover:scale-[1.02] transition duration-300 ease-in-out">
                     INGRESAR
                 </button>
             </form>
+
+            <p class="mt-6 text-sm text-gray-400">
+                ¿Problemas para acceder? Contacte a soporte.
+            </p>
         </div>
     </div>
 
-    <!-- 3. PANTALLA DEL DASHBOARD PRINCIPAL (RUTINAS SEMANALES) -->
-    <div id="dashboard-screen" class="screen flex-col p-4 md:p-10">
-        <!-- Header -->
-        <header class="w-full max-w-4xl mx-auto flex justify-between items-center py-4 border-b border-white/10 mb-8">
-            <h1 class="text-2xl font-bold">Bienvenido, <span id="welcome-name" class="text-blue-400">Usuario</span>!</h1>
-            <button id="logout-button" class="bg-red-600 hover:bg-red-700 text-white text-sm font-semibold py-2 px-4 rounded-full transition duration-200">
-                Salir
+    <!-- PANTALLA DE DASHBOARD (Añadido: Estructura para Perfil y Rutinas) -->
+    <div id="dashboard-screen" class="hidden min-h-screen p-4 sm:p-8">
+        <!-- Header/Nav -->
+        <header class="flex flex-col sm:flex-row justify-between items-center mb-8 space-y-4 sm:space-y-0">
+            <div class="flex items-center space-x-4">
+                <img src="logo gymenez sin fondo.png" alt="GYMENEZ Logo" class="h-8">
+                <h1 class="text-3xl font-extrabold text-purple-400">Dashboard de Usuario</h1>
+            </div>
+            <button id="logout-button" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition duration-200 shadow-xl w-full sm:w-auto">
+                CERRAR SESIÓN
             </button>
         </header>
 
-        <!-- Contenido de Rutinas (Grid de 6 tarjetas) -->
-        <main class="w-full max-w-4xl mx-auto flex-grow">
-            <h2 class="text-xl font-semibold mb-6 text-center md:text-left">Selecciona tu Workout Semanal:</h2>
-            <div id="routines-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Tarjetas generadas dinámicamente por JavaScript -->
-            </div>
-        </main>
-    </div>
-
-    <!-- 4. PANTALLA DE DETALLE DE RUTINA -->
-    <div id="routine-screen" class="screen flex-col p-4 md:p-10">
-        <!-- Header de la rutina -->
-        <header class="w-full max-w-4xl mx-auto flex justify-between items-center py-4 border-b border-white/10 mb-8">
-            <button id="back-to-dashboard" class="text-blue-400 hover:text-blue-500 font-semibold flex items-center" onclick="navigateTo('dashboard-screen')">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-                Volver a la Semana
-            </button>
-            <h1 id="routine-title" class="text-3xl font-bold text-center">Workout [Día]</h1>
-        </header>
-
-        <!-- Lista de Ejercicios -->
-        <main class="w-full max-w-4xl mx-auto flex-grow">
-            <div id="exercise-list" class="space-y-4">
-                <!-- Ejercicios cargados dinámicamente -->
+        <!-- Main Content Area (Utilizando Glassmorphism para consistencia) -->
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Tarjeta de Perfil de Usuario (Sidebar en Desktop) -->
+            <div class="glass-card p-6 w-full lg:w-1/3 rounded-xl min-h-[300px] border-l-4 border-purple-500">
+                <h2 class="text-2xl font-bold mb-4 border-b border-gray-700 pb-2 text-purple-300">Mi Perfil</h2>
+                <div id="profile-details" class="space-y-3">
+                    <p><strong class="text-gray-400">Nombre:</strong> <span id="profile-name" class="block text-xl font-semibold">Cargando...</span></p>
+                    <p><strong class="text-gray-400">Nivel Actual:</strong> <span id="profile-level" class="block text-xl font-semibold text-yellow-400">Cargando...</span></p>
+                    <!-- Campos adicionales (e.g., Edad, etc.) se cargarán aquí -->
+                </div>
             </div>
 
-            <!-- Placeholder de rutina vacía -->
-            <div id="empty-routine-message" class="glass-card p-6 rounded-xl text-center hidden">
-                <p class="text-xl text-gray-400">💪 ¡Rutina por definir!</p>
-                <p class="text-sm text-gray-500 mt-2">El administrador aún no ha cargado los ejercicios para este día.</p>
+            <!-- Área de Rutinas/Dashboard Principal -->
+            <div class="w-full lg:w-2/3">
+                <div class="glass-card p-6 rounded-xl min-h-[300px] border-t-4 border-purple-500">
+                    <h2 class="text-2xl font-bold mb-4 border-b border-gray-700 pb-2 text-purple-300">Mis Rutinas Disponibles</h2>
+                    <div id="routines-list" class="space-y-4">
+                        <p class="text-gray-500">Cargando rutinas...</p>
+                    </div>
+                </div>
             </div>
-            
-            <div id="loading-routine-message" class="glass-card p-6 rounded-xl text-center">
-                <p class="text-xl text-blue-400">Cargando ejercicios...</p>
-                <p class="text-sm text-gray-500 mt-2">Por favor, espera un momento.</p>
-            </div>
-        </main>
+        </div>
     </div>
 
 
     <script>
-        // --- CONFIGURACIÓN Y ESTADO GLOBAL ---
-        const API_BASE_URL = "https://tu-api-en-pythonanywhere.com"; // ¡IMPORTANTE! Reemplaza con tu dominio real
+        // --- CONFIGURACIÓN Y UTILIDADES ---
         const SPLASH_DURATION_MS = 1500;
-        let currentScreen = 'splash-screen';
-        
-        // Estado de autenticación
-        let USER_SESSION = {
-            id: null,
-            token: null,
-            profile: null
-        };
+        const BASE_API_URL = 'http://127.0.0.1:5000/api'; // URL del servidor Flask
 
-        const DAYS_OF_WEEK_ES = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-        
-        // --- UTILIDADES ---
-        
         /**
-         * Muestra un mensaje temporal en la parte superior de la pantalla.
+         * Muestra un mensaje temporal (toast) al usuario.
+         * @param {string} message - El contenido del mensaje.
+         * @param {('success'|'error')} type - El tipo de mensaje (para el color).
          */
-        function showMessage(text, type = 'info') {
-            const box = document.getElementById('message-box');
-            const content = document.getElementById('message-content');
-            
-            let bgColor;
-            if (type === 'success') {
-                bgColor = 'bg-green-600';
-            } else if (type === 'error') {
-                bgColor = 'bg-red-600';
-            } else {
-                bgColor = 'bg-blue-600';
-            }
-            
-            content.className = `rounded-lg shadow-xl p-4 text-sm font-semibold text-white ${bgColor}`;
-            content.textContent = text;
-            box.classList.remove('opacity-0', 'hidden');
-            box.classList.add('opacity-100');
+        function showMessage(message, type) {
+            const msgBox = document.getElementById('message-box');
+            msgBox.textContent = message;
+            msgBox.className = `p-4 rounded-lg text-white font-semibold shadow-2xl ${type === 'success' ? 'msg-success' : 'msg-error'}`;
+            msgBox.classList.add('show');
 
             setTimeout(() => {
-                box.classList.remove('opacity-100');
-                box.classList.add('opacity-0');
-                setTimeout(() => box.classList.add('hidden'), 300);
-            }, 3000);
+                msgBox.classList.remove('show');
+            }, 4000);
         }
 
         /**
-         * Cambia la pantalla visible.
+         * Navega a una pantalla específica, ocultando las demás.
+         * @param {string} screenId - El ID de la pantalla a mostrar (e.g., 'login-screen').
          */
         function navigateTo(screenId) {
-            document.getElementById(currentScreen).classList.remove('active');
-            document.getElementById(screenId).classList.add('active');
-            currentScreen = screenId;
+            ['splash-screen', 'login-screen', 'dashboard-screen'].forEach(id => {
+                const screen = document.getElementById(id);
+                if (screen) {
+                    screen.style.display = (id === screenId) ? 'flex' : 'none';
+                }
+            });
         }
 
+        /**
+         * Transición de Splash a Login.
+         */
         function transitionToLogin() {
             navigateTo('login-screen');
+            // Opcional: Cambiar el fondo si el dashboard tiene uno diferente.
+            document.body.style.backgroundImage = "url('FONDO.png')"; 
         }
-        
-        // --- LLAMADAS AL API ---
+
+        // --- FUNCIONES DE API ---
 
         /**
-         * Función genérica para hacer peticiones POST al API.
+         * Realiza la llamada a la API para login.
+         * @param {string} userId - ID del usuario.
+         * @param {string} password - Contraseña.
+         * @returns {Promise<Object>} - Resultado de la API.
          */
-        async function apiPost(endpoint, data) {
+        async function apiLogin(userId, password) {
             try {
-                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                const response = await fetch(`${BASE_API_URL}/login`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, password: password })
                 });
-                return response.json();
+
+                if (!response.ok) {
+                    // Si el estado HTTP no es 200, lanzar un error
+                    const errorData = await response.json();
+                    return { success: false, error: errorData.error || `Error HTTP: ${response.status}` };
+                }
+
+                const data = await response.json();
+                return data;
+
             } catch (error) {
-                console.error("Error de red o servidor:", error);
-                return { success: false, error: "Error de conexión con el servidor API." };
+                console.error('Error en la llamada a apiLogin:', error);
+                return { success: false, error: 'Error de conexión con el servidor.' };
             }
         }
-        
+
         /**
-         * Función genérica para hacer peticiones GET al API.
+         * Realiza la llamada a la API para cerrar sesión.
          */
-        async function apiGet(endpoint) {
-            try {
-                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                });
-                return response.json();
-            } catch (error) {
-                console.error("Error de red o servidor:", error);
-                return { success: false, error: "Error de conexión con el servidor API." };
-            }
-        }
-
-        async function apiLogin(email, password) {
-            return apiPost('/api/login', { email, password });
-        }
-
         async function apiLogout() {
-            return apiPost('/api/logout', { session_id: USER_SESSION.token });
-        }
-        
-        async function apiGetUserData(userId) {
-            return apiGet(`/api/data/${userId}`);
+            try {
+                // Obtener el ID de usuario de la sesión guardada
+                const session = JSON.parse(localStorage.getItem('userSession'));
+                const userId = session ? session.user_id : null;
+
+                if (!userId) {
+                    localStorage.removeItem('userSession');
+                    return { success: true }; // Simular éxito si no hay sesión
+                }
+
+                const response = await fetch(`${BASE_API_URL}/logout`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    // Enviar solo el ID de usuario para cerrar sesión en el backend si es necesario
+                    body: JSON.stringify({ user_id: userId }) 
+                });
+
+                // Aunque la respuesta no sea 'ok', limpiamos la sesión localmente
+                localStorage.removeItem('userSession');
+                
+                if (response.ok) {
+                    return { success: true };
+                } else {
+                     console.warn(`Logout remoto falló con status ${response.status}, pero sesión local cerrada.`);
+                     return { success: true }; // Considerar un logout local como exitoso
+                }
+
+            } catch (error) {
+                console.error('Error en la llamada a apiLogout:', error);
+                localStorage.removeItem('userSession');
+                return { success: true }; // Considerar un logout local como exitoso
+            }
         }
         
         /**
-         * NUEVO: Obtiene la rutina para un día específico.
+         * Realiza la llamada a la API para obtener el perfil y las rutinas.
+         * @param {string} userId - ID del usuario.
+         * @returns {Promise<Object>} - Resultado de la API.
          */
-        async function apiGetRoutine(day) {
-            return apiGet(`/api/routines/${day}`);
-        }
+        async function apiGetData(userId) {
+            try {
+                const response = await fetch(`${BASE_API_URL}/data/${userId}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
 
-        // --- LÓGICA DE LA APLICACIÓN ---
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    return { success: false, error: errorData.error || `Error HTTP: ${response.status}` };
+                }
 
-        /**
-         * Lógica al iniciar sesión correctamente.
-         */
-        async function handleSuccessfulLogin(userId, sessionId) {
-            USER_SESSION.id = userId;
-            USER_SESSION.token = sessionId;
-            
-            // 1. Cargar datos del perfil
-            const dataResponse = await apiGetUserData(userId);
-            if (dataResponse.success) {
-                USER_SESSION.profile = dataResponse.profile;
-                const welcomeName = USER_SESSION.profile.name || 'Usuario';
-                document.getElementById('welcome-name').textContent = welcomeName.split(' ')[0]; // Muestra solo el primer nombre
-                
-                // 2. Generar las tarjetas de rutina en el dashboard
-                generateRoutineCards();
-                
-                showMessage(`Bienvenido(a), ${welcomeName.split(' ')[0]}!`, 'success');
-                navigateTo('dashboard-screen');
-            } else {
-                showMessage(dataResponse.error || 'Error al cargar el perfil.', 'error');
-                // En caso de error de perfil, redirigir al login y anular la sesión
-                handleLogout();
+                const data = await response.json();
+                return data;
+
+            } catch (error) {
+                console.error('Error en la llamada a apiGetData:', error);
+                return { success: false, error: 'Error al obtener datos del servidor.' };
             }
         }
 
+        // --- LÓGICA DEL DASHBOARD ---
+
         /**
-         * Lógica para el manejo del formulario de login.
+         * Actualiza el HTML del dashboard con los datos del usuario.
+         * @param {Object} data - Objeto que contiene 'profile' y 'routines'.
          */
-        async function handleLogin(event) {
-            event.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+        function updateDashboard(data) {
+            const profile = data.profile || {};
+            const routines = data.routines || [];
+            
+            // 1. Actualizar Detalles del Perfil
+            document.getElementById('profile-name').textContent = profile.name || 'Sin nombre';
+            document.getElementById('profile-level').textContent = profile.level || 'Básico';
+
+            const profileDetails = document.getElementById('profile-details');
+            
+            // Limpiar los detalles existentes (solo mantiene los campos base)
+            profileDetails.innerHTML = `
+                <p><strong class="text-gray-400">Nombre:</strong> <span id="profile-name" class="block text-xl font-semibold">${profile.name || 'Sin nombre'}</span></p>
+                <p><strong class="text-gray-400">Nivel Actual:</strong> <span id="profile-level" class="block text-xl font-semibold text-yellow-400">${profile.level || 'Básico'}</span></p>
+            `;
+            
+            // Agregar otros campos del perfil si existen (ej. edad, activo desde)
+            if (profile.age) {
+                 profileDetails.innerHTML += `<p><strong class="text-gray-400">Edad:</strong> <span class="block text-xl font-semibold">${profile.age} años</span></p>`;
+            }
+            if (profile.activo_desde) {
+                 profileDetails.innerHTML += `<p><strong class="text-gray-400">Activo Desde:</strong> <span class="block text-xl font-semibold">${profile.activo_desde}</span></p>`;
+            }
+
+
+            // 2. Actualizar Lista de Rutinas
+            const routinesList = document.getElementById('routines-list');
+            routinesList.innerHTML = ''; // Limpiar lista
+
+            if (routines.length > 0) {
+                routines.forEach(routine => {
+                    const routineItem = document.createElement('div');
+                    // Usamos el estilo glass-card sutilmente para cada rutina
+                    routineItem.className = 'p-4 glass-card rounded-lg border-l-4 border-purple-400 hover:bg-opacity-10 transition duration-200 cursor-pointer'; 
+                    routineItem.innerHTML = `
+                        <h4 class="text-xl font-bold text-purple-300">${routine.name}</h4>
+                        <p class="text-gray-400 text-sm">Nivel: ${routine.level} | Duración: ${routine.duration}</p>
+                        <p class="mt-1 text-sm text-gray-300">${routine.description.substring(0, 100)}...</p>
+                    `;
+                    // Añadir un listener simple para un futuro detalle
+                    routineItem.addEventListener('click', () => {
+                         showMessage(`Seleccionaste la rutina: ${routine.name}`, 'success');
+                         console.log('Detalle de la rutina:', routine);
+                    });
+                    routinesList.appendChild(routineItem);
+                });
+            } else {
+                routinesList.innerHTML = '<p class="text-gray-500 italic">No hay rutinas asignadas en este momento.</p>';
+            }
+        }
+
+        // --- LÓGICA DE MANEJO DE EVENTOS ---
+
+        /**
+         * Maneja el envío del formulario de login.
+         * @param {Event} e - Evento de formulario.
+         */
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const userId = document.getElementById('user-id').value.trim();
+            const password = document.getElementById('password').value.trim();
             const btn = document.getElementById('login-button');
             
-            btn.disabled = true;
-            btn.textContent = 'Ingresando...';
+            if (!userId || !password) {
+                showMessage('Por favor, ingresa tu ID y contraseña.', 'error');
+                return;
+            }
 
-            const response = await apiLogin(email, password);
-            
-            if (response.success) {
-                handleSuccessfulLogin(response.user_id, response.session_id);
+            btn.disabled = true;
+            btn.textContent = 'Verificando...';
+
+            const loginResponse = await apiLogin(userId, password);
+
+            if (loginResponse.success) {
+                // 1. Guardar la sesión y el token
+                localStorage.setItem('userSession', JSON.stringify({
+                    user_id: userId,
+                    token: loginResponse.token // Asumiendo que el token viene en la respuesta
+                }));
+                
+                // 2. Obtener datos (perfil y rutinas)
+                const dataResponse = await apiGetData(userId);
+
+                if (dataResponse.success) {
+                    updateDashboard(dataResponse);
+                    showMessage(`¡Bienvenido, ${dataResponse.profile.name || userId}!`, 'success');
+                } else {
+                    // Si falla la obtención de datos, aún se inicia sesión pero con alerta
+                    showMessage(`Sesión iniciada, pero error al cargar datos: ${dataResponse.error}`, 'error');
+                    updateDashboard({}); // Cargar dashboard vacío o con info por defecto
+                }
+                
+                // 3. Navegar al dashboard
+                navigateTo('dashboard-screen');
+
             } else {
-                showMessage(response.error, 'error');
-                navigateTo('login-screen');
+                showMessage(loginResponse.error || 'Error de inicio de sesión.', 'error');
             }
             
             btn.disabled = false;
@@ -315,115 +402,49 @@
             btn.disabled = true;
             btn.textContent = 'Cerrando...';
 
-            const response = await apiLogout();
+            await apiLogout(); // La función apiLogout maneja la limpieza local y remota
             
-            if (response.success) {
-                showMessage('Sesión cerrada correctamente.', 'success');
-                USER_SESSION.id = null;
-                USER_SESSION.token = null;
-                USER_SESSION.profile = null;
-                navigateTo('login-screen');
-            } else {
-                showMessage('Error al cerrar sesión.', 'error');
-                // Si el error es solo en el cierre de sesión (token expirado, etc.), igual forzamos el cambio de pantalla.
-                navigateTo('login-screen'); 
-            }
+            showMessage('Sesión cerrada correctamente.', 'success');
+            navigateTo('login-screen');
 
             btn.disabled = false;
             btn.textContent = originalText;
         }
 
-        // --- GESTIÓN DE PANTALLA DE RUTINA ---
-        
-        /**
-         * Genera las 6 tarjetas de rutina en el dashboard.
-         */
-        function generateRoutineCards() {
-            const grid = document.getElementById('routines-grid');
-            grid.innerHTML = ''; // Limpiar grid anterior
-
-            DAYS_OF_WEEK_ES.forEach(day => {
-                const card = document.createElement('div');
-                card.className = 'glass-card p-6 rounded-xl text-center cursor-pointer transform hover:scale-[1.03] transition duration-300 shadow-lg hover:shadow-xl';
-                card.setAttribute('data-day', day);
-                card.onclick = () => loadRoutineDetails(day);
-                
-                card.innerHTML = `
-                    <p class="text-4xl mb-4">🏋️</p>
-                    <h3 class="text-xl font-bold mb-1">WORKOUT ${day.toUpperCase()}</h3>
-                    <p class="text-sm text-gray-400">Toca para ver los ejercicios.</p>
-                `;
-                grid.appendChild(card);
-            });
-        }
-        
-        /**
-         * Carga los detalles de la rutina para el día seleccionado.
-         */
-        async function loadRoutineDetails(day) {
-            navigateTo('routine-screen');
-            
-            // Mostrar estado de carga
-            document.getElementById('routine-title').textContent = `Workout ${day.toUpperCase()}`;
-            document.getElementById('exercise-list').innerHTML = '';
-            document.getElementById('empty-routine-message').classList.add('hidden');
-            document.getElementById('loading-routine-message').classList.remove('hidden');
-
-            const response = await apiGetRoutine(day);
-            document.getElementById('loading-routine-message').classList.add('hidden');
-            
-            if (response.success) {
-                const exercises = response.exercises || [];
-                
-                if (exercises.length === 0) {
-                    document.getElementById('empty-routine-message').classList.remove('hidden');
-                    return;
-                }
-                
-                // RENDERIZAR LA LISTA DE EJERCICIOS
-                const listContainer = document.getElementById('exercise-list');
-                listContainer.innerHTML = '';
-
-                exercises.forEach(ex => {
-                    const exerciseCard = document.createElement('div');
-                    exerciseCard.className = 'glass-card p-4 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between';
-                    
-                    const isIsoText = ex.is_iso ? '<span class="text-yellow-400 font-bold">SÍ</span>' : '<span class="text-gray-400 font-medium">NO</span>';
-                    
-                    exerciseCard.innerHTML = `
-                        <div class="flex-grow min-w-0 mb-3 md:mb-0">
-                            <h4 class="text-lg font-bold text-blue-300 truncate">${ex.name}</h4>
-                            <div class="flex flex-wrap text-sm mt-1 space-x-4">
-                                <p><span class="text-gray-400">REPS/TIEMPO:</span> <span class="font-semibold text-white">${ex.reps}</span></p>
-                                <p><span class="text-gray-400">ISO:</span> ${isIsoText}</p>
-                            </div>
-                        </div>
-                        <a href="${ex.video_url}" target="_blank" class="video-btn bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-full text-sm transition duration-200 shadow-md">
-                            ▶️ Ver Video
-                        </a>
-                    `;
-                    listContainer.appendChild(exerciseCard);
-                });
-
-            } else {
-                 showMessage(response.error || `Error al cargar la rutina de ${day}.`, 'error');
-                 document.getElementById('empty-routine-message').classList.remove('hidden');
-            }
-        }
-
-
-        // --- Lógica de Inicialización ---\
+        // --- Lógica de Inicialización ---
         window.onload = function() {
-            // Iniciar la transición después de la duración definida
-            setTimeout(transitionToLogin, SPLASH_DURATION_MS);
-
             // --- LISTENERS DE FORMULARIO ---
             document.getElementById('login-form').addEventListener('submit', handleLogin);
             
-            // Asignar listener de logout. Solo si existe (debe existir si se carga el dashboard)
-            const logoutButton = document.getElementById('logout-button');
-            if (logoutButton) {
-                logoutButton.addEventListener('click', handleLogout);
+            // Usamos un querySelectorAll porque el botón de logout existe en ambas pantallas
+            document.querySelectorAll('#logout-button').forEach(btn => {
+                 btn.addEventListener('click', handleLogout);
+            });
+
+            // Comprobar si hay una sesión guardada para evitar login
+            const storedSession = localStorage.getItem('userSession');
+            if (storedSession) {
+                const session = JSON.parse(storedSession);
+                
+                // Si hay sesión guardada, intentar cargar el dashboard
+                setTimeout(async () => {
+                    document.getElementById('splash-screen').style.display = 'none';
+                    const dataResponse = await apiGetData(session.user_id);
+                    
+                    if (dataResponse.success) {
+                        updateDashboard(dataResponse);
+                        navigateTo('dashboard-screen');
+                        showMessage('Sesión reanudada.', 'success');
+                    } else {
+                        // Si falla al cargar los datos, forzar el re-login
+                        localStorage.removeItem('userSession');
+                        transitionToLogin();
+                        showMessage('Error al reanudar sesión. Por favor, inicia sesión de nuevo.', 'error');
+                    }
+                }, 100); 
+            } else {
+                // Si no hay sesión, iniciar la transición normal
+                setTimeout(transitionToLogin, SPLASH_DURATION_MS);
             }
         };
     </script>
