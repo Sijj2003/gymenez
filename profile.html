@@ -8,11 +8,11 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         
-        /* Tema de Fondo Minimalista: Base Oscura (DEFAULT/LOGIN) */
+        /* Tema de Fondo Minimalista: Base Oscura */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0d0d1a;
-            /* Usamos el fondo de perfil directamente */
+            /* Fondo de perfil */
             background-image: url('PROFILE_FONDO.png');
             background-size: cover;
             background-position: center;
@@ -28,7 +28,6 @@
             -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         /* Estilo para las tablas de información */
@@ -63,7 +62,7 @@
             text-shadow: 0 0 3px #4b5563; 
         }
 
-        /* Estilos para el mensaje de estado (copiados del funcional v1.html) */
+        /* Estilos para el mensaje de estado */
         #message-box {
             position: fixed;
             top: 1rem;
@@ -100,7 +99,11 @@
 
         <h2 class="text-3xl font-extrabold text-white mb-6">Mi Perfil</h2>
 
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div id="loading-spinner" class="text-center py-12 text-lg text-gray-400">
+            Cargando datos de perfil...
+        </div>
+
+        <div id="profile-content" class="grid grid-cols-1 gap-6 lg:grid-cols-3 hidden">
             
             <div class="glass-card p-6 rounded-2xl lg:col-span-1">
                 <h3 class="text-xl font-bold mb-4 text-sky-300 flex items-center">
@@ -137,8 +140,12 @@
         // 🚀 URL BASE DE TU API. SIN LA BARRA FINAL (/)
         const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
         const messagebox = document.getElementById('message-box');
+        
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const profileContent = document.getElementById('profile-content');
 
-        // Función para mostrar mensajes de estado (copiada de funcional v1.html)
+
+        // Función para mostrar mensajes de estado
         function showMessage(message, type = 'success') {
             messagebox.textContent = message;
             messagebox.className = ''; 
@@ -153,101 +160,136 @@
                 messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
             }, 3000);
         }
+        
+        /**
+         * Llama a la API para obtener el perfil y las mediciones del usuario.
+         * Se asume un endpoint que devuelve toda la data combinada.
+         */
+        async function apiFetchProfileData(userId) {
+            console.log(`API: Llamada a ${API_BASE_URL}/api/profile/${userId}`);
+            
+            try {
+                // Endpoint asumido para obtener datos de perfil + mediciones
+                const response = await fetch(`${API_BASE_URL}/api/profile/${userId}`); 
+                const data = await response.json();
+                
+                if (!response.ok || !data.success) {
+                    return { success: false, error: data.error || 'Error al obtener datos del perfil.' };
+                }
+                
+                // data.profile debe contener todos los campos de PERFIL, GENERALES y CORPORALES
+                return { success: true, profile: data.profile };
 
-        // --- SIMULACIÓN DE DATOS DEL PERFIL ---
-        const DUMMY_PROFILE_DATA = {
-            // Data de la tabla PERFIL
-            email: "juan.perez@gimenez.com",
-            name: "Juan",
-            lastName: "Pérez",
-            dateOfBirth: "15/05/1990", // DD/MM/YYYY
-            activeSince: "10/01/2024", // DD/MM/YYYY
-            gender: "Masculino",
-
-            // Data de la tabla MEDICIONES GENERALES
-            heightMeters: 1.75, // Metros
-            weightKg: 80.5,     // Kilogramos
-            bodyFatIndex: 18.2, // Índice de Grasa (%)
-
-            // Data de la tabla MEDICIONES CORPORALES (cm)
-            measurementsCm: {
-                brazoIzquierdo: 38.5,
-                brazoDerecho: 39.0,
-                antebrazoIzquierdo: 30.1,
-                antebrazoDerecho: 30.5,
-                torax: 110,
-                cintura: 85,
-                cuadricepsIzquierdo: 62.0,
-                cuadricepsDerecho: 62.5,
-                gemeloIzquierdo: 40.2,
-                gemeloDerecho: 40.5,
+            } catch (e) {
+                console.error("Error en la conexión fetch:", e);
+                return { success: false, error: 'No se pudo conectar con el servidor API REST para obtener el perfil.' };
             }
-        };
+        }
 
 
         /**
-         * Renderiza la información del perfil en las tablas.
-         * En una aplicación real, esta función recibiría los datos de la API.
+         * Renderiza la información del perfil en las tablas usando la data de la DB.
          */
         function renderProfile(data) {
             // --- 1. TABLA PERFIL ---
             const profileTable = document.getElementById('profile-table');
             profileTable.innerHTML = `
-                <tr><th>Email</th><td>${data.email}</td></tr>
-                <tr><th>Nombre</th><td>${data.name}</td></tr>
-                <tr><th>Apellido</th><td>${data.lastName}</td></tr>
-                <tr><th>Fecha de Nacimiento</th><td>${data.dateOfBirth}</td></tr>
-                <tr><th>Activo Desde</th><td>${data.activeSince}</td></tr>
-                <tr><th>Sexo</th><td>${data.gender}</td></tr>
+                <tr><th>Email</th><td>${data.email || 'N/A'}</td></tr>
+                <tr><th>Nombre</th><td>${data.name || 'N/A'}</td></tr>
+                <tr><th>Apellido</th><td>${data.last_name || 'N/A'}</td></tr>
+                <tr><th>Fecha de Nacimiento</th><td>${data.dob || 'N/A'}</td></tr>
+                <tr><th>Activo Desde</th><td>${data.activo_desde || 'N/A'}</td></tr>
+                <tr><th>Sexo</th><td>${data.sex || 'N/A'}</td></tr>
             `;
 
             // --- 2. TABLA MEDICIONES GENERALES ---
             const generalTable = document.getElementById('general-measurements-table');
             generalTable.innerHTML = `
-                <tr><th>Estatura</th><td><span class="measurement-value">${data.heightMeters}</span> m</td></tr>
-                <tr><th>Peso</th><td><span class="measurement-value">${data.weightKg}</span> kg</td></tr>
-                <tr><th>Índice de Grasa</th><td><span class="measurement-value">${data.bodyFatIndex}</span> %</td></tr>
+                <tr><th>Estatura</th><td><span class="measurement-value">${data.estatura ? data.estatura.toFixed(2) : 'N/A'}</span> m</td></tr>
+                <tr><th>Peso</th><td><span class="measurement-value">${data.peso ? data.peso.toFixed(1) : 'N/A'}</span> kg</td></tr>
+                <tr><th>Índice de Grasa</th><td><span class="measurement-value">${data.indice_grasa ? data.indice_grasa.toFixed(1) : 'N/A'}</span> %</td></tr>
             `;
-
+            
             // --- 3. TABLA MEDICIONES CORPORALES ---
             const bodyTable = document.getElementById('body-measurements-table');
-            // Usamos un loop para asegurar que todos los campos se incluyan y sea más fácil de mantener
-            let bodyHtml = '';
+            
+            // Mapeo de claves de la DB a etiquetas amigables
             const labels = {
-                brazoIzquierdo: "Brazo Izquierdo",
-                brazoDerecho: "Brazo Derecho",
-                antebrazoIzquierdo: "Antebrazo Izquierdo",
-                antebrazoDerecho: "Antebrazo Derecho",
+                brazo_izquierdo: "Brazo Izquierdo",
+                brazo_derecho: "Brazo Derecho",
+                antebrazo_izquierdo: "Antebrazo Izquierdo",
+                antebrazo_derecho: "Antebrazo Derecho",
                 torax: "Tórax",
                 cintura: "Cintura",
-                cuadricepsIzquierdo: "Cuádriceps Izquierdo",
-                cuadricepsDerecho: "Cuádriceps Derecho",
-                gemeloIzquierdo: "Gemelo Izquierdo",
-                gemeloDerecho: "Gemelo Derecho",
+                cuadriceps_izquierdo: "Cuádriceps Izquierdo",
+                cuadriceps_derecho: "Cuádriceps Derecho",
+                gemelo_izquierdo: "Gemelo Izquierdo",
+                gemelo_derecho: "Gemelo Derecho",
             };
 
-            for (const key in data.measurementsCm) {
-                if (data.measurementsCm.hasOwnProperty(key)) {
-                    const label = labels[key] || key;
-                    bodyHtml += `
-                        <tr>
-                            <th>${label}</th>
-                            <td><span class="measurement-value">${data.measurementsCm[key]}</span> cm</td>
-                        </tr>
-                    `;
-                }
+            let bodyHtml = '';
+            for (const key in labels) {
+                 // Aseguramos que el valor sea un número y lo formateamos a 1 decimal, si no, 'N/A'
+                const value = data[key] !== undefined && data[key] !== null ? parseFloat(data[key]).toFixed(1) : 'N/A';
+                
+                bodyHtml += `
+                    <tr>
+                        <th>${labels[key]}</th>
+                        <td><span class="measurement-value">${value}</span> cm</td>
+                    </tr>
+                `;
             }
             bodyTable.innerHTML = bodyHtml;
         }
 
+        /**
+         * Función principal para cargar y mostrar los datos del perfil.
+         */
+        async function loadProfileData() {
+            // 1. Obtener el ID de usuario de localStorage (establecido al loguearse en funcional v1.html)
+            const storedSession = localStorage.getItem('userSession');
+            
+            if (!storedSession) {
+                loadingSpinner.textContent = '❌ Error: No hay sesión activa. Por favor, inicia sesión.';
+                // Redirigir al login si no hay sesión
+                setTimeout(() => window.location.href = 'funcional v1.html', 3000); 
+                return;
+            }
+            
+            try {
+                const userSession = JSON.parse(storedSession);
+                // Usamos _id para MongoDB o id para alternativas (dependiendo del backend)
+                const userId = userSession._id || userSession.id; 
+                
+                if (!userId) {
+                    throw new Error("ID de usuario no encontrado en la sesión.");
+                }
+
+                // 2. Llamar a la API
+                const response = await apiFetchProfileData(userId);
+
+                // 3. Procesar respuesta
+                if (response.success && response.profile) {
+                    renderProfile(response.profile);
+                    profileContent.classList.remove('hidden');
+                    loadingSpinner.classList.add('hidden');
+                    showMessage('Datos de perfil cargados con éxito.', 'success');
+                } else {
+                    loadingSpinner.textContent = '❌ Error al cargar datos: ' + (response.error || 'Datos incompletos.');
+                    showMessage('Error al cargar datos del perfil.', 'error');
+                }
+
+            } catch (error) {
+                loadingSpinner.textContent = '❌ Error fatal: ' + error.message;
+                showMessage('Error al procesar la sesión o la data.', 'error');
+                console.error("Error en loadProfileData:", error);
+            }
+        }
+
+
         // --- Lógica de Inicialización ---
         window.onload = function() {
-            // En una aplicación real, se haría una llamada a la API para obtener los datos del perfil
-            // fetch(`${API_BASE_URL}/api/profile/${userId}`).then(...)
-            
-            // Usamos datos simulados (DUMMY_PROFILE_DATA) para poblar la vista
-            renderProfile(DUMMY_PROFILE_DATA);
-            showMessage('Datos de perfil cargados (simulados).', 'success');
+            loadProfileData();
         };
     </script>
 </body>
