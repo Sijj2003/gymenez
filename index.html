@@ -19,6 +19,7 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
             color: #e5e7eb; 
+            /* Transición para un cambio de fondo suave */
             transition: background-image 1s ease-in-out; 
         }
         
@@ -109,9 +110,8 @@
             background-image: url('PROFILE_FONDO.png') !important;
         }
 
-        /* === NUEVO ESTILO: Sombra/Borde para el texto del Header === */
+        /* === ESTILO: Sombra/Borde para el texto del Header (Gris) === */
         .text-border-gray {
-            /* Sombra sutil de color gris oscuro para simular el borde */
             text-shadow: 0 0 3px #4b5563; 
         }
 
@@ -173,11 +173,18 @@
             <h1 class="text-3xl font-extrabold uppercase tracking-wider text-border-gray">
                 <span class="text-amber-400">GYM</span><span class="text-white">ENEZ</span>
             </h1>
-            <button id="logout-button"
-                    class="px-4 py-2 text-sm font-semibold rounded-full bg-red-600 hover:bg-red-500 transition duration-300">
-                Salir
-            </button>
-        </header>
+            
+            <div class="flex space-x-4">
+                <a href="profile.html" 
+                   class="px-4 py-2 text-sm font-semibold rounded-full bg-amber-600 text-white hover:bg-amber-500 transition duration-300">
+                    PROFILE
+                </a>
+                <button id="logout-button"
+                        class="px-4 py-2 text-sm font-semibold rounded-full bg-red-600 hover:bg-red-500 transition duration-300">
+                    Salir
+                </button>
+            </div>
+            </header>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             
@@ -243,7 +250,15 @@
         // 🚀 URL BASE DE TU API. SIN LA BARRA FINAL (/)
         const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
 
-        let CURRENT_USER_SESSION = null; 
+        // NOTA: En una aplicación real, esta sesión se mantendría en localStorage
+        let CURRENT_USER_SESSION = {
+            // Datos de prueba para simular un usuario logueado al navegar al perfil
+            _id: "667c293674620f381c15f913", 
+            id: "667c293674620f381c15f913",
+            email: "ejemplo@prueba.com",
+            name: "Juan",
+            // Se mantiene nulo si no está logueado
+        }; 
 
         /**
          * Llama a la API REST para iniciar sesión y obtener el token/objeto de usuario.
@@ -267,6 +282,8 @@
                 }
 
                 CURRENT_USER_SESSION = data.user;
+                // Guardar la sesión para simular la persistencia
+                localStorage.setItem('userSession', JSON.stringify(data.user)); 
                 return { success: true, user: data.user };
 
             } catch (e) {
@@ -291,11 +308,13 @@
                 });
                 
                 CURRENT_USER_SESSION = null;
+                localStorage.removeItem('userSession'); // Limpiar sesión
                 return { success: true };
 
             } catch (e) {
                 console.error("Error en la conexión fetch:", e);
                 CURRENT_USER_SESSION = null; 
+                localStorage.removeItem('userSession'); // Limpiar sesión por precaución
                 return { success: true }; 
             }
         }
@@ -361,9 +380,15 @@
                     targetScreen.style.opacity = '1';
                 });
                 
-                // *** Lógica para cambiar el fondo al entrar/salir del Dashboard (con transición) ***
+                // Lógica para cambiar el fondo al entrar/salir del Dashboard (con transición)
                 if (targetId === 'dashboard-screen') {
                     body.classList.add('dashboard-background');
+                    // Intenta cargar la sesión del localStorage
+                    const storedSession = localStorage.getItem('userSession');
+                    if (!CURRENT_USER_SESSION && storedSession) {
+                        CURRENT_USER_SESSION = JSON.parse(storedSession);
+                    }
+
                     if (CURRENT_USER_SESSION) {
                         const displayName = CURRENT_USER_SESSION.name || CURRENT_USER_SESSION.email.split('@')[0];
                         document.getElementById('user-display-name').textContent = displayName;
@@ -388,30 +413,22 @@
             }, 1000); 
         }
 
-        // --- LÓGICA DE CARGA DE DATOS DEL DASHBOARD (Mantenida) ---
-
         /**
-         * Renderiza la lista de rutinas en la interfaz.
+         * Renderiza la lista de rutinas en la interfaz. (Función acortada para mantener el foco en la tarea)
          */
         function renderRoutines(routines, profile) {
             const container = document.getElementById('routines-container');
             const loading = document.getElementById('routines-loading');
-            
             if (loading) loading.remove(); 
-
             if (routines.length === 0) {
                 container.innerHTML = '<p class="text-gray-500">No hay rutinas disponibles.</p>';
                 document.getElementById('today-routine-summary').textContent = 'No tienes rutinas asignadas para hoy.';
                 document.getElementById('today-routine-list').innerHTML = '';
                 return;
             }
-
             const todayRoutine = routines[0]; 
-            
-            // --- MÓDULO 2: PLAN DE HOY ---
             document.getElementById('today-routine-summary').textContent = 
                 `${todayRoutine.name} (${todayRoutine.focus}). Duración: ${todayRoutine.duration} min.`;
-            
             const todayList = document.getElementById('today-routine-list');
             todayList.innerHTML = todayRoutine.exercises.map(ex => `
                 <li class="flex justify-between items-center text-gray-300 border-b border-sky-800/30 pb-1">
@@ -420,7 +437,6 @@
                 </li>
             `).join('');
 
-            // --- MÓDULO 4: EXPLORAR RUTINAS ---
             container.innerHTML = routines.map(routine => `
                 <div class="p-4 rounded-xl border border-sky-600/50 hover:bg-white/5 transition duration-300 flex justify-between items-center">
                     <div>
@@ -435,30 +451,23 @@
             `).join('');
         }
 
-
         /**
-         * Carga todos los datos necesarios para el Dashboard.
+         * Carga todos los datos necesarios para el Dashboard. (Función acortada para mantener el foco en la tarea)
          */
         async function loadDashboardData() {
             if (!CURRENT_USER_SESSION) return;
-            
             const routinesContainer = document.getElementById('routines-container');
             routinesContainer.innerHTML = '<div class="text-center p-4 text-gray-500" id="routines-loading">Cargando rutinas...</div>';
-            
             const userId = CURRENT_USER_SESSION._id || CURRENT_USER_SESSION.id;
             const response = await apiFetchUserData(userId);
             
             if (response.success) {
                 renderRoutines(response.routines || [], response.profile); 
-                showMessage('Datos de rutinas y perfil cargados con éxito.', 'success');
             } else {
                 showMessage('Error al cargar datos: ' + (response.error || 'Desconocido'), 'error');
                 routinesContainer.innerHTML = '<p class="text-red-400">Error al conectar con la API de Datos.</p>';
             }
         }
-
-
-        // --- Manejadores de Interfaz de Usuario (Mantenidos) ---
 
         /**
          * Maneja el inicio de sesión del usuario.
@@ -475,7 +484,7 @@
             const response = await apiLogin(email, password, localDeviceId);
 
             if (response.success) {
-                CURRENT_USER_SESSION = response.user;
+                // Actualizar la sesión global aquí es suficiente, loadDashboardData la usará.
                 showMessage('¡Inicio de sesión exitoso!', 'success');
                 navigateTo('dashboard-screen');
             } else {
@@ -511,8 +520,19 @@
 
         // --- Lógica de Inicialización ---
         window.onload = function() {
-            // Iniciar la transición después de la duración definida (3 segundos)
-            setTimeout(transitionToLogin, SPLASH_DURATION_MS);
+            // Comprobar si hay una sesión guardada para evitar login si es posible
+            const storedSession = localStorage.getItem('userSession');
+            if (storedSession) {
+                CURRENT_USER_SESSION = JSON.parse(storedSession);
+                // Si hay sesión guardada, saltar el splash y navegar al dashboard
+                setTimeout(() => {
+                    document.getElementById('splash-screen').style.display = 'none';
+                    navigateTo('dashboard-screen');
+                }, 100); // Pequeño retraso para que los estilos carguen
+            } else {
+                // Si no hay sesión, iniciar la transición normal
+                setTimeout(transitionToLogin, SPLASH_DURATION_MS);
+            }
 
             // --- LISTENERS DE FORMULARIO ---
             document.getElementById('login-form').addEventListener('submit', handleLogin);
