@@ -58,15 +58,14 @@
             z-index: 100; 
         }
         
-        /* === ESTILOS PARA EL LOGO Y ANIMACIÓN (Aro de luz removido) === */
+        /* === ESTILOS PARA EL LOGO Y ANIMACIÓN === */
         #splash-logo {
             width: 250px;
             height: auto;
-            animation: simple-pulse 1.5s infinite alternate; /* Usar animación simple */
-            filter: none; /* Asegurar que no haya filtros de brillo */
+            animation: simple-pulse 1.5s infinite alternate; 
+            filter: none; 
         }
         
-        /* Definición de la animación de pulso simple (sin efecto neon de aro de luz) */
         @keyframes simple-pulse {
             from {
                 opacity: 0.8;
@@ -74,10 +73,10 @@
             }
             to {
                 opacity: 1.0;
-                transform: scale(1.05); /* Pulso sutil en tamaño */
+                transform: scale(1.05); 
             }
         }
-        /* ================================================= */
+        /* ======================================= */
 
         /* Estilos para el mensaje de estado */
         #message-box {
@@ -96,9 +95,9 @@
         .message-success { background-color: #10b981; color: white; } 
         .message-error { background-color: #ef4444; color: white; } 
         
-        /* Estilo específico para el logo del login */
+        /* Estilo específico para el logo del login (AUMENTADO EN 50%) */
         #login-logo-img {
-            width: 150px; /* Ajusta el tamaño según sea necesario */
+            width: 225px; /* 150px * 1.5 = 225px */
             height: auto;
             margin: 0 auto;
         }
@@ -131,7 +130,7 @@
                          alt="Logo GYMENEZ" 
                          class="mx-auto"
                     >
-                    </div>
+                </div>
             </div>
 
             <form id="login-form">
