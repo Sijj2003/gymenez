@@ -12,14 +12,15 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0d0d1a;
-            /* El fondo principal (FONDO.png) sigue siendo el predeterminado para el body/login */
+            /* Fondo Inicial (LOGIN) */
             background-image: url('FONDO.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            color: #e5e7eb; /* Color de texto base (Gris Claro) */
-            transition: background-image 0.5s ease; /* Transición para un cambio de fondo suave */
+            color: #e5e7eb; 
+            /* === NUEVO: Transición para un cambio de fondo suave === */
+            transition: background-image 1s ease-in-out; 
         }
         
         /* Estilo específico para el efecto Glassmorphism en las tarjetas */
@@ -104,14 +105,10 @@
             margin: 0 auto;
         }
 
-        /* === NUEVO ESTILO: FONDO ESPECÍFICO PARA EL DASHBOARD === */
+        /* === FONDO ESPECÍFICO PARA EL DASHBOARD === */
         .dashboard-background {
             /* Sobrescribe el fondo del <body> con la nueva imagen */
             background-image: url('PROFILE_FONDO.png') !important;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
         }
 
     </style>
@@ -320,7 +317,8 @@
 
 
         // --- Variables y Utilidades Globales (Mantenidas) ---
-        const SPLASH_DURATION_MS = 3000;
+        // === Mantenido en 3 segundos ===
+        const SPLASH_DURATION_MS = 3000; 
         const screens = ['splash-screen', 'login-screen', 'dashboard-screen'];
         const messagebox = document.getElementById('message-box');
         const body = document.body;
@@ -358,7 +356,7 @@
                     targetScreen.style.opacity = '1';
                 });
                 
-                // *** Lógica para cambiar el fondo al entrar/salir del Dashboard ***
+                // *** Lógica para cambiar el fondo al entrar/salir del Dashboard (con transición) ***
                 if (targetId === 'dashboard-screen') {
                     body.classList.add('dashboard-background');
                     if (CURRENT_USER_SESSION) {
@@ -508,7 +506,7 @@
 
         // --- Lógica de Inicialización ---
         window.onload = function() {
-            // Iniciar la transición después de la duración definida
+            // Iniciar la transición después de la duración definida (3 segundos)
             setTimeout(transitionToLogin, SPLASH_DURATION_MS);
 
             // --- LISTENERS DE FORMULARIO ---
