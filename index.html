@@ -20,7 +20,7 @@
             color: #e5e7eb; /* Color de texto base (Gris Claro) */
         }
         
-        /* Estilo específico para el efecto Glassmorphism en las tarjetas (USADO SOLO EN DASHBOARD) */
+        /* Estilo específico para el efecto Glassmorphism en las tarjetas (USADO AHORA EN LOGIN Y DASHBOARD) */
         .glass-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(15px);
@@ -58,14 +58,15 @@
             z-index: 100; 
         }
         
-        /* === ESTILOS PARA EL LOGO Y ANIMACIÓN === */
+        /* === ESTILOS PARA EL LOGO Y ANIMACIÓN (Simple Pulse sin Neon) === */
         #splash-logo {
             width: 250px;
             height: auto;
-            animation: simple-pulse 1.5s infinite alternate; 
-            filter: none; 
+            animation: simple-pulse 1.5s infinite alternate; /* Usar animación simple */
+            filter: none; /* Asegurar que no haya filtros de brillo */
         }
         
+        /* Definición de la animación de pulso simple (sin efecto neon de aro de luz) */
         @keyframes simple-pulse {
             from {
                 opacity: 0.8;
@@ -73,7 +74,7 @@
             }
             to {
                 opacity: 1.0;
-                transform: scale(1.05); 
+                transform: scale(1.05); /* Pulso sutil en tamaño */
             }
         }
         /* ======================================= */
@@ -95,9 +96,9 @@
         .message-success { background-color: #10b981; color: white; } 
         .message-error { background-color: #ef4444; color: white; } 
         
-        /* Estilo específico para el logo del login (AUMENTADO EN 50%) */
+        /* Estilo específico para el logo del login (50% más grande) */
         #login-logo-img {
-            width: 225px; /* 150px * 1.5 = 225px */
+            width: 225px; 
             height: auto;
             margin: 0 auto;
         }
@@ -122,9 +123,8 @@
     </div>
 
     <div id="login-screen" class="hidden min-h-screen w-full flex items-center justify-center p-4">
-        <div class="p-8 md:p-12 w-full max-w-sm mx-auto rounded-2xl shadow-2xl bg-[#1a1a2e] border-t-2 border-sky-600/50">
-            <div class="text-center mb-10">
-                <div class="text-center mb-10">
+        <div class="glass-card p-6 md:p-8 w-full max-w-sm mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-500/30">
+            <div class="text-center mb-6"> <div class="text-center mb-6">
                     <img id="login-logo-img"
                          src="LOGIN_LOGO.png" 
                          alt="Logo GYMENEZ" 
