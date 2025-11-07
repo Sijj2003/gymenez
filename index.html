@@ -20,7 +20,7 @@
             color: #e5e7eb; /* Color de texto base (Gris Claro) */
         }
         
-        /* Estilo específico para el efecto Glassmorphism en las tarjetas (USADO AHORA EN LOGIN Y DASHBOARD) */
+        /* Estilo específico para el efecto Glassmorphism en las tarjetas */
         .glass-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(15px);
@@ -34,13 +34,15 @@
             box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.6);
         }
 
-        /* Estilo para el botón con efecto NEON */
+        /* Estilo para el botón con efecto NEON (AHORA AMARILLO/GRIS) */
         .neon-button {
             transition: all 0.3s ease;
-            box-shadow: 0 0 10px #0ea5e9, 0 0 20px #0ea5e9;
+            /* Box shadow cambiado a un color amarillo/dorado brillante (Amber-400) */
+            box-shadow: 0 0 10px #fbbf24, 0 0 20px #fbbf24; 
         }
         .neon-button:hover {
-            box-shadow: 0 0 15px #38bdf8, 0 0 30px #38bdf8;
+            /* Box shadow cambiado a un color amarillo/dorado más claro en hover (Amber-300) */
+            box-shadow: 0 0 15px #fcd34d, 0 0 30px #fcd34d;
             transform: scale(1.02);
         }
 
@@ -62,11 +64,10 @@
         #splash-logo {
             width: 250px;
             height: auto;
-            animation: simple-pulse 1.5s infinite alternate; /* Usar animación simple */
-            filter: none; /* Asegurar que no haya filtros de brillo */
+            animation: simple-pulse 1.5s infinite alternate; 
+            filter: none; 
         }
         
-        /* Definición de la animación de pulso simple (sin efecto neon de aro de luz) */
         @keyframes simple-pulse {
             from {
                 opacity: 0.8;
@@ -74,7 +75,7 @@
             }
             to {
                 opacity: 1.0;
-                transform: scale(1.05); /* Pulso sutil en tamaño */
+                transform: scale(1.05); 
             }
         }
         /* ======================================= */
@@ -124,7 +125,8 @@
 
     <div id="login-screen" class="hidden min-h-screen w-full flex items-center justify-center p-4">
         <div class="glass-card p-6 md:p-8 w-full max-w-sm mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-500/30">
-            <div class="text-center mb-6"> <div class="text-center mb-6">
+            <div class="text-center mb-6">
+                <div class="text-center mb-6">
                     <img id="login-logo-img"
                          src="LOGIN_LOGO.png" 
                          alt="Logo GYMENEZ" 
@@ -146,7 +148,7 @@
                 </div>
 
                 <button type="submit" id="login-btn"
-                        class="neon-button w-full py-3 rounded-lg bg-sky-600 text-white font-bold text-lg hover:bg-sky-500 uppercase tracking-wider">
+                        class="neon-button w-full py-3 rounded-lg bg-gray-800 text-amber-400 font-bold text-lg hover:bg-gray-700 uppercase tracking-wider border-2 border-amber-400/50">
                     INGRESAR
                 </button>
             </form>
