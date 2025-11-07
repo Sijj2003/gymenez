@@ -19,7 +19,6 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
             color: #e5e7eb; 
-            /* === NUEVO: Transición para un cambio de fondo suave === */
             transition: background-image 1s ease-in-out; 
         }
         
@@ -107,8 +106,13 @@
 
         /* === FONDO ESPECÍFICO PARA EL DASHBOARD === */
         .dashboard-background {
-            /* Sobrescribe el fondo del <body> con la nueva imagen */
             background-image: url('PROFILE_FONDO.png') !important;
+        }
+
+        /* === NUEVO ESTILO: Sombra/Borde para el texto del Header === */
+        .text-border-gray {
+            /* Sombra sutil de color gris oscuro para simular el borde */
+            text-shadow: 0 0 3px #4b5563; 
         }
 
     </style>
@@ -166,7 +170,10 @@
 
     <div id="dashboard-screen" class="hidden min-h-screen w-full p-4 md:p-8">
         <header class="flex justify-between items-center py-4 px-2 mb-8 border-b border-sky-700/50">
-            <h1 class="text-3xl font-extrabold text-sky-400" style="text-shadow: 0 0 3px #0ea5e9;">GYMENEZ</h1>
+            <h1 class="text-3xl font-extrabold uppercase tracking-wider text-border-gray">
+                <span class="text-amber-400">GYM</span>
+                <span class="text-white">ENEZ</span>
+            </h1>
             <button id="logout-button"
                     class="px-4 py-2 text-sm font-semibold rounded-full bg-red-600 hover:bg-red-500 transition duration-300">
                 Salir
@@ -317,7 +324,6 @@
 
 
         // --- Variables y Utilidades Globales (Mantenidas) ---
-        // === Mantenido en 3 segundos ===
         const SPLASH_DURATION_MS = 3000; 
         const screens = ['splash-screen', 'login-screen', 'dashboard-screen'];
         const messagebox = document.getElementById('message-box');
