@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -93,7 +91,7 @@
                 <span class="text-amber-400">GYM</span><span class="text-white">ENEZ</span>
             </h1>
             
-            <a href="funcional v1.html" 
+            <a href="index.html" 
                class="px-4 py-2 text-sm font-semibold rounded-full bg-sky-600 text-white hover:bg-sky-500 transition duration-300">
                 &larr; Dashboard
             </a>
@@ -272,7 +270,8 @@
             if (!storedSession) {
                 loadingSpinner.textContent = '❌ Error: No hay sesión activa. Redirigiendo a Login...';
                 showMessage('No hay sesión activa.', 'error');
-                setTimeout(() => window.location.href = 'funcional v1.html', 3000); 
+                // Redirigir al index si no hay sesión (CORRECCIÓN HECHA AQUÍ)
+                setTimeout(() => window.location.href = 'index.html', 3000); 
                 return;
             }
             
