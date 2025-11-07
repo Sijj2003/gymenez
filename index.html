@@ -65,7 +65,7 @@
         <!-- El contenido se inyectará aquí (Login o Perfil) -->
     </div>
 
-    <!-- Firebase Imports -->
+    <!-- Firebase Imports y Lógica -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -75,21 +75,31 @@
         setLogLevel('debug');
 
         // ====================================================================
-        // PASO CLAVE 1: Acceder a las variables globales de configuración
-        // Aseguramos que el acceso a las variables globales sea a prueba de fallos.
+        // PASO CLAVE 1: ACCESO Y PARSEO DE LA CONFIGURACIÓN (Punto de Falla)
+        // Se aísla y se refuerza la lógica para acceder a las variables globales.
         // ====================================================================
         let firebaseConfig = {};
+        let configError = null;
+
         try {
-            // Intentamos parsear la configuración. Si no existe, usamos un objeto vacío.
-            firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+            // 1. Verificar si la variable existe
+            if (typeof __firebase_config === 'undefined') {
+                 configError = "La variable global '__firebase_config' no está definida en el entorno.";
+            } else {
+                // 2. Intentar parsear el JSON
+                firebaseConfig = JSON.parse(__firebase_config);
+                if (Object.keys(firebaseConfig).length === 0) {
+                     configError = "La configuración de Firebase está vacía después del parseo.";
+                }
+            }
         } catch (e) {
-            console.error("ERROR CRÍTICO: No se pudo parsear __firebase_config.", e);
+            configError = `Fallo al parsear el JSON de la configuración: ${e.message}`;
+            console.error("ERROR CRÍTICO EN PARSEO DE CONFIG:", e);
         }
 
         // Acceso al ID de la aplicación y al token de autenticación
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
 
         let db, auth;
         let currentUserId = null;
@@ -103,20 +113,27 @@
 
         let currentState = APP_STATE.LOADING;
 
+        // --- Función de Manejo de Errores Global ---
+        function displayAppError(message) {
+            console.error(message);
+            renderState(APP_STATE.ERROR, message);
+        }
+
         // --- Inicialización y Autenticación de Firebase ---
         
         async function initializeFirebase() {
-            if (Object.keys(firebaseConfig).length === 0) {
-                renderState(APP_STATE.ERROR, "Error: Configuración de Firebase no disponible o inválida.");
+            // Si el error de configuración se detectó antes de la inicialización, salimos.
+            if (configError) {
+                displayAppError(`Error de Configuración CRÍTICO: ${configError}`);
                 return;
             }
             
             try {
+                // Inicializar Firebase con la configuración parseada
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
                 
-                // Establecer la persistencia de la sesión
                 await setPersistence(auth, browserSessionPersistence);
 
                 let initialAuthAttempted = false;
@@ -125,26 +142,22 @@
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
                     initialAuthAttempted = true;
-                } else {
-                    // Si no hay token inicial, intentamos el login anónimo, o dejamos que el listener se encargue
-                    // Ya que la persistencia está activa, onAuthStateChanged puede recoger una sesión anterior.
                 }
-
-                // 2. Establecer el listener de estado de autenticación
+                
+                // 2. Listener de estado de autenticación
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         currentUserId = user.uid;
-                        // Si el usuario se autentica (por token o sesión previa), mostramos el perfil
                         if (currentState !== APP_STATE.PROFILE) {
                              renderState(APP_STATE.PROFILE);
                         }
                     } else {
-                        // Si no hay usuario y ya intentamos el auth inicial, mostramos la pantalla de login
                         currentUserId = null;
+                        // Forzar la vista de login si no hay usuario después de los intentos iniciales
                         if (currentState === APP_STATE.LOADING || initialAuthAttempted) {
                             renderState(APP_STATE.LOGIN); 
                         } else {
-                             // Si no se intentó con token, forzar login anónimo (como fallback)
+                             // Fallback: Si no se intentó con token, intentar login anónimo
                              signInAnonymously(auth).catch(e => {
                                  console.error("Fallo el login anónimo:", e);
                                  renderState(APP_STATE.LOGIN);
@@ -154,12 +167,12 @@
                 });
 
             } catch (error) {
-                console.error("Error al inicializar o autenticar Firebase:", error);
-                renderState(APP_STATE.ERROR, `Error de conexión/inicialización: ${error.message}`);
+                // Este catch atrapa errores durante initializeApp o signIn
+                displayAppError(`Fallo al inicializar o autenticar Firebase: ${error.message}`);
             }
         }
 
-        // --- Lógica de Manejo de Estados (Rendering) ---
+        // --- Vistas y Lógica de Rendering (El resto del código permanece igual) ---
 
         function renderState(state, message = null) {
             currentState = state;
@@ -198,8 +211,6 @@
             lucide.createIcons();
         }
 
-        // --- Vistas (Templates HTML) ---
-
         function createLoadingScreen(message) {
              return `
                 <div class="p-8 text-center bg-gray-900 bg-opacity-70 rounded-xl shadow-2xl">
@@ -219,7 +230,7 @@
                         <i data-lucide="alert-triangle" class="w-12 h-12 text-red-400 mb-2"></i>
                         <h1 class="text-3xl font-extrabold text-white">Error Fatal</h1>
                     </div>
-                    <p class="text-center text-red-300 mb-6">${message}</p>
+                    <p class="text-center text-red-300 mb-6 whitespace-pre-wrap">${message}</p>
                     <button onclick="window.location.reload()" 
                         class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition duration-200">
                         Intentar Recargar
@@ -274,6 +285,7 @@
                             <i data-lucide="user-circle" class="w-8 h-8 mr-3 text-blue-400"></i>
                             Mi Perfil de Cliente
                         </h1>
+                        <p class="text-sm text-gray-400">ID de Usuario: <code class="bg-gray-700 px-2 py-1 rounded text-xs text-yellow-300">${currentUserId || 'Cargando...'}</code></p>
                         <button id="logout-button" class="flex items-center text-red-400 hover:text-red-500 transition duration-200 text-sm font-semibold p-2 rounded-lg bg-gray-800 hover:bg-gray-700">
                             <i data-lucide="log-out" class="w-4 h-4 mr-2"></i>
                             Cerrar Sesión
@@ -404,6 +416,7 @@
                     const userData = userDoc.data();
 
                     // 2. Verificar la Contraseña (simple hash/password_hash check)
+                    // NOTA: En la práctica, esto debería ser un hash seguro. Aquí se usa una comparación simple.
                     if (userData.password_hash === password) {
                         currentUserId = finalUserId;
                         success = true;
@@ -454,20 +467,23 @@
             
             // Cargar datos del perfil
             try {
-                const profileRef = doc(db, 'profiles', currentUserId);
-                const profileSnap = await getDoc(profileRef);
+                // Buscamos en las colecciones específicas del entorno
+                const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', currentUserId);
+                const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserId);
 
-                const userRef = doc(db, 'users', currentUserId);
-                const userSnap = await getDoc(userRef);
+                const [profileSnap, userSnap] = await Promise.all([
+                    getDoc(profileRef),
+                    getDoc(userRef)
+                ]);
 
                 if (!profileSnap.exists()) {
-                    messageElement.textContent = `Error: No se encontró perfil para el ID: ${currentUserId}. Asegúrate de crearlo en la App Admin.`;
+                    messageElement.textContent = `Error: No se encontró perfil para el ID: ${currentUserId} en /artifacts/${appId}/public/data/profiles. Asegúrate de crearlo en la App Admin.`;
                     messageElement.classList.remove('hidden');
                     return;
                 }
 
                 const profileData = profileSnap.data();
-                const userData = userSnap.data();
+                const userData = userSnap.data() || {}; // Puede que no exista en 'users' si solo se creó el perfil.
                 
                 // Rellenar DATOS BÁSICOS
                 document.getElementById('profile-name').textContent = `${profileData.name || ''} ${profileData.last_name || ''}`;
@@ -478,14 +494,14 @@
                 document.getElementById('profile-active-since').textContent = profileData.activo_desde || 'N/A';
                 
                 // Rellenar MÉTRICAS GENERALES
-                const weight = profileData.weight;
-                const stature = profileData.stature; // en metros
+                const weight = parseFloat(profileData.weight);
+                const stature = parseFloat(profileData.stature); // en metros
                 
-                document.getElementById('profile-weight').textContent = weight ? `${weight} kg` : 'N/A';
-                document.getElementById('profile-stature').textContent = stature ? `${stature} m` : 'N/A';
+                document.getElementById('profile-weight').textContent = isNaN(weight) ? 'N/A' : `${weight.toFixed(1)} kg`;
+                document.getElementById('profile-stature').textContent = isNaN(stature) ? 'N/A' : `${stature.toFixed(2)} m`;
                 
                 // Calcular y mostrar IMC (BMI)
-                if (weight && stature && stature > 0) {
+                if (!isNaN(weight) && !isNaN(stature) && stature > 0) {
                     const bmi = weight / (stature * stature);
                     document.getElementById('profile-bmi').textContent = bmi.toFixed(1);
                 } else {
@@ -494,22 +510,22 @@
 
                 // Rellenar MEDICIONES CORPORALES
                 const bodyMeasurements = {
-                    'profile-arm-left': ['arm_left', 'cm'],
-                    'profile-arm-right': ['arm_right', 'cm'],
-                    'profile-forearm-left': ['forearm_left', 'cm'],
-                    'profile-forearm-right': ['forearm_right', 'cm'],
-                    'profile-thorax': ['thorax', 'cm'],
-                    'profile-waist': ['waist', 'cm'],
-                    'profile-quad-left': ['quad_left', 'cm'],
-                    'profile-quad-right': ['quad_right', 'cm'],
-                    'profile-calf-left': ['calf_left', 'cm'],
-                    'profile-calf-right': ['calf_right', 'cm'],
+                    'profile-arm-left': 'arm_left',
+                    'profile-arm-right': 'arm_right',
+                    'profile-forearm-left': 'forearm_left',
+                    'profile-forearm-right': 'forearm_right',
+                    'profile-thorax': 'thorax',
+                    'profile-waist': 'waist',
+                    'profile-quad-left': 'quad_left',
+                    'profile-quad-right': 'quad_right',
+                    'profile-calf-left': 'calf_left',
+                    'profile-calf-right': 'calf_right',
                 };
                 
-                for (const [elementId, [fieldKey, unit]] of Object.entries(bodyMeasurements)) {
-                    const value = profileData[fieldKey];
+                for (const [elementId, fieldKey] of Object.entries(bodyMeasurements)) {
+                    let value = profileData[fieldKey];
                     // Aseguramos que la unidad se muestre solo si hay un valor numérico
-                    const formattedValue = (value !== undefined && value !== null) ? `${parseFloat(value).toFixed(1)} ${unit}` : 'N/A';
+                    const formattedValue = (value !== undefined && value !== null) ? `${parseFloat(value).toFixed(1)} cm` : 'N/A';
                     document.getElementById(elementId).textContent = formattedValue;
                 }
 
@@ -523,6 +539,7 @@
         }
 
         // --- Inicio de la Aplicación ---
+        // Se llama a la función de inicialización.
         initializeFirebase();
 
     </script>
