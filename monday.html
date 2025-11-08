@@ -14,7 +14,8 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0d0d1a;
-            background-image: url('PROFILE_FONDO.png');
+            /* Usar un fondo más seguro o quitar la referencia a archivos locales */
+            /* background-image: url('PROFILE_FONDO.png'); */ 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -103,23 +104,11 @@
         </div>
     </section>
 
+    <!-- La sección de scripts se simplifica ya que no necesitamos Firebase Auth/Firestore -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        setLogLevel('Debug');
-
-        // Variables Globales de Firebase (OBLIGATORIAS)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        
-        let db;
-        let auth;
-        let userId = null;
-        let isAuthReady = false;
+        // La URL base del backend en PythonAnywhere
+        const API_BASE_URL = "https://sijj2003.pythonanywhere.com";
+        const API_ROUTINES_ENDPOINT = `${API_BASE_URL}/api/routines`;
 
         // Nombre del día actual (Parámetro estático que cambiará para cada archivo: tuesday.html, wednesday.html, etc.)
         const CURRENT_DAY = 'Lunes'; 
@@ -168,7 +157,7 @@
                 const card = document.createElement('div');
                 card.className = 'glass-item-card p-4 rounded-xl shadow-lg';
                 
-                // MOCKUP - Aquí se muestra la información de la base de datos
+                // Estructura de la tarjeta de ejercicio
                 card.innerHTML = `
                     <div class="flex items-center justify-between">
                         <div>
@@ -193,98 +182,60 @@
 
 
         /**
-         * Carga la rutina del día actual desde Firestore.
+         * Carga la rutina del día actual haciendo una petición a la API.
          */
-        function loadRoutine(dayName) {
-            if (!isAuthReady || !userId) {
-                showMessage("Autenticación no completa. No se puede cargar la rutina.", 'error');
-                console.error("Authentication not ready or userId missing.");
-                return;
-            }
-
+        async function loadRoutine(dayName) {
             dayTitle.textContent = `Rutina de ${dayName}`;
             loadingSpinner.classList.remove('hidden');
             exercisesContainer.innerHTML = ''; // Limpiar
 
             try {
-                // Ruta a la colección privada del usuario
-                const routinePath = `/artifacts/${appId}/users/${userId}/routines`;
-                
-                // Query: Ejercicios donde el campo 'day' es igual al día actual
-                const q = query(
-                    collection(db, routinePath), 
-                    where('day', '==', dayName)
-                );
-
-                // Escuchador en tiempo real
-                onSnapshot(q, (snapshot) => {
-                    const exercises = [];
-                    snapshot.forEach(doc => {
-                        exercises.push({ id: doc.id, ...doc.data() });
-                    });
-                    
-                    renderExercises(exercises);
-                    showMessage(`Rutina de ${dayName} actualizada.`, 'success');
-                }, (error) => {
-                    console.error("Error fetching routine:", error);
-                    showMessage(`Error al cargar la rutina: ${error.message}`, 'error');
-                    loadingSpinner.classList.add('hidden');
-                    noDataMessage.classList.remove('hidden');
-                    noDataMessage.innerHTML = `<p class="text-xl text-red-400">Error al cargar datos.</p><p class="mt-2 text-sm">Verifica la consola para detalles: ${error.message}</p>`;
-                });
-
-            } catch (e) {
-                console.error("Error setting up Firestore listener:", e);
-                showMessage(`Error de conexión a Firestore: ${e.message}`, 'error');
-                loadingSpinner.classList.add('hidden');
-                noDataMessage.classList.remove('hidden');
-            }
-        }
-
-        /**
-         * Inicializa Firebase y establece el estado de autenticación.
-         */
-        async function initializeFirebase() {
-            if (!firebaseConfig) {
-                console.error("Firebase config is missing.");
-                showMessage("Error: Configuración de Firebase no disponible.", 'error');
-                return;
-            }
-
-            try {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                // Esperar a que el estado de autenticación cambie
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        isAuthReady = true;
-                        loadRoutine(CURRENT_DAY);
-                    } else if (initialAuthToken) {
-                        // Intento de inicio de sesión con el token proporcionado por el entorno
-                        try {
-                            await signInWithCustomToken(auth, initialAuthToken);
-                        } catch (error) {
-                            console.warn("Custom token failed. Signing in anonymously.", error);
-                            await signInAnonymously(auth);
-                        }
-                    } else {
-                        // Si no hay token, iniciar sesión anónimamente
-                        await signInAnonymously(auth);
+                const response = await fetch(API_ROUTINES_ENDPOINT, {
+                    method: 'GET',
+                    headers: {
+                        // Es importante establecer CORS en el backend para que esto funcione
+                        'Content-Type': 'application/json',
                     }
                 });
 
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success && data.routines) {
+                    // 1. Encontrar la rutina específica para el día actual
+                    // Asumimos que cada rutina tiene un campo 'day' que indica a qué día pertenece.
+                    const routineForDay = data.routines.find(r => r.day === dayName);
+                    
+                    if (routineForDay && routineForDay.exercises && Array.isArray(routineForDay.exercises)) {
+                        // 2. Renderizar los ejercicios de esa rutina
+                        renderExercises(routineForDay.exercises);
+                        showMessage(`Rutina de ${dayName} cargada correctamente.`, 'success');
+                    } else {
+                        // Si no se encuentra la rutina o la lista de ejercicios está vacía
+                        renderExercises([]); 
+                        showMessage(`No hay rutina asignada para ${dayName}.`, 'success');
+                    }
+                } else {
+                    throw new Error("Respuesta de API inválida.");
+                }
+
             } catch (e) {
-                console.error("Error initializing Firebase or Auth:", e);
-                showMessage(`Error fatal de Firebase: ${e.message}`, 'error');
+                console.error("Error al cargar la rutina desde la API:", e);
+                showMessage(`Error al cargar la rutina: ${e.message}`, 'error');
+                loadingSpinner.classList.add('hidden');
+                noDataMessage.classList.remove('hidden');
+                noDataMessage.innerHTML = `<p class="text-xl text-red-400">Error al cargar datos.</p><p class="mt-2 text-sm">Verifica la consola para detalles: ${e.message}</p>`;
             }
         }
 
         // --- Lógica de Inicialización ---
         window.onload = function() {
-            initializeFirebase();
+            // No se necesita inicializar Firebase aquí, solo cargar la rutina a través de la API
+            loadRoutine(CURRENT_DAY);
         };
     </script>
 </body>
