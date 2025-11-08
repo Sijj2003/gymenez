@@ -91,7 +91,7 @@
 
     <div id="message-box"></div>
     
-    <header class="flex justify-between items-center py-4 px-8 mb-8">
+    <header class="flex justify-between items-center py-4 px-8 mb-4">
         <h1 class="text-3xl font-extrabold uppercase tracking-wider text-border-gray">
             <span class="text-amber-400">GYM</span><span class="text-white">ENEZ</span>
         </h1>
@@ -104,16 +104,17 @@
         </div>
     </header>
     
+    <!-- Reduje el padding top para compensar la eliminación del h2 -->
     <section id="routines-screen" class="min-h-screen p-4 sm:p-8 pt-0"> 
         <div class="max-w-6xl mx-auto">
             
-            <h2 class="text-3xl font-bold text-center text-white mb-8 border-b border-amber-400 pb-2">
-                Selecciona el Día de Entrenamiento
-            </h2>
+            <!-- ELIMINADO: Título "Selecciona el Día de Entrenamiento" y su raya amarilla -->
 
             <div id="day-cards-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
                 
-                <!-- Definición del SVG de Mancuerna Estilizada para uso repetitivo --><!-- Ahora con color amarillo y clases para borde negro --><script>
+                <!-- Definición del SVG de Mancuerna Estilizada para uso repetitivo -->
+                <!-- Ahora con color amarillo y clases para borde negro -->
+                <script>
                     const dumbbellSVG = `
                         <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <!-- Mango de la mancuerna --><rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
