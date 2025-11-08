@@ -113,6 +113,9 @@
         // Nombre del día actual (Parámetro estático que cambiará para cada archivo: tuesday.html, wednesday.html, etc.)
         const CURRENT_DAY = 'Lunes'; 
         
+        // 🚨 IMPORTANTE: ESTA VARIABLE DEBE CONTENER EL NOMBRE DEL USUARIO AUTENTICADO
+        const MOCK_CURRENT_USER_NAME = "SEBASTIAN ISAAC JIMENEZ JIMENEZ"; // <-- ¡AJUSTAR!
+        
         // --- Utilidades ---
         const messagebox = document.getElementById('message-box');
         const loadingSpinner = document.getElementById('loading-spinner');
@@ -150,18 +153,15 @@
             noDataMessage.classList.add('hidden');
             loadingSpinner.classList.add('hidden');
             
-            // Ordenar ejercicios por el campo 'order' si existe
-            exercises.sort((a, b) => (a.order || 0) - (b.order || 0));
-
             exercises.forEach(exercise => {
                 const card = document.createElement('div');
                 card.className = 'glass-item-card p-4 rounded-xl shadow-lg';
                 
-                // Estructura de la tarjeta de ejercicio
+                // Usando la estructura de datos que proporcionaste: name, sets y reps
                 card.innerHTML = `
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-lg font-bold text-amber-400 uppercase">${exercise.exerciseName || 'Ejercicio sin nombre'}</p>
+                            <p class="text-lg font-bold text-amber-400 uppercase">${exercise.name || 'Ejercicio sin nombre'}</p>
                             <p class="text-sm text-gray-300">Series: ${exercise.sets || '-'}</p>
                             <p class="text-sm text-gray-300">Repeticiones: ${exercise.reps || '-'}</p>
                             <p class="text-sm text-gray-300">Peso Estimado: ${exercise.weight || 'N/A'}</p>
@@ -182,18 +182,20 @@
 
 
         /**
-         * Carga la rutina del día actual haciendo una petición a la API.
+         * Carga la rutina del día actual haciendo una petición a la API con parámetros de consulta.
          */
         async function loadRoutine(dayName) {
             dayTitle.textContent = `Rutina de ${dayName}`;
             loadingSpinner.classList.remove('hidden');
             exercisesContainer.innerHTML = ''; // Limpiar
 
+            // CONSTRUIR LA URL CON QUERY PARAMS: user y day
+            const fetchUrl = `${API_ROUTINES_ENDPOINT}?user=${encodeURIComponent(MOCK_CURRENT_USER_NAME)}&day=${encodeURIComponent(dayName)}`;
+
             try {
-                const response = await fetch(API_ROUTINES_ENDPOINT, {
+                const response = await fetch(fetchUrl, {
                     method: 'GET',
                     headers: {
-                        // Es importante establecer CORS en el backend para que esto funcione
                         'Content-Type': 'application/json',
                     }
                 });
@@ -206,21 +208,21 @@
                 const data = await response.json();
 
                 if (data.success && data.routines) {
-                    // 1. Encontrar la rutina específica para el día actual
-                    // Asumimos que cada rutina tiene un campo 'day' que indica a qué día pertenece.
-                    const routineForDay = data.routines.find(r => r.day === dayName);
+                    // El backend ya filtró. Solo necesitamos la primera (y única) rutina.
+                    const routineForUserAndDay = data.routines[0]; 
                     
-                    if (routineForDay && routineForDay.exercises && Array.isArray(routineForDay.exercises)) {
-                        // 2. Renderizar los ejercicios de esa rutina
-                        renderExercises(routineForDay.exercises);
-                        showMessage(`Rutina de ${dayName} cargada correctamente.`, 'success');
+                    if (routineForUserAndDay && routineForUserAndDay.exercises && Array.isArray(routineForUserAndDay.exercises)) {
+                        // Renderizar los ejercicios de esa rutina
+                        renderExercises(routineForUserAndDay.exercises);
+                        showMessage(`Rutina de ${dayName} cargada correctamente para ${MOCK_CURRENT_USER_NAME}.`, 'success');
                     } else {
-                        // Si no se encuentra la rutina o la lista de ejercicios está vacía
+                        // Si la respuesta es vacía o falta 'exercises'
                         renderExercises([]); 
-                        showMessage(`No hay rutina asignada para ${dayName}.`, 'success');
+                        showMessage(`No hay rutina asignada para ${dayName} y usuario ${MOCK_CURRENT_USER_NAME}.`, 'success');
                     }
                 } else {
-                    throw new Error("Respuesta de API inválida.");
+                    // Esto capturará errores como la falta de índice compuesto si no existe
+                    throw new Error(data.error || "Respuesta de API inválida o error en el filtrado del backend.");
                 }
 
             } catch (e) {
@@ -234,7 +236,9 @@
 
         // --- Lógica de Inicialización ---
         window.onload = function() {
-            // No se necesita inicializar Firebase aquí, solo cargar la rutina a través de la API
+            if (MOCK_CURRENT_USER_NAME === "SEBASTIAN ISAAC JIMENEZ JIMENEZ") {
+                console.warn("ADVERTENCIA: Usando nombre de usuario de prueba. Reemplazar 'MOCK_CURRENT_USER_NAME' con la variable real del usuario autenticado.");
+            }
             loadRoutine(CURRENT_DAY);
         };
     </script>
