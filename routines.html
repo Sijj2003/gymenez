@@ -22,6 +22,13 @@
             background-attachment: fixed;
             color: #e5e7eb; 
             transition: background-image 1s ease-in-out; 
+
+            /* === APLICADO DE index.html: Borde negro para todas las letras (Text Stroke Effect) === */
+            text-shadow: 
+                -0.5px -0.5px 0 #000,  
+                 0.5px -0.5px 0 #000,
+                -0.5px  0.5px 0 #000,
+                 0.5px  0.5px 0 #000;
         }
         
         /* Estilo específico para el efecto Glassmorphism en las tarjetas (IDÉNTICO A index.html) */
@@ -55,29 +62,33 @@
         .message-success { background-color: #10b981; color: white; } 
         .message-error { background-color: #ef4444; color: white; } 
 
-        /* Estilo para el botón de regreso */
-        .back-button {
-            transition: all 0.2s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        /* === ESTILO DE index.html: Sombra/Borde para el texto del Header (Gris) === */
+        .text-border-gray {
+            text-shadow: 0 0 3px #4b5563; 
         }
-        .back-button:hover {
-            box-shadow: 0 0 10px rgba(102, 163, 255, 0.8);
-        }
+        
     </style>
 </head>
 <body class="min-h-screen">
 
     <div id="message-box"></div>
     
-    <section id="routines-screen" class="min-h-screen p-4 sm:p-8 pt-20">
+    <header class="flex justify-between items-center py-4 px-8 mb-8">
+        <h1 class="text-3xl font-extrabold uppercase tracking-wider text-border-gray">
+            <span class="text-amber-400">GYM</span><span class="text-white">ENEZ</span>
+        </h1>
         
-        <a href="index.html" class="back-button absolute top-4 left-4 sm:top-8 sm:left-8 flex items-center text-white bg-[#3a69a8] hover:bg-[#66a3ff] rounded-full p-2 transition duration-200 shadow-lg">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-            <span class="ml-2 pr-2 hidden sm:inline font-semibold">Dashboard</span>
-        </a>
+        <div class="flex space-x-4">
+            <a href="index.html" 
+               class="px-4 py-2 text-sm font-semibold rounded-full bg-sky-600 text-white hover:bg-sky-500 transition duration-300">
+                DASHBOARD
+            </a>
+            </div>
+    </header>
+    <section id="routines-screen" class="min-h-screen p-4 sm:p-8 pt-0"> 
 
         <header class="mb-12 text-center">
-            <h1 class="text-4xl font-extrabold text-[#66a3ff] tracking-wider">🏋️ Mis Rutinas de Entrenamiento</h1>
+            <h1 class="text-4xl font-extrabold text-amber-400 tracking-wider">🏋️ MIS RUTINAS</h1>
             <p class="text-lg text-gray-400 mt-2">Consulta y gestiona tus planes de entrenamiento personalizados.</p>
         </header>
 
@@ -90,20 +101,20 @@
 
             <div id="routines-content" class="hidden">
                 
-                <div class="glass-card p-6 mb-6 rounded-xl shadow-lg">
+                <div class="glass-card p-6 mb-6 rounded-xl shadow-lg border-t-2 border-sky-400/50 hover:border-sky-400">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <svg class="w-6 h-6 mr-2 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         Añadir Nueva Rutina
                     </h2>
                     <p class="text-gray-400">Pulsa el botón para comenzar la creación de un nuevo plan.</p>
-                    <button class="mt-4 px-4 py-2 bg-[#3a69a8] hover:bg-[#66a3ff] text-white font-semibold rounded-lg transition duration-200 shadow-md">
+                    <button class="mt-4 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-semibold rounded-lg transition duration-200 shadow-md">
                         Crear Rutina Personalizada
                     </button>
                 </div>
 
-                <div class="glass-card p-6 mb-6 rounded-xl shadow-lg">
+                <div class="glass-card p-6 mb-6 rounded-xl shadow-lg border-t-2 border-amber-400/50 hover:border-amber-400">
                     <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-xl font-bold text-[#66a3ff]">Rutina Semanal de Volumen</h3>
+                        <h3 class="text-xl font-bold text-amber-400">Rutina Semanal de Volumen</h3>
                         <span class="px-3 py-1 bg-green-700/50 text-green-200 text-xs font-semibold rounded-full">Activa</span>
                     </div>
                     <p class="text-gray-400 mb-4">Enfocada en hipertrofia y ganancia muscular. Dividida en 4 días (Superior/Inferior).</p>
@@ -112,14 +123,14 @@
                         <span class="font-semibold text-white">Nivel: Intermedio</span>
                     </div>
                     <div class="mt-4 flex space-x-3">
-                        <button class="px-4 py-1 bg-sky-700/50 hover:bg-sky-600 text-white text-sm font-semibold rounded transition duration-200">Ver Detalles</button>
+                        <button class="px-4 py-1 bg-sky-600/50 hover:bg-sky-500 text-white text-sm font-semibold rounded transition duration-200">Ver Detalles</button>
                         <button class="px-4 py-1 bg-red-700/50 hover:bg-red-600 text-white text-sm font-semibold rounded transition duration-200">Eliminar</button>
                     </div>
                 </div>
 
-                <div class="glass-card p-6 mb-6 rounded-xl shadow-lg">
+                <div class="glass-card p-6 mb-6 rounded-xl shadow-lg border-t-2 border-amber-400/50 hover:border-amber-400">
                     <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-xl font-bold text-[#66a3ff]">Mantenimiento Funcional</h3>
+                        <h3 class="text-xl font-bold text-amber-400">Mantenimiento Funcional</h3>
                         <span class="px-3 py-1 bg-yellow-700/50 text-yellow-200 text-xs font-semibold rounded-full">Inactiva</span>
                     </div>
                     <p class="text-gray-400 mb-4">Rutina de cuerpo completo (full body) de bajo impacto. Ideal para viajes.</p>
@@ -128,7 +139,7 @@
                         <span class="font-semibold text-white">Nivel: Básico</span>
                     </div>
                     <div class="mt-4 flex space-x-3">
-                        <button class="px-4 py-1 bg-sky-700/50 hover:bg-sky-600 text-white text-sm font-semibold rounded transition duration-200">Ver Detalles</button>
+                        <button class="px-4 py-1 bg-sky-600/50 hover:bg-sky-500 text-white text-sm font-semibold rounded transition duration-200">Ver Detalles</button>
                         <button class="px-4 py-1 bg-red-700/50 hover:bg-red-600 text-white text-sm font-semibold rounded transition duration-200">Eliminar</button>
                     </div>
                 </div>
