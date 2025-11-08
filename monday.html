@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rutina Lunes</title>
+    <link rel="icon" type="image/png" href="mini_logo.png">
+    <link rel="shortcut icon" type="image/png" href="mini_logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        /* Tema de Fondo Minimalista: Base Oscura */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0d1a;
+            background-image: url('PROFILE_FONDO.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #e5e7eb; 
+            text-shadow: 
+                -0.5px -0.5px 0 #000,  
+                 0.5px -0.5px 0 #000,
+                -0.5px  0.5px 0 #000,
+                 0.5px  0.5px 0 #000;
+        }
+        
+        /* Estilo para tarjetas de ejercicios */
+        .glass-item-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.3);
+            border-left: 5px solid #facc15; /* Borde amarillo de contraste */
+        }
+
+        /* Contraste en el texto del header */
+        .text-border-gray {
+            text-shadow: 0 0 3px #4b5563; 
+        }
+
+        /* Estilos para notificaciones */
+        #message-box {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            pointer-events: none;
+        }
+        .message-success { background-color: #10b981; color: white; } 
+        .message-error { background-color: #ef4444; color: white; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div id="message-box"></div>
+    
+    <header class="flex justify-between items-center py-4 px-8 mb-4">
+        <h1 class="text-3xl font-extrabold uppercase tracking-wider text-border-gray">
+            <span class="text-amber-400">GYM</span><span class="text-white">ENEZ</span>
+        </h1>
+        
+        <div class="flex space-x-4">
+            <a href="routines.html" 
+               class="px-4 py-2 text-sm font-semibold rounded-full bg-sky-600 text-white hover:bg-sky-500 transition duration-300">
+                VOLVER A DÍAS
+            </a>
+        </div>
+    </header>
+    
+    <section id="routine-detail" class="min-h-screen p-4 sm:p-8 pt-0"> 
+        <div class="max-w-4xl mx-auto">
+            
+            <h2 id="day-title" class="text-4xl font-extrabold text-center text-amber-400 uppercase mb-8 pb-2">
+                Cargando Rutina...
+            </h2>
+
+            <div id="loading-spinner" class="text-center py-10">
+                <div class="animate-spin inline-block w-8 h-8 border-4 border-amber-400 border-t-transparent rounded-full"></div>
+                <p class="mt-4 text-gray-400">Estableciendo conexión y cargando ejercicios...</p>
+            </div>
+
+            <div id="exercises-container" class="space-y-4">
+                <!-- Los ejercicios se inyectarán aquí -->
+            </div>
+            
+            <div id="no-data-message" class="hidden text-center py-10 text-gray-400">
+                <p class="text-xl">
+                    <span class="text-amber-400 font-bold">¡Día Libre!</span> No se encontraron ejercicios asignados para este día.
+                </p>
+                <p class="mt-2 text-sm">Disfruta tu descanso o contacta a tu entrenador.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        setLogLevel('Debug');
+
+        // Variables Globales de Firebase (OBLIGATORIAS)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        let db;
+        let auth;
+        let userId = null;
+        let isAuthReady = false;
+
+        // Nombre del día actual (Parámetro estático que cambiará para cada archivo: tuesday.html, wednesday.html, etc.)
+        const CURRENT_DAY = 'Lunes'; 
+        
+        // --- Utilidades ---
+        const messagebox = document.getElementById('message-box');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const exercisesContainer = document.getElementById('exercises-container');
+        const noDataMessage = document.getElementById('no-data-message');
+        const dayTitle = document.getElementById('day-title');
+
+        function showMessage(message, type = 'success') {
+            messagebox.textContent = message;
+            messagebox.className = ''; 
+            messagebox.classList.add('transition-none');
+            messagebox.classList.add('message-' + type);
+            messagebox.style.opacity = '1';
+            messagebox.style.transform = 'translateX(-50%) translateY(0)';
+            
+            setTimeout(() => {
+                messagebox.style.opacity = '0';
+                messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
+            }, 3000);
+        }
+
+        /**
+         * Renderiza la lista de ejercicios en el DOM.
+         * @param {Array<Object>} exercises - Lista de ejercicios a mostrar.
+         */
+        function renderExercises(exercises) {
+            exercisesContainer.innerHTML = ''; // Limpiar contenedor
+            
+            if (exercises.length === 0) {
+                noDataMessage.classList.remove('hidden');
+                loadingSpinner.classList.add('hidden');
+                return;
+            }
+
+            noDataMessage.classList.add('hidden');
+            loadingSpinner.classList.add('hidden');
+            
+            // Ordenar ejercicios por el campo 'order' si existe
+            exercises.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+            exercises.forEach(exercise => {
+                const card = document.createElement('div');
+                card.className = 'glass-item-card p-4 rounded-xl shadow-lg';
+                
+                // MOCKUP - Aquí se muestra la información de la base de datos
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-lg font-bold text-amber-400 uppercase">${exercise.exerciseName || 'Ejercicio sin nombre'}</p>
+                            <p class="text-sm text-gray-300">Series: ${exercise.sets || '-'}</p>
+                            <p class="text-sm text-gray-300">Repeticiones: ${exercise.reps || '-'}</p>
+                            <p class="text-sm text-gray-300">Peso Estimado: ${exercise.weight || 'N/A'}</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <!-- Icono de completado (simulado) -->
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center ${exercise.isCompleted ? 'bg-green-600' : 'bg-gray-700'} text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                exercisesContainer.appendChild(card);
+            });
+        }
+
+
+        /**
+         * Carga la rutina del día actual desde Firestore.
+         */
+        function loadRoutine(dayName) {
+            if (!isAuthReady || !userId) {
+                showMessage("Autenticación no completa. No se puede cargar la rutina.", 'error');
+                console.error("Authentication not ready or userId missing.");
+                return;
+            }
+
+            dayTitle.textContent = `Rutina de ${dayName}`;
+            loadingSpinner.classList.remove('hidden');
+            exercisesContainer.innerHTML = ''; // Limpiar
+
+            try {
+                // Ruta a la colección privada del usuario
+                const routinePath = `/artifacts/${appId}/users/${userId}/routines`;
+                
+                // Query: Ejercicios donde el campo 'day' es igual al día actual
+                const q = query(
+                    collection(db, routinePath), 
+                    where('day', '==', dayName)
+                );
+
+                // Escuchador en tiempo real
+                onSnapshot(q, (snapshot) => {
+                    const exercises = [];
+                    snapshot.forEach(doc => {
+                        exercises.push({ id: doc.id, ...doc.data() });
+                    });
+                    
+                    renderExercises(exercises);
+                    showMessage(`Rutina de ${dayName} actualizada.`, 'success');
+                }, (error) => {
+                    console.error("Error fetching routine:", error);
+                    showMessage(`Error al cargar la rutina: ${error.message}`, 'error');
+                    loadingSpinner.classList.add('hidden');
+                    noDataMessage.classList.remove('hidden');
+                    noDataMessage.innerHTML = `<p class="text-xl text-red-400">Error al cargar datos.</p><p class="mt-2 text-sm">Verifica la consola para detalles: ${error.message}</p>`;
+                });
+
+            } catch (e) {
+                console.error("Error setting up Firestore listener:", e);
+                showMessage(`Error de conexión a Firestore: ${e.message}`, 'error');
+                loadingSpinner.classList.add('hidden');
+                noDataMessage.classList.remove('hidden');
+            }
+        }
+
+        /**
+         * Inicializa Firebase y establece el estado de autenticación.
+         */
+        async function initializeFirebase() {
+            if (!firebaseConfig) {
+                console.error("Firebase config is missing.");
+                showMessage("Error: Configuración de Firebase no disponible.", 'error');
+                return;
+            }
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Esperar a que el estado de autenticación cambie
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        isAuthReady = true;
+                        loadRoutine(CURRENT_DAY);
+                    } else if (initialAuthToken) {
+                        // Intento de inicio de sesión con el token proporcionado por el entorno
+                        try {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } catch (error) {
+                            console.warn("Custom token failed. Signing in anonymously.", error);
+                            await signInAnonymously(auth);
+                        }
+                    } else {
+                        // Si no hay token, iniciar sesión anónimamente
+                        await signInAnonymously(auth);
+                    }
+                });
+
+            } catch (e) {
+                console.error("Error initializing Firebase or Auth:", e);
+                showMessage(`Error fatal de Firebase: ${e.message}`, 'error');
+            }
+        }
+
+        // --- Lógica de Inicialización ---
+        window.onload = function() {
+            initializeFirebase();
+        };
+    </script>
+</body>
+</html>
