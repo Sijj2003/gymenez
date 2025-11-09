@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rutina Miércoles</title>
+    <link rel="icon" type="image/png" href="mini_logo.png">
+    <link rel="shortcut icon" type="image/png" href="mini_logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        /* Tema de Fondo Minimalista: Base Oscura */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0d1a;
+            background-image: url('PROFILE_FONDO.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #e5e7eb; 
+            /* Sombra de texto general del body (se mantiene) */
+            text-shadow: 
+                -0.5px -0.5px 0 #000,  
+                 0.5px -0.5px 0 #000,
+                -0.5px  0.5px 0 #000,
+                 0.5px  0.5px 0 #000;
+        }
+        
+        /* Estilo para tarjetas de ejercicios */
+        .glass-item-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.3);
+            border-left: 5px solid #facc15; /* Borde amarillo de contraste */
+        }
+        
+        /* === ESTILO PARA MÁXIMO CONTRASTE EN LAS CARDS === */
+        .text-contrast-dark {
+            text-shadow: 
+                1px 1px 2px #000,
+                -1px -1px 2px #000,
+                1px -1px 2px #000,
+                -1px 1px 2px #000,
+                0 0 5px rgba(0, 0, 0, 0.8); /* Sombra difuminada fuerte */
+        }
+        /* Contraste en el texto del header */
+        .text-border-gray {
+            text-shadow: 0 0 3px #4b5563; 
+        }
+
+        /* Estilos para notificaciones */
+        #message-box {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            pointer-events: none;
+        }
+        .message-success { background-color: #10b981; color: white; } 
+        .message-error { background-color: #ef4444; color: white; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div id="message-box"></div>
+    
+    <header class="flex justify-between items-center py-4 px-8 mb-4">
+        <h1 class="text-3xl font-extrabold uppercase tracking-wider text-border-gray">
+            <span class="text-amber-400">GYM</span><span class="text-white">ENEZ</span>
+        </h1>
+        
+        <div class="flex space-x-4">
+            <a href="routines.html" 
+               class="px-4 py-2 text-sm font-semibold rounded-full bg-sky-600 text-white hover:bg-sky-500 transition duration-300">
+                REGRESAR
+            </a>
+        </div>
+    </header>
+    
+    <section id="routine-detail" class="min-h-screen p-4 sm:p-8 pt-0"> 
+        <div class="max-w-4xl mx-auto">
+            
+            <h2 id="day-title" class="text-4xl font-extrabold text-center text-amber-400 uppercase mb-8 pb-2">
+                Cargando Rutina...
+            </h2>
+
+            <div id="loading-spinner" class="text-center py-10">
+                <div class="animate-spin inline-block w-8 h-8 border-4 border-amber-400 border-t-transparent rounded-full"></div>
+                <p class="mt-4 text-gray-400">Estableciendo conexión y cargando ejercicios...</p>
+            </div>
+
+            <div id="exercises-container" class="space-y-4">
+                <!-- Los ejercicios se inyectarán aquí -->
+            </div>
+            
+            <div id="no-data-message" class="hidden text-center py-10 text-gray-400">
+                <p class="text-xl">
+                    <span class="text-amber-400 font-bold">¡Día Libre!</span> No se encontraron ejercicios asignados para este día.
+                </p>
+                <p class="mt-2 text-sm">Disfruta tu descanso o contacta a tu entrenador.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <script type="module">
+        // 🚀 URL BASE DE TU API.
+        const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
+        
+        let userId = null;
+
+        // Nombre del día actual: ¡Miércoles!
+        const CURRENT_DAY = 'Miércoles'; 
+        
+        // --- Utilidades del DOM ---
+        const messagebox = document.getElementById('message-box');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const exercisesContainer = document.getElementById('exercises-container');
+        const noDataMessage = document.getElementById('no-data-message');
+        const dayTitle = document.getElementById('day-title');
+
+        function showMessage(message, type = 'success') {
+            messagebox.textContent = message;
+            messagebox.className = ''; 
+            messagebox.classList.add('transition-none');
+            messagebox.classList.add('message-' + type);
+            messagebox.style.opacity = '1';
+            messagebox.style.transform = 'translateX(-50%) translateY(0)';
+            
+            setTimeout(() => {
+                messagebox.style.opacity = '0';
+                messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
+            }, 3000);
+        }
+
+        /**
+         * Renderiza la lista de ejercicios en el DOM.
+         * @param {Array<Object>} exercises - Lista de ejercicios a mostrar.
+         */
+        function renderExercises(exercises) {
+            exercisesContainer.innerHTML = ''; // Limpiar contenedor
+            
+            if (exercises.length === 0) {
+                noDataMessage.classList.remove('hidden');
+                loadingSpinner.classList.add('hidden');
+                return;
+            }
+
+            noDataMessage.classList.add('hidden');
+            loadingSpinner.classList.add('hidden');
+            
+            // Ordenar ejercicios por el campo 'order' si existe
+            exercises.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+            exercises.forEach(exercise => {
+                const card = document.createElement('div');
+                card.className = 'glass-item-card p-4 rounded-xl shadow-lg';
+                
+                // Muestra la información de la base de datos
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="text-contrast-dark"> 
+                            <p class="text-lg font-bold text-amber-400 uppercase">${exercise.exerciseName || 'Ejercicio sin nombre'}</p>
+                            <p class="text-sm text-gray-300">Series: ${exercise.sets || '-'}</p>
+                            <p class="text-sm text-gray-300">Repeticiones: ${exercise.reps || '-'}</p>
+                            <p class="text-sm text-gray-300">Peso Estimado: ${exercise.weight || 'N/A'}</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <!-- Icono de completado (simulado) -->
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center ${exercise.isCompleted ? 'bg-green-600' : 'bg-gray-700'} text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                exercisesContainer.appendChild(card);
+            });
+        }
+
+
+        /**
+         * Carga la rutina del día actual usando la API REST (api_server.py) 
+         * para obtener solo los ejercicios del usuario y día correctos.
+         */
+        async function loadRoutine(dayName) {
+            // Se verifica que userId haya sido cargado desde localStorage
+            if (!userId) {
+                showMessage("Sesión de usuario no encontrada. Por favor, inicie sesión.", 'error');
+                loadingSpinner.classList.add('hidden');
+                return;
+            }
+
+            dayTitle.textContent = `Rutina de ${dayName}`;
+            loadingSpinner.classList.remove('hidden');
+            exercisesContainer.innerHTML = ''; // Limpiar
+
+            // URL del nuevo endpoint: /api/routines/day/{user_id}/{day_name}
+            const API_URL = `${API_BASE_URL}/api/routines/day/${userId}/${dayName}`; 
+            
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || 'Fallo en la respuesta de la API.');
+                }
+                
+                // La API devuelve un array de rutinas. Tomamos los ejercicios de la primera rutina encontrada.
+                const routines = data.routines;
+                let allExercises = [];
+
+                if (routines.length > 0 && routines[0].exercises) {
+                    allExercises = routines[0].exercises;
+                }
+                
+                renderExercises(allExercises);
+
+                if (allExercises.length > 0) {
+                    showMessage(`Rutina de ${dayName} cargada correctamente.`, 'success');
+                } else {
+                    // Si no hay ejercicios, muestra el mensaje de "Día Libre"
+                    loadingSpinner.classList.add('hidden');
+                    noDataMessage.classList.remove('hidden');
+                    showMessage(`No se encontraron ejercicios asignados para ${dayName}.`, 'success');
+                }
+
+            } catch (e) {
+                console.error("Error al cargar la rutina:", e);
+                showMessage(`Error al cargar la rutina: ${e.message}`, 'error');
+                loadingSpinner.classList.add('hidden');
+                noDataMessage.classList.remove('hidden');
+                noDataMessage.innerHTML = `<p class="text-xl text-red-400">Error al cargar datos.</p><p class="mt-2 text-sm">Verifica la consola: ${e.message}</p>`;
+            }
+        }
+
+        /**
+         * Carga la sesión del usuario desde localStorage y, si existe, inicia la carga de datos.
+         */
+        function loadSessionAndData() {
+            const storedSession = localStorage.getItem('userSession');
+            
+            if (storedSession) {
+                try {
+                    const userSession = JSON.parse(storedSession);
+                    // Asume que el ID está en el campo '_id' o 'id' (como en profile.html)
+                    userId = userSession._id || userSession.id; 
+
+                    if (userId) {
+                        loadRoutine(CURRENT_DAY); 
+                        return;
+                    }
+                } catch (e) {
+                    console.error("Error parsing user session:", e);
+                }
+            }
+            
+            // Si la sesión no es válida o falta, muestra error.
+            showMessage("Sesión expirada o no iniciada.", 'error');
+            loadingSpinner.classList.add('hidden');
+            noDataMessage.classList.remove('hidden');
+            noDataMessage.innerHTML = '<p class="text-xl text-red-400">Acceso denegado.</p><p class="mt-2 text-sm">Por favor, inicie sesión nuevamente para ver su rutina.</p>';
+        }
+
+        // --- Lógica de Inicialización ---
+        window.onload = function() {
+            loadSessionAndData();
+        };
+    </script>
+</body>
+</html>
