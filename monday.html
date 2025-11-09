@@ -103,24 +103,12 @@
     </section>
 
     <script type="module">
-        // Importaciones de Firebase (Solo Auth y App)
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        // Eliminamos las importaciones de Firestore ya que ahora usamos la API REST.
+        // ⚠️ NOTA: Eliminamos las importaciones de Firebase SDK para evitar el error de configuración.
 
-        // Variables Globales de Firebase (OBLIGATORIAS)
-        // La corrección a tu error "Firebase config is missing" depende de tu entorno de despliegue.
-        // Asumimos que estas variables seguirán siendo inyectadas o definidas.
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        
-        // 🚀 URL BASE DE TU API. Usamos la de PythonAnywhere como referencia de tu entorno
+        // 🚀 URL BASE DE TU API.
         const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
         
-        let auth;
         let userId = null;
-        let isAuthReady = false; // Mantener para control de flujo
 
         // Nombre del día actual
         const CURRENT_DAY = 'Lunes'; 
@@ -169,7 +157,7 @@
                 const card = document.createElement('div');
                 card.className = 'glass-item-card p-4 rounded-xl shadow-lg';
                 
-                // MOCKUP - Aquí se muestra la información de la base de datos
+                // Muestra la información de la base de datos
                 card.innerHTML = `
                     <div class="flex items-center justify-between">
                         <div>
@@ -197,9 +185,10 @@
          * para obtener solo los ejercicios del usuario y día correctos.
          */
         async function loadRoutine(dayName) {
-            if (!isAuthReady || !userId) {
-                showMessage("Autenticación no completa. No se puede cargar la rutina.", 'error');
-                console.error("Authentication not ready or userId missing.");
+            // Se verifica que userId haya sido cargado desde localStorage
+            if (!userId) {
+                showMessage("Sesión de usuario no encontrada. Por favor, inicie sesión.", 'error');
+                loadingSpinner.classList.add('hidden');
                 return;
             }
 
@@ -207,8 +196,7 @@
             loadingSpinner.classList.remove('hidden');
             exercisesContainer.innerHTML = ''; // Limpiar
 
-            // --- LLAMADA AL NUEVO ENDPOINT REST ---
-            // Construimos la URL usando la API_BASE_URL que definimos arriba
+            // URL del nuevo endpoint: /api/routines/day/{user_id}/{day_name}
             const API_URL = `${API_BASE_URL}/api/routines/day/${userId}/${dayName}`; 
             
             try {
@@ -248,50 +236,36 @@
         }
 
         /**
-         * Inicializa Firebase y establece el estado de autenticación.
+         * Carga la sesión del usuario desde localStorage y, si existe, inicia la carga de datos.
          */
-        async function initializeFirebase() {
-            if (!firebaseConfig) {
-                console.error("Firebase config is missing.");
-                showMessage("Error: Configuración de Firebase no disponible.", 'error');
-                return;
-            }
+        function loadSessionAndData() {
+            const storedSession = localStorage.getItem('userSession');
+            
+            if (storedSession) {
+                try {
+                    const userSession = JSON.parse(storedSession);
+                    // Asume que el ID está en el campo '_id' o 'id' (como en profile.html)
+                    userId = userSession._id || userSession.id; 
 
-            try {
-                // Inicializa la app de Firebase con la configuración proporcionada.
-                const app = initializeApp(firebaseConfig);
-                // Ya no necesitamos getFirestore(app)
-                auth = getAuth(app); 
-
-                // Esperar a que el estado de autenticación cambie para obtener el userId
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        isAuthReady = true;
-                        loadRoutine(CURRENT_DAY); // Cargar la rutina una vez tenemos el userId
-                    } else if (initialAuthToken) {
-                        // Intento de inicio de sesión con el token personalizado
-                        try {
-                            await signInWithCustomToken(auth, initialAuthToken);
-                        } catch (error) {
-                            console.warn("Custom token failed. Signing in anonymously.", error);
-                            await signInAnonymously(auth);
-                        }
-                    } else {
-                        // Si no hay token, iniciar sesión anónimamente
-                        await signInAnonymously(auth);
+                    if (userId) {
+                        loadRoutine(CURRENT_DAY); 
+                        return;
                     }
-                });
-
-            } catch (e) {
-                console.error("Error initializing Firebase or Auth:", e);
-                showMessage(`Error fatal de Firebase: ${e.message}`, 'error');
+                } catch (e) {
+                    console.error("Error parsing user session:", e);
+                }
             }
+            
+            // Si la sesión no es válida o falta, muestra error.
+            showMessage("Sesión expirada o no iniciada.", 'error');
+            loadingSpinner.classList.add('hidden');
+            noDataMessage.classList.remove('hidden');
+            noDataMessage.innerHTML = '<p class="text-xl text-red-400">Acceso denegado.</p><p class="mt-2 text-sm">Por favor, inicie sesión nuevamente para ver su rutina.</p>';
         }
 
         // --- Lógica de Inicialización ---
         window.onload = function() {
-            initializeFirebase();
+            loadSessionAndData();
         };
     </script>
 </body>
