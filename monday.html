@@ -108,6 +108,7 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         
         // Variables Globales de Firebase (OBLIGATORIAS)
+        // Estas variables deben ser inyectadas por el entorno de despliegue.
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
@@ -115,10 +116,10 @@
         let auth;
         let userId = null;
 
-        // Nombre del día actual (Parámetro estático que cambiará para cada archivo: tuesday.html, wednesday.html, etc.)
+        // Nombre del día actual
         const CURRENT_DAY = 'Lunes'; 
         
-        // --- Utilidades ---
+        // --- Utilidades del DOM ---
         const messagebox = document.getElementById('message-box');
         const loadingSpinner = document.getElementById('loading-spinner');
         const exercisesContainer = document.getElementById('exercises-container');
@@ -186,7 +187,8 @@
 
 
         /**
-         * Carga la rutina del día actual usando la API REST (api_server.py).
+         * Carga la rutina del día actual usando la API REST (api_server.py) 
+         * para obtener solo los ejercicios del usuario y día correctos.
          */
         async function loadRoutine(dayName) {
             if (!userId) {
@@ -200,7 +202,8 @@
             loadingSpinner.classList.remove('hidden');
             exercisesContainer.innerHTML = ''; // Limpiar
 
-            // --- LLAMADA AL NUEVO ENDPOINT REST ---
+            // URL del nuevo endpoint: /api/routines/day/{user_id}/{day_name}
+            // Asume que tu servidor Flask está en el mismo dominio o gestiona CORS.
             const API_URL = `/api/routines/day/${userId}/${dayName}`; 
             
             try {
@@ -250,16 +253,17 @@
             }
 
             try {
+                // Inicializa la app de Firebase con la configuración proporcionada.
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app); // Solo necesitamos Auth
 
-                // Esperar a que el estado de autenticación cambie
+                // Esperar a que el estado de autenticación cambie para obtener el userId
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         userId = user.uid;
                         loadRoutine(CURRENT_DAY); // Cargar la rutina una vez tenemos el userId
                     } else if (initialAuthToken) {
-                        // Intento de inicio de sesión con el token proporcionado por el entorno
+                        // Intento de inicio de sesión con el token personalizado
                         try {
                             await signInWithCustomToken(auth, initialAuthToken);
                         } catch (error) {
