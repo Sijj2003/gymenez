@@ -14,8 +14,7 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0d0d1a;
-            /* Usar un fondo más seguro o quitar la referencia a archivos locales */
-            /* background-image: url('PROFILE_FONDO.png'); */ 
+            background-image: url('PROFILE_FONDO.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -91,8 +90,7 @@
             </div>
 
             <div id="exercises-container" class="space-y-4">
-                <!-- Los ejercicios se inyectarán aquí -->
-            </div>
+                </div>
             
             <div id="no-data-message" class="hidden text-center py-10 text-gray-400">
                 <p class="text-xl">
@@ -104,17 +102,21 @@
         </div>
     </section>
 
-    <!-- La sección de scripts se simplifica ya que no necesitamos Firebase Auth/Firestore -->
     <script type="module">
-        // La URL base del backend en PythonAnywhere
-        const API_BASE_URL = "https://sijj2003.pythonanywhere.com";
-        const API_ROUTINES_ENDPOINT = `${API_BASE_URL}/api/routines`;
+        // Importaciones de Firebase (Solo Auth y App)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        
+        // Variables Globales de Firebase (OBLIGATORIAS)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        let auth;
+        let userId = null;
 
         // Nombre del día actual (Parámetro estático que cambiará para cada archivo: tuesday.html, wednesday.html, etc.)
         const CURRENT_DAY = 'Lunes'; 
-        
-        // 🚨 IMPORTANTE: ESTA VARIABLE DEBE CONTENER EL NOMBRE DEL USUARIO AUTENTICADO
-        const MOCK_CURRENT_USER_NAME = "SEBASTIAN ISAAC JIMENEZ JIMENEZ"; // <-- ¡AJUSTAR!
         
         // --- Utilidades ---
         const messagebox = document.getElementById('message-box');
@@ -153,21 +155,23 @@
             noDataMessage.classList.add('hidden');
             loadingSpinner.classList.add('hidden');
             
+            // Ordenar ejercicios por el campo 'order' si existe
+            exercises.sort((a, b) => (a.order || 0) - (b.order || 0));
+
             exercises.forEach(exercise => {
                 const card = document.createElement('div');
                 card.className = 'glass-item-card p-4 rounded-xl shadow-lg';
                 
-                // Usando la estructura de datos que proporcionaste: name, sets y reps
+                // MOCKUP - Aquí se muestra la información de la base de datos
                 card.innerHTML = `
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-lg font-bold text-amber-400 uppercase">${exercise.name || 'Ejercicio sin nombre'}</p>
+                            <p class="text-lg font-bold text-amber-400 uppercase">${exercise.exerciseName || 'Ejercicio sin nombre'}</p>
                             <p class="text-sm text-gray-300">Series: ${exercise.sets || '-'}</p>
                             <p class="text-sm text-gray-300">Repeticiones: ${exercise.reps || '-'}</p>
                             <p class="text-sm text-gray-300">Peso Estimado: ${exercise.weight || 'N/A'}</p>
                         </div>
                         <div class="flex items-center space-x-4">
-                            <!-- Icono de completado (simulado) -->
                             <div class="w-10 h-10 rounded-full flex items-center justify-center ${exercise.isCompleted ? 'bg-green-600' : 'bg-gray-700'} text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
@@ -182,64 +186,101 @@
 
 
         /**
-         * Carga la rutina del día actual haciendo una petición a la API con parámetros de consulta.
+         * Carga la rutina del día actual usando la API REST (api_server.py).
          */
         async function loadRoutine(dayName) {
+            if (!userId) {
+                showMessage("Autenticación incompleta. No se puede cargar la rutina.", 'error');
+                console.error("userId missing.");
+                loadingSpinner.classList.add('hidden');
+                return;
+            }
+
             dayTitle.textContent = `Rutina de ${dayName}`;
             loadingSpinner.classList.remove('hidden');
             exercisesContainer.innerHTML = ''; // Limpiar
 
-            // CONSTRUIR LA URL CON QUERY PARAMS: user y day
-            const fetchUrl = `${API_ROUTINES_ENDPOINT}?user=${encodeURIComponent(MOCK_CURRENT_USER_NAME)}&day=${encodeURIComponent(dayName)}`;
-
+            // --- LLAMADA AL NUEVO ENDPOINT REST ---
+            const API_URL = `/api/routines/day/${userId}/${dayName}`; 
+            
             try {
-                const response = await fetch(fetchUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || `Error HTTP: ${response.status}`);
-                }
-
+                const response = await fetch(API_URL);
                 const data = await response.json();
 
-                if (data.success && data.routines) {
-                    // El backend ya filtró. Solo necesitamos la primera (y única) rutina.
-                    const routineForUserAndDay = data.routines[0]; 
-                    
-                    if (routineForUserAndDay && routineForUserAndDay.exercises && Array.isArray(routineForUserAndDay.exercises)) {
-                        // Renderizar los ejercicios de esa rutina
-                        renderExercises(routineForUserAndDay.exercises);
-                        showMessage(`Rutina de ${dayName} cargada correctamente para ${MOCK_CURRENT_USER_NAME}.`, 'success');
-                    } else {
-                        // Si la respuesta es vacía o falta 'exercises'
-                        renderExercises([]); 
-                        showMessage(`No hay rutina asignada para ${dayName} y usuario ${MOCK_CURRENT_USER_NAME}.`, 'success');
-                    }
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || 'Fallo en la respuesta de la API.');
+                }
+                
+                // La API devuelve un array de rutinas. Tomamos los ejercicios de la primera rutina encontrada.
+                const routines = data.routines;
+                let allExercises = [];
+
+                if (routines.length > 0 && routines[0].exercises) {
+                    allExercises = routines[0].exercises;
+                }
+                
+                renderExercises(allExercises);
+
+                if (allExercises.length > 0) {
+                    showMessage(`Rutina de ${dayName} cargada correctamente.`, 'success');
                 } else {
-                    // Esto capturará errores como la falta de índice compuesto si no existe
-                    throw new Error(data.error || "Respuesta de API inválida o error en el filtrado del backend.");
+                    // Si no hay ejercicios, muestra el mensaje de "Día Libre"
+                    loadingSpinner.classList.add('hidden');
+                    noDataMessage.classList.remove('hidden');
+                    showMessage(`No se encontraron ejercicios asignados para ${dayName}.`, 'success');
                 }
 
             } catch (e) {
-                console.error("Error al cargar la rutina desde la API:", e);
+                console.error("Error al cargar la rutina:", e);
                 showMessage(`Error al cargar la rutina: ${e.message}`, 'error');
                 loadingSpinner.classList.add('hidden');
                 noDataMessage.classList.remove('hidden');
-                noDataMessage.innerHTML = `<p class="text-xl text-red-400">Error al cargar datos.</p><p class="mt-2 text-sm">Verifica la consola para detalles: ${e.message}</p>`;
+                noDataMessage.innerHTML = `<p class="text-xl text-red-400">Error al cargar datos.</p><p class="mt-2 text-sm">Verifica la consola: ${e.message}</p>`;
+            }
+        }
+
+        /**
+         * Inicializa Firebase y establece el estado de autenticación.
+         */
+        async function initializeFirebase() {
+            if (!firebaseConfig) {
+                console.error("Firebase config is missing.");
+                showMessage("Error: Configuración de Firebase no disponible.", 'error');
+                return;
+            }
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app); // Solo necesitamos Auth
+
+                // Esperar a que el estado de autenticación cambie
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        loadRoutine(CURRENT_DAY); // Cargar la rutina una vez tenemos el userId
+                    } else if (initialAuthToken) {
+                        // Intento de inicio de sesión con el token proporcionado por el entorno
+                        try {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } catch (error) {
+                            console.warn("Custom token failed. Signing in anonymously.", error);
+                            await signInAnonymously(auth);
+                        }
+                    } else {
+                        // Si no hay token, iniciar sesión anónimamente
+                        await signInAnonymously(auth);
+                    }
+                });
+
+            } catch (e) {
+                console.error("Error initializing Firebase or Auth:", e);
+                showMessage(`Error fatal de Firebase: ${e.message}`, 'error');
             }
         }
 
         // --- Lógica de Inicialización ---
         window.onload = function() {
-            if (MOCK_CURRENT_USER_NAME === "SEBASTIAN ISAAC JIMENEZ JIMENEZ") {
-                console.warn("ADVERTENCIA: Usando nombre de usuario de prueba. Reemplazar 'MOCK_CURRENT_USER_NAME' con la variable real del usuario autenticado.");
-            }
-            loadRoutine(CURRENT_DAY);
+            initializeFirebase();
         };
     </script>
 </body>
