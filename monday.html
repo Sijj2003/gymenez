@@ -142,6 +142,50 @@
                 messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
             }, 3000);
         }
+        
+        /**
+         * Llama a la API para obtener el enlace del tutorial y lo abre en una nueva pestaña.
+         * Requiere que el endpoint /api/exercises/tutorial/{exercise_name} esté activo en la API.
+         * @param {string} exerciseName - El nombre del ejercicio para buscar el enlace.
+         */
+        async function openTutorial(exerciseName) {
+            // Codifica el nombre para que la URL sea válida (ej: "Press Banca" -> "Press%20Banca")
+            const encodedName = encodeURIComponent(exerciseName);
+            const API_URL = `${API_BASE_URL}/api/exercises/tutorial/${encodedName}`;
+
+            try {
+                // Muestra un mensaje de carga para feedback inmediato
+                showMessage(`Buscando tutorial para: ${exerciseName}...`, 'success');
+                
+                const response = await fetch(API_URL);
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    // Intenta lanzar el error proporcionado por la API o un mensaje por defecto
+                    throw new Error(data.error || 'Tutorial no disponible.');
+                }
+                
+                const tutorialLink = data.tutorialLink;
+
+                if (tutorialLink) {
+                    // Abre el enlace del tutorial en una nueva pestaña
+                    window.open(tutorialLink, '_blank'); 
+                    showMessage(`Tutorial abierto: ${exerciseName}`, 'success');
+                } else {
+                    showMessage('El enlace del tutorial no está configurado.', 'error');
+                }
+
+            } catch (e) {
+                console.error("Error al obtener el tutorial:", e);
+                // Si es un error 404, mostramos un mensaje más amigable
+                if (e.message.includes('404')) {
+                    showMessage(`Tutorial no encontrado para ${exerciseName}.`, 'error');
+                } else {
+                    showMessage(`Error: ${e.message}`, 'error');
+                }
+            }
+        }
+
 
         /**
          * Renderiza la lista de ejercicios en el DOM.
@@ -176,6 +220,13 @@
                             <p class="text-sm text-gray-300">Peso Estimado: ${exercise.weight || 'N/A'}</p>
                         </div>
                         <div class="flex items-center space-x-4">
+                            
+                            <button 
+                                onclick="openTutorial('${exercise.exerciseName.replace(/'/g, "\\'")}')" 
+                                class="px-3 py-1 text-sm font-semibold rounded-lg bg-green-600 text-white hover:bg-green-500 transition duration-300 shadow-md whitespace-nowrap">
+                                TUTORIAL
+                            </button>
+                            
                             <div class="w-10 h-10 rounded-full flex items-center justify-center ${exercise.isCompleted ? 'bg-green-600' : 'bg-gray-700'} text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
