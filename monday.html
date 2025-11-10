@@ -152,17 +152,28 @@
             // Codifica el nombre para que la URL sea válida (ej: "Press Banca" -> "Press%20Banca")
             const encodedName = encodeURIComponent(exerciseName);
             const API_URL = `${API_BASE_URL}/api/exercises/tutorial/${encodedName}`;
+            let data = null;
 
             try {
-                // Muestra un mensaje de carga para feedback inmediato
                 showMessage(`Buscando tutorial para: ${exerciseName}...`, 'success');
                 
                 const response = await fetch(API_URL);
-                const data = await response.json();
 
+                // ⭐ CORRECCIÓN CLAVE: Manejar respuesta que no es JSON (como HTML de error 500)
+                const contentType = response.headers.get("content-type");
+                
+                if (contentType && contentType.includes("application/json")) {
+                    data = await response.json();
+                } else {
+                    // Si el servidor devuelve HTML (como una página de error 500), 
+                    // evitamos el SyntaxError y leemos el texto directamente para debugging.
+                    const errorText = await response.text(); 
+                    console.error("Respuesta no JSON del servidor:", errorText);
+                    throw new Error(`Error ${response.status} en el servidor. El servidor devolvió HTML/Texto, no JSON. (Revisar logs del servidor)`);
+                }
+                
                 if (!response.ok || !data.success) {
-                    // Intenta lanzar el error proporcionado por la API o un mensaje por defecto
-                    throw new Error(data.error || 'Tutorial no disponible.');
+                    throw new Error(data.error || `Error ${response.status} en el servidor. Tutorial no disponible.`);
                 }
                 
                 const tutorialLink = data.tutorialLink;
@@ -177,9 +188,8 @@
 
             } catch (e) {
                 console.error("Error al obtener el tutorial:", e);
-                // Si es un error 404, mostramos un mensaje más amigable
-                if (e.message.includes('404')) {
-                    showMessage(`Tutorial no encontrado para ${exerciseName}.`, 'error');
+                if (e.message.includes('500') || e.message.includes('404')) {
+                    showMessage(`Error de conexión o configuración. Detalles: ${e.message}`, 'error');
                 } else {
                     showMessage(`Error: ${e.message}`, 'error');
                 }
@@ -187,7 +197,6 @@
         }
         
         // 🔥 SOLUCIÓN AL ERROR 'openTutorial is not defined'
-        // Esto hace que la función sea accesible desde el HTML usando onclick="..."
         window.openTutorial = openTutorial; 
 
 
