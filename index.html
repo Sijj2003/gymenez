@@ -208,6 +208,18 @@
                     <p class="text-base text-white mt-4">Comienza tu entrenamiento o explora tus rutinas.</p>
                 </div>
             </a>
+
+            <a href="goals.html" class="col-span-1 block"> 
+                <div class="glass-card p-6 md:p-8 w-full rounded-2xl flex flex-col items-center justify-center text-center h-64 cursor-pointer border-t-2 border-amber-400/50 hover:border-amber-400">
+                    <svg class="w-16 h-16 mb-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <h2 class="text-4xl font-extrabold uppercase tracking-widest">
+                        <span class="text-amber-400">GO</span><span class="text-white">ALS</span>
+                    </h2>
+                    <p class="text-base text-white mt-4">Hazle seguimiento a tus objetivos y ve tu progreso.</p>
+                </div>
+            </a>
             </div>
     </div>
 
@@ -293,7 +305,7 @@
         // Función simplificada, ya que no se necesita la data de rutinas para el dashboard.
         async function loadDashboardData() {
             if (!CURRENT_USER_SESSION) return;
-            console.log("Dashboard cargado solo con el acceso a WORKOUT.");
+            console.log("Dashboard cargado solo con el acceso a WORKOUT y GOALS.");
         }
 
 
