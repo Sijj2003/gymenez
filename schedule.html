@@ -117,11 +117,6 @@
         </h1>
         
         <div class="flex space-x-4">
-            <button id="open-manage-modal" 
-                    class="neon-button px-6 py-2 text-sm rounded-full bg-gray-800 text-amber-400 font-bold uppercase tracking-wider border-2 border-amber-400/50 hover:bg-gray-700 transition duration-300">
-                GESTIONAR
-            </button>
-            
             <button id="back-button"
                     class="px-6 py-2 text-sm font-semibold rounded-full bg-sky-600 text-white hover:bg-sky-500 transition duration-300">
                 REGRESAR
@@ -133,6 +128,13 @@
         <h2 class="text-4xl md:text-5xl font-extrabold uppercase tracking-widest text-center text-border-gray mb-8">
             <span class="text-amber-400">CRONOGRAMA </span><span class="text-white">MENSUAL</span>
         </h2>
+        
+        <div class="mb-10 text-center">
+            <button id="open-manage-modal" 
+                    class="neon-button px-8 py-3 rounded-lg bg-gray-800 text-amber-400 font-bold text-lg uppercase tracking-wider border-2 border-amber-400/50">
+                GESTIONAR
+            </button>
+        </div>
         
         <div class="glass-card p-4 md:p-8 rounded-2xl border-t-2 border-sky-400/50">
             <h3 class="text-2xl font-semibold mb-6 text-sky-400">Próximas Sesiones Asignadas</h3>
@@ -171,7 +173,7 @@
                 
             </div>
             <div class="mt-10 text-center">
-                <p class="text-sm text-gray-500">Usa el botón "GESTIONAR" para agendar nuevas citas personalizadas.</p>
+                <p class="text-sm text-gray-500">Usa el botón "GESTIONAR" arriba para agendar nuevas citas personalizadas.</p>
             </div>
         </div>
     </main>
@@ -228,7 +230,7 @@
         const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
         const messagebox = document.getElementById('message-box');
 
-        // Funciones de utilidad copiadas de index.html
+        // Funciones de utilidad
         function showMessage(message, type = 'success') {
             messagebox.textContent = message;
             messagebox.className = ''; 
@@ -240,7 +242,6 @@
             setTimeout(() => {
                 messagebox.style.opacity = '0';
                 messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
-                // Necesario para que la transición de fade-out funcione en algunos navegadores
                 setTimeout(() => messagebox.classList.remove('transition-none'), 500); 
             }, 3000);
         }
@@ -272,7 +273,6 @@
             }
         }
 
-        // Función para manejar el botón REGRESAR (puede redirigir al index/dashboard)
         function handleGoBack() {
             // Asumiendo que index.html es la página principal/dashboard
             window.location.href = 'index.html'; 
@@ -304,7 +304,6 @@
             modal.classList.add('hidden');
         }
         
-        // Cierra el modal si se hace clic fuera del contenido
         function closeModalOutside(event) {
             if (event.target === modal) {
                 closeManageModal();
