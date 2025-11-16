@@ -83,13 +83,6 @@
             text-shadow: 0 0 3px #4b5563; 
         }
 
-        /* Estilo para los días con rutina asignada (simulación) */
-        .routine-assigned {
-            border: 2px solid #10b981; /* Borde verde de éxito */
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); 
-            background: rgba(16, 185, 129, 0.1); 
-        }
-
         /* Estilo para el input en el modal */
         .modal-input {
             width: 100%;
@@ -106,6 +99,11 @@
             box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.5);
         }
 
+        /* Estilo de la tarjeta de rutina para el cronograma */
+        .routine-card {
+            border-left: 5px solid #38bdf8; /* Borde izquierdo azul cielo */
+        }
+
     </style>
 </head>
 <body class="min-h-screen dashboard-background text-white p-4 md:p-8">
@@ -119,62 +117,61 @@
         </h1>
         
         <div class="flex space-x-4">
-            <a href="profile.html" 
-               class="px-4 py-2 text-sm font-semibold rounded-full bg-amber-600 text-white hover:bg-amber-500 transition duration-300">
-                PROFILE
-            </a>
-            <button id="logout-button"
-                    class="px-4 py-2 text-sm font-semibold rounded-full bg-red-600 hover:bg-red-500 transition duration-300">
-                Salir
+            <button id="open-manage-modal" 
+                    class="neon-button px-6 py-2 text-sm rounded-full bg-gray-800 text-amber-400 font-bold uppercase tracking-wider border-2 border-amber-400/50 hover:bg-gray-700 transition duration-300">
+                GESTIONAR
+            </button>
+            
+            <button id="back-button"
+                    class="px-6 py-2 text-sm font-semibold rounded-full bg-sky-600 text-white hover:bg-sky-500 transition duration-300">
+                REGRESAR
             </button>
         </div>
     </header>
 
     <main class="max-w-6xl mx-auto mt-10">
         <h2 class="text-4xl md:text-5xl font-extrabold uppercase tracking-widest text-center text-border-gray mb-8">
-            <span class="text-amber-400">PLANIFICADOR </span><span class="text-white">DE RUTINAS</span>
+            <span class="text-amber-400">CRONOGRAMA </span><span class="text-white">MENSUAL</span>
         </h2>
         
         <div class="glass-card p-4 md:p-8 rounded-2xl border-t-2 border-sky-400/50">
-            <h3 class="text-2xl font-semibold mb-6 text-sky-400">Tu Semana de Entrenamiento Estandar</h3>
-            <p class="mb-6 text-gray-300">Los días marcados en verde tienen rutinas asignadas automáticamente.</p>
+            <h3 class="text-2xl font-semibold mb-6 text-sky-400">Próximas Sesiones Asignadas</h3>
+            <p class="mb-6 text-gray-300">Organiza tu tiempo con las rutinas estándar y citas que tienes agendadas.</p>
             
-            <div id="schedule-grid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
-                <div class="glass-card p-4 rounded-xl routine-assigned">
-                    <p class="font-bold text-lg mb-1">Lunes</p>
-                    <p class="text-sm text-gray-300">Rutina Asignada</p>
+            <div id="schedule-list" class="space-y-6">
+                
+                <div class="space-y-3">
+                    <h4 class="text-xl font-bold text-amber-400 border-b border-gray-700 pb-1">Lunes, 2 Diciembre</h4>
+                    <div class="glass-card p-4 rounded-xl routine-card flex justify-between items-center">
+                        <div>
+                            <p class="font-semibold text-lg">Rutina Estándar: Full Body</p>
+                            <p class="text-sm text-gray-400">Asignada automáticamente</p>
+                        </div>
+                        <span class="text-lg font-extrabold text-white">7:00 AM</span>
+                    </div>
                 </div>
-                <div class="glass-card p-4 rounded-xl">
-                    <p class="font-bold text-lg mb-1">Martes</p>
-                    <p class="text-sm text-gray-500">Libre</p>
+
+                <div class="space-y-3">
+                    <h4 class="text-xl font-bold text-amber-400 border-b border-gray-700 pb-1">Miércoles, 4 Diciembre</h4>
+                    <div class="glass-card p-4 rounded-xl routine-card flex justify-between items-center">
+                        <div>
+                            <p class="font-semibold text-lg">Cita Personalizada: Hipertrofia de Pierna</p>
+                            <p class="text-sm text-sky-400">Con Coach Alejandro</p>
+                        </div>
+                        <span class="text-lg font-extrabold text-white">5:30 PM</span>
+                    </div>
                 </div>
-                <div class="glass-card p-4 rounded-xl routine-assigned">
-                    <p class="font-bold text-lg mb-1">Miércoles</p>
-                    <p class="text-sm text-gray-300">Rutina Asignada</p>
+
+                <div class="space-y-3">
+                    <h4 class="text-xl font-bold text-amber-400 border-b border-gray-700 pb-1">Viernes, 6 Diciembre</h4>
+                    <div class="glass-card p-4 rounded-xl routine-card flex justify-center items-center opacity-70">
+                        <p class="text-gray-500 italic">No tienes rutinas o citas programadas para este día.</p>
+                    </div>
                 </div>
-                <div class="glass-card p-4 rounded-xl">
-                    <p class="font-bold text-lg mb-1">Jueves</p>
-                    <p class="text-sm text-gray-500">Libre</p>
-                </div>
-                <div class="glass-card p-4 rounded-xl routine-assigned">
-                    <p class="font-bold text-lg mb-1">Viernes</p>
-                    <p class="text-sm text-gray-300">Rutina Asignada</p>
-                </div>
-                <div class="glass-card p-4 rounded-xl">
-                    <p class="font-bold text-lg mb-1">Sábado</p>
-                    <p class="text-sm text-gray-500">Libre</p>
-                </div>
-                <div class="glass-card p-4 rounded-xl">
-                    <p class="font-bold text-lg mb-1">Domingo</p>
-                    <p class="text-sm text-gray-500">Libre</p>
-                </div>
+                
             </div>
-            
             <div class="mt-10 text-center">
-                <button id="open-manage-modal" 
-                        class="neon-button px-8 py-3 rounded-lg bg-gray-800 text-amber-400 font-bold text-lg uppercase tracking-wider border-2 border-amber-400/50">
-                    GESTIONAR
-                </button>
+                <p class="text-sm text-gray-500">Usa el botón "GESTIONAR" para agendar nuevas citas personalizadas.</p>
             </div>
         </div>
     </main>
@@ -241,14 +238,14 @@
             messagebox.style.transform = 'translateX(-50%) translateY(0)';
             
             setTimeout(() => {
-                messagebox.style.style = '';
                 messagebox.style.opacity = '0';
                 messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
+                // Necesario para que la transición de fade-out funcione en algunos navegadores
+                setTimeout(() => messagebox.classList.remove('transition-none'), 500); 
             }, 3000);
         }
 
         async function apiLogout() {
-            // Lógica de logout copiada de index.html
             try {
                 let userId = null;
                 const storedSession = localStorage.getItem('userSession');
@@ -258,7 +255,6 @@
                 }
 
                 if (userId) {
-                    // Nota: Esta llamada al servidor es asíncrona y no detiene la navegación.
                     await fetch(`${API_BASE_URL}/api/logout`, {
                         method: 'POST',
                         headers: {
@@ -271,39 +267,26 @@
             } catch (e) {
                 console.error("Error al intentar cerrar sesión en el servidor:", e);
             } finally {
-                localStorage.removeItem('userSession'); // Limpiar sesión local siempre
+                localStorage.removeItem('userSession'); 
                 return { success: true }; 
             }
         }
 
-        async function handleLogout() {
-            const btn = document.getElementById('logout-button');
-            const originalText = btn.textContent;
-            
-            btn.disabled = true;
-            btn.textContent = 'Cerrando...';
-
-            await apiLogout(); 
-            
-            showMessage('Sesión cerrada correctamente.', 'success');
-            // Redirigir al index/login
+        // Función para manejar el botón REGRESAR (puede redirigir al index/dashboard)
+        function handleGoBack() {
+            // Asumiendo que index.html es la página principal/dashboard
             window.location.href = 'index.html'; 
-
-            btn.disabled = false;
-            btn.textContent = originalText;
         }
 
         function checkAuthentication() {
             const storedSession = localStorage.getItem('userSession');
             if (!storedSession) {
-                // Si no hay sesión, redirige al login
                 showMessage('Sesión expirada o no iniciada. Redirigiendo al inicio.', 'error');
                 setTimeout(() => {
                     window.location.href = 'index.html';
                 }, 1500); 
             } else {
-                // Si hay sesión, puedes cargar data específica del usuario si la necesitas
-                console.log("Usuario autenticado en la pantalla de Schedule.");
+                console.log("Usuario autenticado en la pantalla de Schedule (Cronograma).");
             }
         }
 
@@ -336,14 +319,19 @@
             const timeSlot = document.getElementById('time-slot-select').value;
             const btn = document.getElementById('schedule-btn');
             
+            if (!trainer || !routineType.trim() || !timeSlot) {
+                showMessage('Por favor, completa todos los campos del formulario.', 'error');
+                return;
+            }
+
             btn.disabled = true;
             btn.textContent = 'AGENDANDO...';
             
             // --- SIMULACIÓN DE LLAMADA A API (Aquí iría la lógica real) ---
-            await new Promise(resolve => setTimeout(resolve, 1500)); // Espera de 1.5s
+            await new Promise(resolve => setTimeout(resolve, 1500)); 
             
             // Muestra la confirmación
-            showMessage(`Rutina agendada con éxito para el slot ${timeSlot}!`, 'success');
+            showMessage(`Rutina "${routineType.substring(0, 20)}..." agendada con éxito!`, 'success');
             
             // Limpia el formulario y cierra el modal
             scheduleForm.reset();
@@ -357,7 +345,7 @@
         window.onload = function() {
             checkAuthentication();
             // LISTENERS
-            document.getElementById('logout-button').addEventListener('click', handleLogout);
+            document.getElementById('back-button').addEventListener('click', handleGoBack);
             openModalBtn.addEventListener('click', openManageModal);
             scheduleForm.addEventListener('submit', handleScheduleSubmit);
         };
