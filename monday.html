@@ -39,17 +39,16 @@
             border-left: 5px solid #facc15; /* Borde amarillo de contraste */
         }
         
-        /* === NUEVO ESTILO PARA MÁXIMO CONTRASTE EN LAS CARDS === */
+        /* === ESTILOS DE CONTRASTE === */
         .text-contrast-dark {
-            /* Una sombra de texto más grande para asegurar contraste sobre fondos complejos */
+            /* Sombra de texto para asegurar contraste sobre fondos complejos */
             text-shadow: 
                 1px 1px 2px #000,
                 -1px -1px 2px #000,
                 1px -1px 2px #000,
                 -1px 1px 2px #000,
-                0 0 5px rgba(0, 0, 0, 0.8); /* Sombra difuminada fuerte */
+                0 0 5px rgba(0, 0, 0, 0.8); 
         }
-        /* Contraste en el texto del header */
         .text-border-gray {
             text-shadow: 0 0 3px #4b5563; 
         }
@@ -71,7 +70,7 @@
         .message-success { background-color: #10b981; color: white; } 
         .message-error { background-color: #ef4444; color: white; }
         
-        /* Estilos para la pantalla de felicitación */
+        /* Estilos para la pantalla de felicitación (MEJORADO) */
         #finish-screen {
             position: fixed;
             top: 0;
@@ -80,9 +79,10 @@
             height: 100%;
             background-color: #000000; /* Fondo negro */
             display: flex;
-            justify-content: center;
-            align-items: center;
+            justify-content: center; /* Centrado horizontal */
+            align-items: center; /* Centrado vertical */
             flex-direction: column;
+            text-align: center; /* Asegura el centrado del texto en varias líneas */
             z-index: 2000;
             opacity: 0;
             pointer-events: none;
@@ -95,11 +95,25 @@
         }
 
         #finish-message {
-            font-size: 3rem;
+            /* Aumento de tamaño y contraste */
+            font-size: 3rem; /* Tamaño base para móviles */
             font-weight: 900;
-            color: #facc15; /* Amarillo de contraste */
-            text-shadow: 0 0 10px rgba(255, 255, 0, 0.5), 0 0 20px rgba(255, 165, 0, 0.5);
-            z-index: 2001; /* Asegurar que el mensaje esté sobre el confetti */
+            color: #facc15; /* Amarillo brillante */
+            
+            /* Sombra de texto fuerte para máximo contraste */
+            text-shadow: 
+                0 0 5px #000,
+                0 0 15px rgba(255, 165, 0, 0.9), /* Fuego */
+                0 0 30px rgba(255, 255, 0, 0.7); /* Brillo */
+            
+            z-index: 2001;
+        }
+        
+        /* Ajuste de tamaño en pantallas más grandes */
+        @media (min-width: 768px) {
+            #finish-message {
+                font-size: 5rem;
+            }
         }
 
     </style>
@@ -168,7 +182,7 @@
         const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
         
         let userId = null;
-        let routineExercises = []; // Almacena la lista de ejercicios cargados
+        let routineExercises = []; 
         
         // Nombre del día actual
         const CURRENT_DAY = 'Lunes'; 
@@ -204,7 +218,6 @@
          * @param {string} exerciseName - El nombre del ejercicio para buscar el enlace.
          */
         async function openTutorial(exerciseName) {
-            // ... (Función openTutorial, se mantiene sin cambios) ...
             const encodedName = encodeURIComponent(exerciseName);
             const API_URL = `${API_BASE_URL}/api/exercises/tutorial/${encodedName}`;
             let data = null;
@@ -246,11 +259,10 @@
             }
         }
         
-        // 🔥 SOLUCIÓN AL ERROR 'openTutorial is not defined'
         window.openTutorial = openTutorial; 
 
 
-        // --- NUEVAS FUNCIONES DE INTERACTIVIDAD ---
+        // --- FUNCIONES DE INTERACTIVIDAD ---
 
         /**
          * Actualiza el estado visual del botón 'Rutina Terminada'.
@@ -262,7 +274,7 @@
             finishRoutineBtn.disabled = !allCompleted;
             
             // Eliminar clases anteriores
-            finishRoutineBtn.classList.remove('bg-red-600', 'hover:bg-red-500', 'bg-green-600', 'hover:bg-green-500', 'text-gray-300');
+            finishRoutineBtn.classList.remove('bg-red-600', 'hover:bg-red-500', 'bg-green-600', 'hover:bg-green-500', 'text-gray-300', 'text-white');
 
             if (allCompleted) {
                 // Estado ACTIVO (Verde)
@@ -276,7 +288,6 @@
         /**
          * Maneja el clic en el botón 'Completar' de un ejercicio.
          * @param {string} exerciseName - Nombre único del ejercicio.
-         * @param {HTMLElement} cardElement - La tarjeta DOM del ejercicio.
          */
         function toggleExerciseCompleted(exerciseName) {
             const exercise = routineExercises.find(e => e.exerciseName === exerciseName);
@@ -286,12 +297,14 @@
             exercise.isCompleted = !exercise.isCompleted;
 
             // 2. Actualizar visualmente la tarjeta
-            const completedIndicator = document.getElementById(`completed-indicator-${exerciseName.replace(/\s/g, '-')}`);
-            const completedButton = document.getElementById(`completed-button-${exerciseName.replace(/\s/g, '-')}`);
+            const cardId = exerciseName.replace(/\s/g, '-');
+            const completedIndicator = document.getElementById(`completed-indicator-${cardId}`);
+            const completedButton = document.getElementById(`completed-button-${cardId}`);
             
             if (exercise.isCompleted) {
                 completedIndicator.classList.remove('bg-gray-700');
                 completedIndicator.classList.add('bg-green-600');
+                
                 completedButton.classList.remove('bg-sky-600', 'hover:bg-sky-500');
                 completedButton.classList.add('bg-gray-700', 'hover:bg-gray-600');
                 completedButton.textContent = 'HECHO';
@@ -299,6 +312,7 @@
             } else {
                 completedIndicator.classList.remove('bg-green-600');
                 completedIndicator.classList.add('bg-gray-700');
+                
                 completedButton.classList.remove('bg-gray-700', 'hover:bg-gray-600');
                 completedButton.classList.add('bg-sky-600', 'hover:bg-sky-500');
                 completedButton.textContent = 'COMPLETAR';
@@ -309,7 +323,6 @@
             updateFinishButtonState();
         }
 
-        // 🔥 SOLUCIÓN AL ERROR 'toggleExerciseCompleted is not defined'
         window.toggleExerciseCompleted = toggleExerciseCompleted; 
 
 
@@ -319,11 +332,10 @@
         function displayCompletionFireworks() {
             finishScreen.classList.add('show');
             
-            // Intentar reproducir el sonido (puede fallar si el navegador lo bloquea)
+            // Intentar reproducir el sonido 
             fireworksAudio.currentTime = 0; // Reiniciar
             fireworksAudio.play().catch(e => console.warn("Error al reproducir audio:", e.message));
 
-            // Configuración de los fuegos artificiales (usando la librería canvas-confetti)
             const duration = 5 * 1000;
             const animationEnd = Date.now() + duration;
             const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 2001 };
@@ -336,7 +348,15 @@
                 const timeLeft = animationEnd - Date.now();
 
                 if (timeLeft <= 0) {
-                    return clearInterval(interval);
+                    clearInterval(interval);
+                    
+                    // --- REDIRECCIÓN AQUÍ ---
+                    setTimeout(() => {
+                        window.location.href = 'routines.html';
+                    }, 1000); // Espera 1 segundo después de que termina la animación para redirigir
+                    // -------------------------
+
+                    return;
                 }
 
                 const particleCount = 50 * (timeLeft / duration);
@@ -346,7 +366,7 @@
                 confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: randomInRange(0.7, 0.9) } }));
             }, 250);
 
-            // Ocultar la pantalla después de la duración
+            // Ocultar la pantalla (aunque la redirección lo hará, es una buena práctica)
             setTimeout(() => {
                 finishScreen.classList.remove('show');
             }, duration + 1000); 
@@ -359,12 +379,12 @@
             if (!finishRoutineBtn.disabled) {
                 displayCompletionFireworks();
                 showMessage("¡Gran trabajo! Rutina finalizada con éxito.", 'success');
-                // Aquí podrías añadir lógica para enviar el estado de la rutina a la API.
+                // Lógica de API futura aquí
             }
         });
 
 
-        // --- FIN NUEVAS FUNCIONES DE INTERACTIVIDAD ---
+        // --- FIN FUNCIONES DE INTERACTIVIDAD ---
         
         /**
          * Renderiza la lista de ejercicios en el DOM.
@@ -392,7 +412,6 @@
                 const card = document.createElement('div');
                 card.className = 'glass-item-card p-4 rounded-xl shadow-lg';
                 
-                // Asegurar que 'isCompleted' exista, por si no viene de la API
                 exercise.isCompleted = exercise.isCompleted || false; 
                 
                 const cardId = exercise.exerciseName.replace(/\s/g, '-');
@@ -411,19 +430,22 @@
                         </div>
                         <div class="flex items-center space-x-4">
                             
-                            <button 
-                                id="completed-button-${cardId}"
-                                onclick="toggleExerciseCompleted('${exercise.exerciseName.replace(/'/g, "\\'")}')" 
-                                class="px-3 py-1 text-sm font-semibold rounded-lg ${btnBgClass} text-white transition duration-300 shadow-md whitespace-nowrap">
-                                ${btnText}
-                            </button>
-                            
-                            <button 
-                                onclick="openTutorial('${exercise.exerciseName.replace(/'/g, "\\'")}')" 
-                                class="px-3 py-1 text-sm font-semibold rounded-lg bg-green-600 text-white hover:bg-green-500 transition duration-300 shadow-md whitespace-nowrap">
-                                TUTORIAL
-                            </button>
-                            
+                            <div class="flex flex-col space-y-2 items-end"> 
+                                
+                                <button 
+                                    id="completed-button-${cardId}"
+                                    onclick="toggleExerciseCompleted('${exercise.exerciseName.replace(/'/g, "\\'")}')" 
+                                    class="w-full px-3 py-1 text-sm font-semibold rounded-lg ${btnBgClass} text-white transition duration-300 shadow-md whitespace-nowrap">
+                                    ${btnText}
+                                </button>
+                                
+                                <button 
+                                    onclick="openTutorial('${exercise.exerciseName.replace(/'/g, "\\'")}')" 
+                                    class="w-full px-3 py-1 text-sm font-semibold rounded-lg bg-green-600 text-white hover:bg-green-500 transition duration-300 shadow-md whitespace-nowrap">
+                                    TUTORIAL
+                                </button>
+                            </div>
+
                             <div id="completed-indicator-${cardId}" class="w-10 h-10 rounded-full flex items-center justify-center ${circleBgClass} text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
@@ -441,11 +463,9 @@
 
 
         /**
-         * Carga la rutina del día actual usando la API REST (api_server.py) 
-         * para obtener solo los ejercicios del usuario y día correctos.
+         * Carga la rutina del día actual usando la API REST.
          */
         async function loadRoutine(dayName) {
-            // Se verifica que userId haya sido cargado desde localStorage
             if (!userId) {
                 showMessage("Sesión de usuario no encontrada. Por favor, inicie sesión.", 'error');
                 loadingSpinner.classList.add('hidden');
@@ -454,10 +474,9 @@
 
             dayTitle.textContent = `Rutina de ${dayName}`;
             loadingSpinner.classList.remove('hidden');
-            exercisesContainer.innerHTML = ''; // Limpiar
-            finishRoutineContainer.classList.add('hidden'); // Ocultar
+            exercisesContainer.innerHTML = ''; 
+            finishRoutineContainer.classList.add('hidden'); 
 
-            // URL del nuevo endpoint: /api/routines/day/{user_id}/{day_name}
             const API_URL = `${API_BASE_URL}/api/routines/day/${userId}/${dayName}`; 
             
             try {
@@ -468,7 +487,6 @@
                     throw new Error(data.error || 'Fallo en la respuesta de la API.');
                 }
                 
-                // La API devuelve un array de rutinas. Tomamos los ejercicios de la primera rutina encontrada.
                 const routines = data.routines;
                 let allExercises = [];
 
@@ -477,7 +495,6 @@
                 }
                 
                 // Inyectar el estado de completado inicial (Falso por defecto si no lo da la API)
-                // Esto es crucial para el nuevo sistema de completado
                 allExercises.forEach(e => {
                     e.isCompleted = false; 
                 });
@@ -488,7 +505,6 @@
                 if (allExercises.length > 0) {
                     showMessage(`Rutina de ${dayName} cargada correctamente.`, 'success');
                 } else {
-                    // Si no hay ejercicios, muestra el mensaje de "Día Libre"
                     loadingSpinner.classList.add('hidden');
                     noDataMessage.classList.remove('hidden');
                     showMessage(`No se encontraron ejercicios asignados para ${dayName}.`, 'success');
@@ -504,7 +520,7 @@
         }
 
         /**
-         * Carga la sesión del usuario desde localStorage y, si existe, inicia la carga de datos.
+         * Carga la sesión del usuario desde localStorage.
          */
         function loadSessionAndData() {
             const storedSession = localStorage.getItem('userSession');
@@ -512,7 +528,6 @@
             if (storedSession) {
                 try {
                     const userSession = JSON.parse(storedSession);
-                    // Asume que el ID está en el campo '_id' o 'id' (como en profile.html)
                     userId = userSession._id || userSession.id; 
 
                     if (userId) {
@@ -524,7 +539,6 @@
                 }
             }
             
-            // Si la sesión no es válida o falta, muestra error.
             showMessage("Sesión expirada o no iniciada.", 'error');
             loadingSpinner.classList.add('hidden');
             noDataMessage.classList.remove('hidden');
