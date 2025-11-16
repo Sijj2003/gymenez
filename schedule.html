@@ -1,1 +1,366 @@
-proximamente
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GYMENEZ | Schedule</title>
+    <link rel="icon" type="image/png" href="mini_logo.png">
+    <link rel="shortcut icon" type="image/png" href="mini_logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        /* Tema de Fondo Minimalista: Base Oscura (DEFAULT/LOGIN) */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0d1a;
+            /* Fondo Inicial (LOGIN) */
+            background-image: url('FONDO.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #e5e7eb; 
+            /* Transición para un cambio de fondo suave */
+            transition: background-image 1s ease-in-out; 
+            
+            /* === APLICADO: Borde negro para todas las letras (Text Stroke Effect) === */
+            text-shadow: 
+                -0.5px -0.5px 0 #000,  
+                 0.5px -0.5px 0 #000,
+                -0.5px  0.5px 0 #000,
+                 0.5px  0.5px 0 #000;
+        }
+        
+        /* Estilo específico para el efecto Glassmorphism en las tarjetas */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.6);
+        }
+
+        /* Estilo para el botón con efecto NEON (AMARILLO/GRIS) */
+        .neon-button {
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px #fbbf24, 0 0 20px #fbbf24; 
+        }
+        .neon-button:hover {
+            box-shadow: 0 0 15px #fcd34d, 0 0 30px #fcd34d;
+            transform: scale(1.02);
+        }
+
+        /* Estilos para el mensaje de estado */
+        #message-box {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            pointer-events: none;
+        }
+        .message-success { background-color: #10b981; color: white; } 
+        .message-error { background-color: #ef4444; color: white; } 
+        
+        /* === FONDO ESPECÍFICO PARA EL DASHBOARD === */
+        .dashboard-background {
+            background-image: url('PROFILE_FONDO.png') !important;
+        }
+
+        /* === ESTILO: Sombra/Borde para el texto del Header (Gris) === */
+        .text-border-gray {
+            text-shadow: 0 0 3px #4b5563; 
+        }
+
+        /* Estilo para los días con rutina asignada (simulación) */
+        .routine-assigned {
+            border: 2px solid #10b981; /* Borde verde de éxito */
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); 
+            background: rgba(16, 185, 129, 0.1); 
+        }
+
+        /* Estilo para el input en el modal */
+        .modal-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            background-color: transparent;
+            color: white;
+            border: 1px solid #4b5563;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .modal-input:focus {
+            border-color: #38bdf8; /* sky-400 */
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.5);
+        }
+
+    </style>
+</head>
+<body class="min-h-screen dashboard-background text-white p-4 md:p-8">
+
+    <div id="message-box"></div>
+
+    <header class="flex justify-between items-center py-4 px-2 mb-8 max-w-6xl mx-auto">
+        <h1 class="text-3xl font-extrabold uppercase tracking-wider text-border-gray cursor-pointer" 
+            onclick="window.location.href='index.html';">
+            <span class="text-amber-400">GYM</span><span class="text-white">ENEZ</span>
+        </h1>
+        
+        <div class="flex space-x-4">
+            <a href="profile.html" 
+               class="px-4 py-2 text-sm font-semibold rounded-full bg-amber-600 text-white hover:bg-amber-500 transition duration-300">
+                PROFILE
+            </a>
+            <button id="logout-button"
+                    class="px-4 py-2 text-sm font-semibold rounded-full bg-red-600 hover:bg-red-500 transition duration-300">
+                Salir
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto mt-10">
+        <h2 class="text-4xl md:text-5xl font-extrabold uppercase tracking-widest text-center text-border-gray mb-8">
+            <span class="text-amber-400">PLANIFICADOR </span><span class="text-white">DE RUTINAS</span>
+        </h2>
+        
+        <div class="glass-card p-4 md:p-8 rounded-2xl border-t-2 border-sky-400/50">
+            <h3 class="text-2xl font-semibold mb-6 text-sky-400">Tu Semana de Entrenamiento Estandar</h3>
+            <p class="mb-6 text-gray-300">Los días marcados en verde tienen rutinas asignadas automáticamente.</p>
+            
+            <div id="schedule-grid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
+                <div class="glass-card p-4 rounded-xl routine-assigned">
+                    <p class="font-bold text-lg mb-1">Lunes</p>
+                    <p class="text-sm text-gray-300">Rutina Asignada</p>
+                </div>
+                <div class="glass-card p-4 rounded-xl">
+                    <p class="font-bold text-lg mb-1">Martes</p>
+                    <p class="text-sm text-gray-500">Libre</p>
+                </div>
+                <div class="glass-card p-4 rounded-xl routine-assigned">
+                    <p class="font-bold text-lg mb-1">Miércoles</p>
+                    <p class="text-sm text-gray-300">Rutina Asignada</p>
+                </div>
+                <div class="glass-card p-4 rounded-xl">
+                    <p class="font-bold text-lg mb-1">Jueves</p>
+                    <p class="text-sm text-gray-500">Libre</p>
+                </div>
+                <div class="glass-card p-4 rounded-xl routine-assigned">
+                    <p class="font-bold text-lg mb-1">Viernes</p>
+                    <p class="text-sm text-gray-300">Rutina Asignada</p>
+                </div>
+                <div class="glass-card p-4 rounded-xl">
+                    <p class="font-bold text-lg mb-1">Sábado</p>
+                    <p class="text-sm text-gray-500">Libre</p>
+                </div>
+                <div class="glass-card p-4 rounded-xl">
+                    <p class="font-bold text-lg mb-1">Domingo</p>
+                    <p class="text-sm text-gray-500">Libre</p>
+                </div>
+            </div>
+            
+            <div class="mt-10 text-center">
+                <button id="open-manage-modal" 
+                        class="neon-button px-8 py-3 rounded-lg bg-gray-800 text-amber-400 font-bold text-lg uppercase tracking-wider border-2 border-amber-400/50">
+                    GESTIONAR
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <div id="manage-modal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center p-4" onclick="closeModalOutside(event)">
+        <div class="glass-card p-6 md:p-8 w-full max-w-lg mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-500/30">
+            
+            <div class="flex justify-between items-center mb-6">
+                 <h3 class="text-2xl font-bold text-amber-400">Agendar Nueva Rutina</h3>
+                 <button onclick="closeManageModal()" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+            </div>
+
+            <form id="schedule-form">
+                
+                <div class="mb-5">
+                    <label for="trainer-select" class="block text-sm font-medium text-white mb-2">Seleccionar Entrenador</label>
+                    <select id="trainer-select" class="modal-input" required>
+                        <option value="" disabled selected>Elige un entrenador...</option>
+                        <option value="trainer1" class="bg-[#0d0d1a] text-white">Coach Alejandro (Especialista en Fuerza)</option>
+                        <option value="trainer2" class="bg-[#0d0d1a] text-white">Coach Sofía (Especialista en Cardio)</option>
+                        <option value="trainer3" class="bg-[#0d0d1a] text-white">Coach Javier (Especialista en Movilidad)</option>
+                    </select>
+                </div>
+                
+                <div class="mb-5">
+                    <label for="routine-type" class="block text-sm font-medium text-white mb-2">Describe la Rutina que Deseas Agendar</label>
+                    <textarea id="routine-type" rows="3" placeholder="Ej: Entrenamiento de pecho y bíceps con énfasis en hipertrofia" class="modal-input" required></textarea>
+                </div>
+
+                <div class="mb-8">
+                    <label for="time-slot-select" class="block text-sm font-medium text-white mb-2">Horario Habilitado</label>
+                    <select id="time-slot-select" class="modal-input" required>
+                        <option value="" disabled selected>Selecciona un horario libre...</option>
+                        <option value="mon-9" class="bg-[#0d0d1a] text-white">Lunes 9:00 AM - Coach Alejandro</option>
+                        <option value="tue-15" class="bg-[#0d0d1a] text-white">Martes 3:00 PM - Coach Sofía</option>
+                        <option value="wed-18" class="bg-[#0d0d1a] text-white">Miércoles 6:00 PM - Coach Javier</option>
+                        <option value="thu-10" class="bg-[#0d0d1a] text-white">Jueves 10:00 AM - Coach Alejandro</option>
+                    </select>
+                    <p class="text-xs text-gray-400 mt-2">Los horarios mostrados se actualizan según el entrenador seleccionado.</p>
+                </div>
+
+                <button type="submit" id="schedule-btn"
+                        class="neon-button w-full py-3 rounded-lg bg-sky-800 text-white font-bold text-lg hover:bg-sky-700 uppercase tracking-wider border-2 border-sky-400/50">
+                    AGENDAR CITA
+                </button>
+            </form>
+            
+        </div>
+    </div>
+
+
+    <script>
+        // --- CONFIGURACIÓN DE SEGURIDAD Y SESIÓN ---
+        const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
+        const messagebox = document.getElementById('message-box');
+
+        // Funciones de utilidad copiadas de index.html
+        function showMessage(message, type = 'success') {
+            messagebox.textContent = message;
+            messagebox.className = ''; 
+            messagebox.classList.add('transition-none');
+            messagebox.classList.add('message-' + type);
+            messagebox.style.opacity = '1';
+            messagebox.style.transform = 'translateX(-50%) translateY(0)';
+            
+            setTimeout(() => {
+                messagebox.style.style = '';
+                messagebox.style.opacity = '0';
+                messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
+            }, 3000);
+        }
+
+        async function apiLogout() {
+            // Lógica de logout copiada de index.html
+            try {
+                let userId = null;
+                const storedSession = localStorage.getItem('userSession');
+                if (storedSession) {
+                    const storedUser = JSON.parse(storedSession);
+                    userId = storedUser._id || storedUser.id;
+                }
+
+                if (userId) {
+                    // Nota: Esta llamada al servidor es asíncrona y no detiene la navegación.
+                    await fetch(`${API_BASE_URL}/api/logout`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ userId: userId })
+                    });
+                }
+                
+            } catch (e) {
+                console.error("Error al intentar cerrar sesión en el servidor:", e);
+            } finally {
+                localStorage.removeItem('userSession'); // Limpiar sesión local siempre
+                return { success: true }; 
+            }
+        }
+
+        async function handleLogout() {
+            const btn = document.getElementById('logout-button');
+            const originalText = btn.textContent;
+            
+            btn.disabled = true;
+            btn.textContent = 'Cerrando...';
+
+            await apiLogout(); 
+            
+            showMessage('Sesión cerrada correctamente.', 'success');
+            // Redirigir al index/login
+            window.location.href = 'index.html'; 
+
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
+
+        function checkAuthentication() {
+            const storedSession = localStorage.getItem('userSession');
+            if (!storedSession) {
+                // Si no hay sesión, redirige al login
+                showMessage('Sesión expirada o no iniciada. Redirigiendo al inicio.', 'error');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500); 
+            } else {
+                // Si hay sesión, puedes cargar data específica del usuario si la necesitas
+                console.log("Usuario autenticado en la pantalla de Schedule.");
+            }
+        }
+
+
+        // --- LÓGICA DEL MODAL DE GESTIÓN ---
+        const modal = document.getElementById('manage-modal');
+        const openModalBtn = document.getElementById('open-manage-modal');
+        const scheduleForm = document.getElementById('schedule-form');
+
+        function openManageModal() {
+            modal.classList.remove('hidden');
+        }
+
+        function closeManageModal() {
+            modal.classList.add('hidden');
+        }
+        
+        // Cierra el modal si se hace clic fuera del contenido
+        function closeModalOutside(event) {
+            if (event.target === modal) {
+                closeManageModal();
+            }
+        }
+
+        async function handleScheduleSubmit(e) {
+            e.preventDefault();
+            
+            const trainer = document.getElementById('trainer-select').value;
+            const routineType = document.getElementById('routine-type').value;
+            const timeSlot = document.getElementById('time-slot-select').value;
+            const btn = document.getElementById('schedule-btn');
+            
+            btn.disabled = true;
+            btn.textContent = 'AGENDANDO...';
+            
+            // --- SIMULACIÓN DE LLAMADA A API (Aquí iría la lógica real) ---
+            await new Promise(resolve => setTimeout(resolve, 1500)); // Espera de 1.5s
+            
+            // Muestra la confirmación
+            showMessage(`Rutina agendada con éxito para el slot ${timeSlot}!`, 'success');
+            
+            // Limpia el formulario y cierra el modal
+            scheduleForm.reset();
+            closeManageModal();
+
+            btn.disabled = false;
+            btn.textContent = 'AGENDAR CITA';
+        }
+
+        // --- Lógica de Inicialización ---
+        window.onload = function() {
+            checkAuthentication();
+            // LISTENERS
+            document.getElementById('logout-button').addEventListener('click', handleLogout);
+            openModalBtn.addEventListener('click', openManageModal);
+            scheduleForm.addEventListener('submit', handleScheduleSubmit);
+        };
+    </script>
+</body>
+</html>
