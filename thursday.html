@@ -7,6 +7,7 @@
     <link rel="icon" type="image/png" href="mini_logo.png">
     <link rel="shortcut icon" type="image/png" href="mini_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         
@@ -38,17 +39,15 @@
             border-left: 5px solid #facc15; /* Borde amarillo de contraste */
         }
         
-        /* === NUEVO ESTILO PARA MÁXIMO CONTRASTE EN LAS CARDS === */
+        /* === ESTILOS DE CONTRASTE === */
         .text-contrast-dark {
-            /* Una sombra de texto más grande para asegurar contraste sobre fondos complejos */
             text-shadow: 
                 1px 1px 2px #000,
                 -1px -1px 2px #000,
                 1px -1px 2px #000,
                 -1px 1px 2px #000,
-                0 0 5px rgba(0, 0, 0, 0.8); /* Sombra difuminada fuerte */
+                0 0 5px rgba(0, 0, 0, 0.8); 
         }
-        /* Contraste en el texto del header */
         .text-border-gray {
             text-shadow: 0 0 3px #4b5563; 
         }
@@ -69,12 +68,81 @@
         }
         .message-success { background-color: #10b981; color: white; } 
         .message-error { background-color: #ef4444; color: white; }
+        
+        /* ======================================= */
+        /* Estilos para Pantalla de Éxito */
+        /* ======================================= */
+        #finish-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000; 
+            display: flex;
+            justify-content: center; 
+            align-items: center; 
+            flex-direction: column;
+            text-align: center; 
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.7s ease-in-out; 
+            gap: 1rem; 
+        }
+
+        #finish-screen.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Título Principal: RUTINA FINALIZADA (CON FADE) */
+        #finish-message {
+            font-size: 3rem; 
+            font-weight: 900;
+            line-height: 1;
+            padding: 0.5rem 1rem;
+            color: #facc15; /* Amarillo */
+            
+            /* Animación de Desvanecimiento (Fade In/Fade Out) */
+            animation: fade-pulse 1.5s ease-in-out infinite alternate; 
+
+            /* Sombra suave para contraste */
+            text-shadow: 
+                0 0 5px rgba(250, 202, 21, 0.5), 
+                0 0 15px rgba(250, 202, 21, 0.3); 
+            
+            z-index: 2001;
+        }
+
+        /* Keyframes para la animación de desvanecimiento */
+        @keyframes fade-pulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        
+        /* Ajuste de tamaño en pantallas más grandes */
+        @media (min-width: 768px) {
+            #finish-message {
+                font-size: 5rem;
+            }
+        }
+
     </style>
 </head>
 <body class="min-h-screen">
 
     <div id="message-box"></div>
     
+    <div id="finish-screen">
+        <h2 id="finish-message">RUTINA FINALIZADA</h2>
+    </div>
+
+    <audio id="fireworks-audio" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/download/mixkit-fireworks-whistle-explosion-466.wav" type="audio/wav">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+
     <header class="flex justify-between items-center py-4 px-8 mb-4">
         <h1 class="text-3xl font-extrabold uppercase tracking-wider text-border-gray">
             <span class="text-amber-400">GYM</span><span class="text-white">ENEZ</span>
@@ -82,7 +150,7 @@
         
         <div class="flex space-x-4">
             <a href="routines.html" 
-                class="px-4 py-2 text-sm font-semibold rounded-full bg-sky-600 text-white hover:bg-sky-500 transition duration-300">
+               class="px-4 py-2 text-sm font-semibold rounded-full bg-sky-600 text-white hover:bg-sky-500 transition duration-300">
                 REGRESAR
             </a>
         </div>
@@ -92,7 +160,7 @@
         <div class="max-w-4xl mx-auto">
             
             <h2 id="day-title" class="text-4xl font-extrabold text-center text-amber-400 uppercase mb-8 pb-2">
-                Cargando Rutina...
+                Rutina de Jueves
             </h2>
 
             <div id="loading-spinner" class="text-center py-10">
@@ -101,7 +169,15 @@
             </div>
 
             <div id="exercises-container" class="space-y-4">
-                </div>
+            </div>
+            
+            <div id="finish-routine-container" class="mt-8 text-center hidden">
+                <button id="finish-routine-btn" 
+                        class="w-full sm:w-1/2 py-3 rounded-xl text-lg font-bold transition duration-300 uppercase shadow-xl"
+                        disabled>
+                    RUTINA TERMINADA
+                </button>
+            </div>
             
             <div id="no-data-message" class="hidden text-center py-10 text-gray-400">
                 <p class="text-xl">
@@ -118,9 +194,10 @@
         const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
         
         let userId = null;
-
+        let routineExercises = []; 
+        
         // Nombre del día actual
-        const CURRENT_DAY = 'Jueves'; // <-- DÍA CORRECTO
+        const CURRENT_DAY = 'Jueves'; 
         
         // --- Utilidades del DOM ---
         const messagebox = document.getElementById('message-box');
@@ -128,6 +205,11 @@
         const exercisesContainer = document.getElementById('exercises-container');
         const noDataMessage = document.getElementById('no-data-message');
         const dayTitle = document.getElementById('day-title');
+        const finishRoutineContainer = document.getElementById('finish-routine-container');
+        const finishRoutineBtn = document.getElementById('finish-routine-btn');
+        const finishScreen = document.getElementById('finish-screen');
+        const fireworksAudio = document.getElementById('fireworks-audio');
+
 
         function showMessage(message, type = 'success') {
             messagebox.textContent = message;
@@ -145,11 +227,8 @@
         
         /**
          * Llama a la API para obtener el enlace del tutorial y lo abre en una nueva pestaña.
-         * Requiere que el endpoint /api/exercises/tutorial/{exercise_name} esté activo en la API.
-         * @param {string} exerciseName - El nombre del ejercicio para buscar el enlace.
          */
         async function openTutorial(exerciseName) {
-            // Codifica el nombre para que la URL sea válida (ej: "Press Banca" -> "Press%20Banca")
             const encodedName = encodeURIComponent(exerciseName);
             const API_URL = `${API_BASE_URL}/api/exercises/tutorial/${encodedName}`;
             let data = null;
@@ -158,15 +237,11 @@
                 showMessage(`Buscando tutorial para: ${exerciseName}...`, 'success');
                 
                 const response = await fetch(API_URL);
-
-                // ⭐ CORRECCIÓN CLAVE: Manejar respuesta que no es JSON (como HTML de error 500)
                 const contentType = response.headers.get("content-type");
                 
                 if (contentType && contentType.includes("application/json")) {
                     data = await response.json();
                 } else {
-                    // Si el servidor devuelve HTML (como una página de error 500), 
-                    // evitamos el SyntaxError y leemos el texto directamente para debugging.
                     const errorText = await response.text(); 
                     console.error("Respuesta no JSON del servidor:", errorText);
                     throw new Error(`Error ${response.status} en el servidor. El servidor devolvió HTML/Texto, no JSON. (Revisar logs del servidor)`);
@@ -179,7 +254,6 @@
                 const tutorialLink = data.tutorialLink;
 
                 if (tutorialLink) {
-                    // Abre el enlace del tutorial en una nueva pestaña
                     window.open(tutorialLink, '_blank'); 
                     showMessage(`Tutorial abierto: ${exerciseName}`, 'success');
                 } else {
@@ -196,16 +270,134 @@
             }
         }
         
-        // 🔥 SOLUCIÓN AL ERROR 'openTutorial is not defined'
         window.openTutorial = openTutorial; 
 
 
+        // --- FUNCIONES DE INTERACTIVIDAD ---
+
+        /**
+         * Actualiza el estado visual del botón 'Rutina Terminada'.
+         */
+        function updateFinishButtonState() {
+            // Comprueba si TODOS los ejercicios están marcados como completados
+            const allCompleted = routineExercises.length > 0 && routineExercises.every(e => e.isCompleted);
+            
+            finishRoutineBtn.disabled = !allCompleted;
+            
+            // Eliminar clases anteriores
+            finishRoutineBtn.classList.remove('bg-red-600', 'hover:bg-red-500', 'bg-green-600', 'hover:bg-green-500', 'text-gray-300', 'text-white');
+
+            if (allCompleted) {
+                // Estado ACTIVO (Verde)
+                finishRoutineBtn.classList.add('bg-green-600', 'hover:bg-green-500', 'text-white');
+            } else {
+                // Estado INACTIVO (Rojo)
+                finishRoutineBtn.classList.add('bg-red-600', 'hover:bg-red-500', 'text-gray-300');
+            }
+        }
+
+        /**
+         * Maneja el clic en el botón 'Completar' de un ejercicio.
+         */
+        function toggleExerciseCompleted(exerciseName) {
+            const exercise = routineExercises.find(e => e.exerciseName === exerciseName);
+            if (!exercise) return;
+
+            // 1. Alternar el estado en el modelo de datos
+            exercise.isCompleted = !exercise.isCompleted;
+
+            // 2. Actualizar visualmente la tarjeta
+            const cardId = exerciseName.replace(/\s/g, '-');
+            const completedIndicator = document.getElementById(`completed-indicator-${cardId}`);
+            const completedButton = document.getElementById(`completed-button-${cardId}`);
+            
+            if (exercise.isCompleted) {
+                completedIndicator.classList.remove('bg-gray-700');
+                completedIndicator.classList.add('bg-green-600');
+                
+                completedButton.classList.remove('bg-sky-600', 'hover:bg-sky-500');
+                completedButton.classList.add('bg-gray-700', 'hover:bg-gray-600');
+                completedButton.textContent = 'HECHO';
+                showMessage(`${exerciseName} marcado como completado.`, 'success');
+            } else {
+                completedIndicator.classList.remove('bg-green-600');
+                completedIndicator.classList.add('bg-gray-700');
+                
+                completedButton.classList.remove('bg-gray-700', 'hover:bg-gray-600');
+                completedButton.classList.add('bg-sky-600', 'hover:bg-sky-500');
+                completedButton.textContent = 'COMPLETAR';
+                showMessage(`${exerciseName} marcado como pendiente.`, 'error');
+            }
+
+            // 3. Actualizar el estado del botón de rutina terminada
+            updateFinishButtonState();
+        }
+
+        window.toggleExerciseCompleted = toggleExerciseCompleted; 
+
+
+        /**
+         * Muestra la animación de felicitación con fuegos artificiales y sonido.
+         */
+        function displayCompletionFireworks() {
+            finishScreen.classList.add('show');
+            
+            // Intentar reproducir el sonido 
+            fireworksAudio.currentTime = 0; // Reiniciar
+            fireworksAudio.play().catch(e => console.warn("Error al reproducir audio:", e.message));
+
+            const duration = 5 * 1000; // Duración total de la animación de 5 segundos
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 2001 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    
+                    // --- REDIRECCIÓN ---
+                    // Redirige 1 segundo después de que los fuegos artificiales hayan terminado.
+                    setTimeout(() => {
+                        window.location.href = 'routines.html';
+                    }, 1000); 
+
+                    return;
+                }
+
+                const particleCount = 50 * (timeLeft / duration);
+                // Lanzamiento desde la izquierda
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: randomInRange(0.7, 0.9) } }));
+                // Lanzamiento desde la derecha
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: randomInRange(0.7, 0.9) } }));
+            }, 250);
+        }
+
+        /**
+         * Evento para el botón de rutina terminada.
+         */
+        finishRoutineBtn.addEventListener('click', () => {
+            if (!finishRoutineBtn.disabled) {
+                displayCompletionFireworks();
+                showMessage("¡Gran trabajo! Rutina finalizada con éxito.", 'success');
+                // Lógica de API futura aquí
+            }
+        });
+
+
+        // --- FIN FUNCIONES DE INTERACTIVIDAD ---
+        
         /**
          * Renderiza la lista de ejercicios en el DOM.
-         * @param {Array<Object>} exercises - Lista de ejercicios a mostrar.
          */
         function renderExercises(exercises) {
-            exercisesContainer.innerHTML = ''; // Limpiar contenedor
+            exercisesContainer.innerHTML = ''; 
+            finishRoutineContainer.classList.add('hidden'); 
+            routineExercises = exercises; 
             
             if (exercises.length === 0) {
                 noDataMessage.classList.remove('hidden');
@@ -215,13 +407,20 @@
 
             noDataMessage.classList.add('hidden');
             loadingSpinner.classList.add('hidden');
+            finishRoutineContainer.classList.remove('hidden'); 
             
-            // Ordenar ejercicios por el campo 'order' si existe
             exercises.sort((a, b) => (a.order || 0) - (b.order || 0));
 
             exercises.forEach(exercise => {
                 const card = document.createElement('div');
                 card.className = 'glass-item-card p-4 rounded-xl shadow-lg';
+                
+                exercise.isCompleted = exercise.isCompleted || false; 
+                
+                const cardId = exercise.exerciseName.replace(/\s/g, '-');
+                const btnBgClass = exercise.isCompleted ? 'bg-gray-700 hover:bg-gray-600' : 'bg-sky-600 hover:bg-sky-500';
+                const btnText = exercise.isCompleted ? 'HECHO' : 'COMPLETAR';
+                const circleBgClass = exercise.isCompleted ? 'bg-green-600' : 'bg-gray-700';
                 
                 // Muestra la información de la base de datos
                 card.innerHTML = `
@@ -234,13 +433,23 @@
                         </div>
                         <div class="flex items-center space-x-4">
                             
-                            <button 
-                                onclick="openTutorial('${exercise.exerciseName.replace(/'/g, "\\'")}')" 
-                                class="px-3 py-1 text-sm font-semibold rounded-lg bg-green-600 text-white hover:bg-green-500 transition duration-300 shadow-md whitespace-nowrap">
-                                TUTORIAL
-                            </button>
-                            
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center ${exercise.isCompleted ? 'bg-green-600' : 'bg-gray-700'} text-white">
+                            <div class="flex flex-col space-y-2 items-end"> 
+                                
+                                <button 
+                                    id="completed-button-${cardId}"
+                                    onclick="toggleExerciseCompleted('${exercise.exerciseName.replace(/'/g, "\\'")}')" 
+                                    class="w-full px-3 py-1 text-sm font-semibold rounded-lg ${btnBgClass} text-white transition duration-300 shadow-md whitespace-nowrap">
+                                    ${btnText}
+                                </button>
+                                
+                                <button 
+                                    onclick="openTutorial('${exercise.exerciseName.replace(/'/g, "\\'")}')" 
+                                    class="w-full px-3 py-1 text-sm font-semibold rounded-lg bg-green-600 text-white hover:bg-green-500 transition duration-300 shadow-md whitespace-nowrap">
+                                    TUTORIAL
+                                </button>
+                            </div>
+
+                            <div id="completed-indicator-${cardId}" class="w-10 h-10 rounded-full flex items-center justify-center ${circleBgClass} text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                                 </svg>
@@ -250,15 +459,15 @@
                 `;
                 exercisesContainer.appendChild(card);
             });
+            
+            updateFinishButtonState();
         }
 
 
         /**
-         * Carga la rutina del día actual usando la API REST (api_server.py) 
-         * para obtener solo los ejercicios del usuario y día correctos.
+         * Carga la rutina del día actual usando la API REST.
          */
         async function loadRoutine(dayName) {
-            // Se verifica que userId haya sido cargado desde localStorage
             if (!userId) {
                 showMessage("Sesión de usuario no encontrada. Por favor, inicie sesión.", 'error');
                 loadingSpinner.classList.add('hidden');
@@ -267,9 +476,9 @@
 
             dayTitle.textContent = `Rutina de ${dayName}`;
             loadingSpinner.classList.remove('hidden');
-            exercisesContainer.innerHTML = ''; // Limpiar
+            exercisesContainer.innerHTML = ''; 
+            finishRoutineContainer.classList.add('hidden'); 
 
-            // URL del nuevo endpoint: /api/routines/day/{user_id}/{day_name}
             const API_URL = `${API_BASE_URL}/api/routines/day/${userId}/${dayName}`; 
             
             try {
@@ -280,7 +489,6 @@
                     throw new Error(data.error || 'Fallo en la respuesta de la API.');
                 }
                 
-                // La API devuelve un array de rutinas. Tomamos los ejercicios de la primera rutina encontrada.
                 const routines = data.routines;
                 let allExercises = [];
 
@@ -288,12 +496,16 @@
                     allExercises = routines[0].exercises;
                 }
                 
+                allExercises.forEach(e => {
+                    e.isCompleted = false; 
+                });
+
+
                 renderExercises(allExercises);
 
                 if (allExercises.length > 0) {
                     showMessage(`Rutina de ${dayName} cargada correctamente.`, 'success');
                 } else {
-                    // Si no hay ejercicios, muestra el mensaje de "Día Libre"
                     loadingSpinner.classList.add('hidden');
                     noDataMessage.classList.remove('hidden');
                     showMessage(`No se encontraron ejercicios asignados para ${dayName}.`, 'success');
@@ -309,7 +521,7 @@
         }
 
         /**
-         * Carga la sesión del usuario desde localStorage y, si existe, inicia la carga de datos.
+         * Carga la sesión del usuario desde localStorage.
          */
         function loadSessionAndData() {
             const storedSession = localStorage.getItem('userSession');
@@ -317,7 +529,6 @@
             if (storedSession) {
                 try {
                     const userSession = JSON.parse(storedSession);
-                    // Asume que el ID está en el campo '_id' o 'id' (como en profile.html)
                     userId = userSession._id || userSession.id; 
 
                     if (userId) {
@@ -329,7 +540,6 @@
                 }
             }
             
-            // Si la sesión no es válida o falta, muestra error.
             showMessage("Sesión expirada o no iniciada.", 'error');
             loadingSpinner.classList.add('hidden');
             noDataMessage.classList.remove('hidden');
