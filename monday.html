@@ -41,7 +41,6 @@
         
         /* === ESTILOS DE CONTRASTE === */
         .text-contrast-dark {
-            /* Sombra de texto para asegurar contraste sobre fondos complejos */
             text-shadow: 
                 1px 1px 2px #000,
                 -1px -1px 2px #000,
@@ -71,7 +70,7 @@
         .message-error { background-color: #ef4444; color: white; }
         
         /* ======================================= */
-        /* Estilos PREMIUM para Pantalla de Éxito */
+        /* Estilos para Pantalla de Éxito */
         /* ======================================= */
         #finish-screen {
             position: fixed;
@@ -88,8 +87,8 @@
             z-index: 2000;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.7s ease-in-out; /* Transición más lenta y suave */
-            gap: 1rem; /* Espacio entre los mensajes */
+            transition: opacity 0.7s ease-in-out; 
+            gap: 1rem; 
         }
 
         #finish-screen.show {
@@ -97,53 +96,29 @@
             pointer-events: auto;
         }
 
-        /* Título Principal: FELICIDADES, RUTINA FINALIZADA */
+        /* Título Principal: RUTINA FINALIZADA (CON FADE) */
         #finish-message {
             font-size: 3rem; 
             font-weight: 900;
             line-height: 1;
             padding: 0.5rem 1rem;
+            color: #facc15; /* Amarillo */
             
-            /* Efecto Gradiente Animado (PREMIUM LOOK) */
-            background: linear-gradient(45deg, #ffd700, #ff8c00, #ffd700);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-fill-color: transparent;
-            background-size: 200% auto;
-            animation: gradient-pulse 3s ease-in-out infinite;
+            /* Animación de Desvanecimiento (Fade In/Fade Out) */
+            animation: fade-pulse 1.5s ease-in-out infinite alternate; 
 
-            /* Sombra de texto fuerte para máximo contraste */
+            /* Sombra suave para contraste */
             text-shadow: 
-                0 0 10px rgba(0, 0, 0, 0.7), /* Contorno negro */
-                0 0 20px rgba(255, 165, 0, 0.9), 
-                0 0 40px rgba(255, 255, 0, 0.7); 
+                0 0 5px rgba(250, 202, 21, 0.5), 
+                0 0 15px rgba(250, 202, 21, 0.3); 
             
             z-index: 2001;
         }
 
-        /* Título Secundario: ¡Logro Desbloqueado! */
-        #finish-subtitle {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #ffffff;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            animation: bounce-in 1s ease-out;
-            z-index: 2001;
-        }
-
-        /* Keyframes para la animación del gradiente */
-        @keyframes gradient-pulse {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Keyframes para la entrada del subtítulo */
-        @keyframes bounce-in {
-            0% { transform: scale(0.5); opacity: 0; }
-            70% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(1); }
+        /* Keyframes para la animación de desvanecimiento */
+        @keyframes fade-pulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
         }
         
         /* Ajuste de tamaño en pantallas más grandes */
@@ -160,8 +135,7 @@
     <div id="message-box"></div>
     
     <div id="finish-screen">
-        <h3 id="finish-subtitle">¡LOGRO DESBLOQUEADO!</h3>
-        <h2 id="finish-message">FELICIDADES, RUTINA FINALIZADA</h2>
+        <h2 id="finish-message">RUTINA FINALIZADA</h2>
     </div>
 
     <audio id="fireworks-audio" preload="auto">
@@ -253,7 +227,6 @@
         
         /**
          * Llama a la API para obtener el enlace del tutorial y lo abre en una nueva pestaña.
-         * @param {string} exerciseName - El nombre del ejercicio para buscar el enlace.
          */
         async function openTutorial(exerciseName) {
             const encodedName = encodeURIComponent(exerciseName);
@@ -325,7 +298,6 @@
 
         /**
          * Maneja el clic en el botón 'Completar' de un ejercicio.
-         * @param {string} exerciseName - Nombre único del ejercicio.
          */
         function toggleExerciseCompleted(exerciseName) {
             const exercise = routineExercises.find(e => e.exerciseName === exerciseName);
@@ -374,7 +346,7 @@
             fireworksAudio.currentTime = 0; // Reiniciar
             fireworksAudio.play().catch(e => console.warn("Error al reproducir audio:", e.message));
 
-            const duration = 5 * 1000;
+            const duration = 5 * 1000; // Duración total de la animación de 5 segundos
             const animationEnd = Date.now() + duration;
             const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 2001 };
 
@@ -389,6 +361,7 @@
                     clearInterval(interval);
                     
                     // --- REDIRECCIÓN ---
+                    // Redirige 1 segundo después de que los fuegos artificiales hayan terminado.
                     setTimeout(() => {
                         window.location.href = 'routines.html';
                     }, 1000); 
@@ -402,11 +375,6 @@
                 // Lanzamiento desde la derecha
                 confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: randomInRange(0.7, 0.9) } }));
             }, 250);
-
-            // Ocultar la pantalla (aunque la redirección lo hará, es una buena práctica)
-            setTimeout(() => {
-                finishScreen.classList.remove('show');
-            }, duration + 1000); 
         }
 
         /**
@@ -425,12 +393,11 @@
         
         /**
          * Renderiza la lista de ejercicios en el DOM.
-         * @param {Array<Object>} exercises - Lista de ejercicios a mostrar.
          */
         function renderExercises(exercises) {
-            exercisesContainer.innerHTML = ''; // Limpiar contenedor
-            finishRoutineContainer.classList.add('hidden'); // Ocultar el botón de finalización por defecto
-            routineExercises = exercises; // Almacenar la lista cargada
+            exercisesContainer.innerHTML = ''; 
+            finishRoutineContainer.classList.add('hidden'); 
+            routineExercises = exercises; 
             
             if (exercises.length === 0) {
                 noDataMessage.classList.remove('hidden');
@@ -440,9 +407,8 @@
 
             noDataMessage.classList.add('hidden');
             loadingSpinner.classList.add('hidden');
-            finishRoutineContainer.classList.remove('hidden'); // Mostrar el botón de finalización
+            finishRoutineContainer.classList.remove('hidden'); 
             
-            // Ordenar ejercicios por el campo 'order' si existe
             exercises.sort((a, b) => (a.order || 0) - (b.order || 0));
 
             exercises.forEach(exercise => {
@@ -494,7 +460,6 @@
                 exercisesContainer.appendChild(card);
             });
             
-            // Inicializar el estado del botón de rutina terminada después de renderizar
             updateFinishButtonState();
         }
 
@@ -531,7 +496,6 @@
                     allExercises = routines[0].exercises;
                 }
                 
-                // Inyectar el estado de completado inicial (Falso por defecto si no lo da la API)
                 allExercises.forEach(e => {
                     e.isCompleted = false; 
                 });
