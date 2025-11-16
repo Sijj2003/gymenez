@@ -104,30 +104,25 @@
         </div>
     </header>
     
-    <!-- Reduje el padding top para compensar la eliminación del h2 -->
     <section id="routines-screen" class="min-h-screen p-4 sm:p-8 pt-0"> 
         <div class="max-w-6xl mx-auto">
             
-            <!-- ELIMINADO: Título "Selecciona el Día de Entrenamiento" y su raya amarilla -->
-
             <div id="day-cards-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
                 
-                <!-- Definición del SVG de Mancuerna Estilizada para uso repetitivo -->
-                <!-- Ahora con color amarillo y clases para borde negro -->
                 <script>
                     const dumbbellSVG = `
                         <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Mango de la mancuerna --><rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
-                            <!-- Pesas izquierda --><rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
+                            <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
+                            <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
                             <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
-                            <!-- Pesas derecha --><rect x="75" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
+                            <rect x="75" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
                             <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
                         </svg>
                     `;
                 </script>
 
 
-                <!-- Tarjeta Lunes --><a href="monday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
+                <a href="monday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
                     <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
                         <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
@@ -138,7 +133,7 @@
                     <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Lunes</h3>
                 </a>
                 
-                <!-- Tarjeta Martes --><a href="tuesday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
+                <a href="tuesday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
                     <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
                         <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
@@ -149,7 +144,7 @@
                     <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Martes</h3>
                 </a>
 
-                <!-- Tarjeta Miércoles --><a href="wednesday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
+                <a href="wednesday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
                     <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
                         <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
@@ -160,7 +155,7 @@
                     <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Miércoles</h3>
                 </a>
 
-                <!-- Tarjeta Jueves --><a href="thursday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
+                <a href="thursday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
                     <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
                         <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
@@ -171,7 +166,7 @@
                     <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Jueves</h3>
                 </a>
                 
-                <!-- Tarjeta Viernes --><a href="friday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
+                <a href="friday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
                     <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
                         <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
@@ -182,7 +177,7 @@
                     <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Viernes</h3>
                 </a>
                 
-                <!-- Tarjeta Sábado --><a href="saturday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
+                <a href="saturday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
                     <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
                         <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
@@ -191,6 +186,17 @@
                         <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
                     </svg>
                     <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Sábado</h3>
+                </a>
+
+                <a href="extra_routines.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-emerald-500 hover:border-emerald-500 flex flex-col items-center justify-center text-center">
+                    <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="25" y="45" width="50" height="10" rx="3" fill="#10b981" class="bar"/>
+                        <rect x="10" y="30" width="15" height="40" rx="5" fill="#10b981" class="weight"/>
+                        <rect x="5" y="35" width="5" height="30" rx="2" fill="#10b981" class="weight"/>
+                        <rect x="75" y="30" width="15" height="40" rx="5" fill="#10b981" class="weight"/>
+                        <rect x="90" y="35" width="5" height="30" rx="2" fill="#10b981" class="weight"/>
+                    </svg>
+                    <h3 class="text-xl font-bold uppercase tracking-wider text-emerald-500 day-name-text">RUTINAS EXTRA</h3>
                 </a>
                 
             </div>
