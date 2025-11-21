@@ -109,19 +109,6 @@
             
             <div id="day-cards-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
                 
-                <script>
-                    const dumbbellSVG = `
-                        <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
-                            <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
-                            <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
-                            <rect x="75" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
-                            <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
-                        </svg>
-                    `;
-                </script>
-
-
                 <a href="monday.html" 
                    data-day-name="lunes" 
                    class="glass-card routine-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
@@ -211,24 +198,18 @@
         const messagebox = document.getElementById('message-box');
         
         // Nombres de los días de la semana en español, indexados por getDay() (0 = Domingo, 1 = Lunes...)
-        // Usamos la versión con acentos y minúsculas para compararla con el H3 de la tarjeta.
         const DAY_NAMES = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
         const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
-        // --- SIMULACIÓN DE LA COLECCIÓN JOURNAL (Base de Datos) ---
-        // Almacena el timestamp de la última vez que se completó una rutina por día.
-        
         /**
          * Simula la obtención de la última fecha de completado para un día de rutina.
          * @param {string} dayName Nombre del día (ej: 'lunes').
          * @returns {Date | null} La fecha de la última vez que se completó, o null.
          */
         function getLastCompletedDate(dayName) {
-            // Nota: En un sistema real, esto sería una llamada a la API o DB. 
-            // Usamos localStorage para persistir la simulación entre recargas.
-            const journal = JSON.parse(localStorage.getItem('gymenez_journal')) || {};
-            // Normalizamos el nombre del día a minúsculas y sin acentos para la clave de almacenamiento
+            // Normalizamos el nombre del día a minúsculas y sin acentos para la clave de almacenamiento (ej: 'lunes')
             const key = dayName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
+            const journal = JSON.parse(localStorage.getItem('gymenez_journal')) || {};
             const timestamp = journal[key];
             return timestamp ? new Date(timestamp) : null;
         }
@@ -253,20 +234,22 @@
         function updateRoutineCards() {
             const today = new Date();
             const todayIndex = today.getDay();
-            const todayName = DAY_NAMES[todayIndex]; // Ej: 'lunes'
+            // Nombre del día actual, normalizado para la comparación
+            const todayNameNormalized = DAY_NAMES[todayIndex].normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
             const routineCards = document.querySelectorAll('.routine-card');
 
             routineCards.forEach(card => {
                 const dayLinkElement = card.querySelector('h3');
                 const daySVG = card.querySelector('svg');
-                // El nombre del día es el texto del H3 en minúsculas y sin acento
-                const cardDayName = dayLinkElement.textContent.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                // El nombre de la tarjeta, normalizado para la búsqueda en el journal (ej: 'lunes')
+                const cardDayNameNormalized = dayLinkElement.textContent.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                 
-                // 1. Limpiar clases de estilo dinámico (Verde/Rojo) y restaurar base
+                
+                // 1. Limpiar clases de estilo dinámico y restaurar base
                 card.classList.remove('border-green-500', 'border-red-500', 'cursor-not-allowed', 'opacity-50');
                 dayLinkElement.classList.remove('text-green-500', 'text-red-500');
                 
-                // Restaurar color base (Amarillo/Amber-400) al borde y texto si fue modificado
+                // Restaurar color base (Amarillo/Amber-400) al borde y texto 
                 card.classList.add('border-amber-400');
                 dayLinkElement.classList.add('text-amber-400');
 
@@ -275,35 +258,26 @@
                 });
                 
                 card.style.pointerEvents = 'auto'; // Habilitar clics por defecto
-                card.setAttribute('href', `${cardDayName}.html`); // Restaurar el enlace
+                card.setAttribute('href', `${cardDayNameNormalized}.html`); // Restaurar el enlace
 
 
                 // 2. Revisar si la rutina fue completada en los últimos 7 días.
-                const lastCompleted = getLastCompletedDate(cardDayName);
+                const lastCompleted = getLastCompletedDate(cardDayNameNormalized);
                 let isRecentlyCompleted = false;
                 
                 if (lastCompleted) {
-                    // Calcular la diferencia en días. Se usa la fecha actual - 7 días.
+                    // Calcular el punto en el tiempo hace 7 días calendario.
                     const sevenDaysAgo = today.getTime() - (7 * MS_PER_DAY);
                     
-                    // Si la fecha de completado es MÁS reciente que hace 7 días, está completada recientemente.
+                    // Si la fecha de completado es MÁS reciente que hace 7 días, se marca como completada.
                     if (lastCompleted.getTime() > sevenDaysAgo) {
-                         // Adicionalmente, se verifica que la rutina completada corresponda 
-                         // al mismo día de la semana (Lunes, Martes, etc.)
-                         const completedDayIndex = lastCompleted.getDay();
-                         const completedDayName = DAY_NAMES[completedDayIndex];
-                         
-                         // Si es el mismo día de la semana, se considera reciente y se bloquea
-                         if (completedDayName === cardDayName) {
-                            isRecentlyCompleted = true;
-                         }
+                        isRecentlyCompleted = true;
                     }
                 }
 
                 // 3. Aplicar Estilos
                 if (isRecentlyCompleted) {
-                    // ESTILO ROJO: Rutina Completada hace menos de 7 días (No se puede repetir)
-                    // Se remueve el amarillo y se añade el rojo
+                    // ESTILO ROJO: Rutina Completada hace menos de 7 días (Bloqueada)
                     card.classList.remove('border-amber-400');
                     dayLinkElement.classList.remove('text-amber-400');
 
@@ -315,11 +289,10 @@
                     });
                     
                     card.style.pointerEvents = 'none'; // Deshabilitar clic
-                    card.setAttribute('href', '#'); // Anular el enlace (mejor que null)
+                    card.setAttribute('href', '#'); // Anular el enlace 
                     
-                } else if (cardDayName === todayName.normalize("NFD").replace(/[\u0300-\u036f]/g, "")) {
+                } else if (cardDayNameNormalized === todayNameNormalized) {
                     // ESTILO VERDE: Día de Entrenamiento de Hoy (Solo si no está en rojo)
-                    // Se remueve el amarillo y se añade el verde
                     card.classList.remove('border-amber-400');
                     dayLinkElement.classList.remove('text-amber-400');
                     
@@ -330,7 +303,6 @@
                         el.setAttribute('fill', '#22c55e'); // Color verde: #22c55e (green-500)
                     });
                 } 
-                // Si no es hoy ni está completada recientemente, mantiene el amarillo base.
             });
         }
 
@@ -339,15 +311,18 @@
         window.onload = function() {
             updateRoutineCards();
             
-            // Ejemplo de uso para prueba: Descomentar para simular una rutina completada hoy (se pondría en rojo)
+            // --- CÓDIGO OPCIONAL DE PRUEBA: Descomentar para probar el estado rojo ---
             /*
-            const todayIndex = new Date().getDay();
-            const todayName = DAY_NAMES[todayIndex].normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            // SIMULACIÓN: Marca la rutina de 'lunes' como completada hoy.
             const journal = JSON.parse(localStorage.getItem('gymenez_journal')) || {};
-            journal[todayName] = Date.now();
+            journal['lunes'] = Date.now();
             localStorage.setItem('gymenez_journal', JSON.stringify(journal));
-            updateRoutineCards(); // Volver a correr la lógica con el dato simulado
-            showMessage('DEMO: La rutina de hoy está en rojo (Simulación de completada).', 'success');
+            
+            // Vuelve a correr la lógica
+            updateRoutineCards(); 
+
+            // Muestra un mensaje de prueba
+            showMessage('DEMO: La rutina de Lunes está en rojo (Simulación de completada hoy).', 'success');
             */
 
             showMessage('Selecciona un día para ver tu rutina.', 'success');
