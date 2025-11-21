@@ -39,22 +39,13 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        /* === ESTILO UNIFICADO CON index.html DASHBOARD CARD (Solo para cards activas) === */
-        .glass-card:not(.card-disabled):hover {
-            transform: translateY(-2px); /* Menos desplazamiento que antes */
-            box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.6); /* Sombra unificada */
             cursor: pointer; /* Indicador de elemento pulsable */
         }
         
-        /* Estilo para tarjetas deshabilitadas (rojo + no pointer) */
-        .card-disabled {
-            opacity: 0.6; /* Un poco más de atenuación visual */
-            cursor: not-allowed;
-            pointer-events: none; /* Deshabilita clics y eventos de ratón */
-            transition: none !important; /* Anula todas las transiciones para que no haya hover */
-            transform: none !important; /* Anula transform en hover */
+        /* === ESTILO UNIFICADO CON index.html DASHBOARD CARD === */
+        .glass-card:hover {
+            transform: translateY(-2px); /* Menos desplazamiento que antes */
+            box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.6); /* Sombra unificada */
         }
 
         /* Sombra/Borde para el texto del Header (Gris) */
@@ -77,7 +68,6 @@
             pointer-events: none;
         }
         .message-success { background-color: #10b981; color: white; } 
-        .message-error { background-color: #ef4444; color: white; } 
         
         /* Estilo de borde negro para el SVG (simulando un stroke) */
         .dumbbell-svg .bar, .dumbbell-svg .weight {
@@ -114,58 +104,103 @@
         </div>
     </header>
     
+    <!-- Reduje el padding top para compensar la eliminación del h2 -->
     <section id="routines-screen" class="min-h-screen p-4 sm:p-8 pt-0"> 
         <div class="max-w-6xl mx-auto">
+            
+            <!-- ELIMINADO: Título "Selecciona el Día de Entrenamiento" y su raya amarilla -->
+
             <div id="day-cards-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
                 
+                <!-- Definición del SVG de Mancuerna Estilizada para uso repetitivo -->
+                <!-- Ahora con color amarillo y clases para borde negro -->
                 <script>
                     const dumbbellSVG = `
                         <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
-                            <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
+                            <!-- Mango de la mancuerna --><rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
+                            <!-- Pesas izquierda --><rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
                             <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
-                            <rect x="75" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
+                            <!-- Pesas derecha --><rect x="75" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
                             <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
                         </svg>
                     `;
                 </script>
 
-                <div data-day="Lunes" data-target="monday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 flex flex-col items-center justify-center text-center">
-                    ${dumbbellSVG}
+
+                <!-- Tarjeta Lunes --><a href="monday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
+                    <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
+                        <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
+                        <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                        <rect x="75" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
+                        <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                    </svg>
                     <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Lunes</h3>
-                </div>
+                </a>
                 
-                <div data-day="Martes" data-target="tuesday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 flex flex-col items-center justify-center text-center">
-                    ${dumbbellSVG}
+                <!-- Tarjeta Martes --><a href="tuesday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
+                    <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
+                        <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
+                        <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                        <rect x="75" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
+                        <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                    </svg>
                     <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Martes</h3>
-                </div>
+                </a>
 
-                <div data-day="Miércoles" data-target="wednesday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 flex flex-col items-center justify-center text-center">
-                    ${dumbbellSVG}
+                <!-- Tarjeta Miércoles --><a href="wednesday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
+                    <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
+                        <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
+                        <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                        <rect x="75" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
+                        <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                    </svg>
                     <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Miércoles</h3>
-                </div>
+                </a>
 
-                <div data-day="Jueves" data-target="thursday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 flex flex-col items-center justify-center text-center">
-                    ${dumbbellSVG}
+                <!-- Tarjeta Jueves --><a href="thursday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
+                    <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
+                        <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
+                        <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                        <rect x="75" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
+                        <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                    </svg>
                     <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Jueves</h3>
-                </div>
+                </a>
                 
-                <div data-day="Viernes" data-target="friday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 flex flex-col items-center justify-center text-center">
-                    ${dumbbellSVG}
+                <!-- Tarjeta Viernes --><a href="friday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
+                    <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
+                        <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
+                        <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                        <rect x="75" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
+                        <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                    </svg>
                     <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Viernes</h3>
-                </div>
+                </a>
                 
-                <div data-day="Sábado" data-target="saturday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 flex flex-col items-center justify-center text-center">
-                    ${dumbbellSVG}
+                <!-- Tarjeta Sábado --><a href="saturday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
+                    <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
+                        <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
+                        <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                        <rect x="75" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
+                        <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                    </svg>
                     <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Sábado</h3>
-                </div>
+                </a>
                 
             </div>
+
         </div>
+
     </section>
 
     <script>
-        // --- Variables y Utilidades Globales ---
+        // --- Variables y Utilidades Globales (Mantenemos solo la caja de mensajes por si acaso) ---
         const messagebox = document.getElementById('message-box');
 
         // Función para mostrar mensajes de estado (éxito/error)
@@ -178,79 +213,16 @@
             messagebox.style.transform = 'translateX(-50%) translateY(0)';
             
             setTimeout(() => {
-                // Restablecer estilos para la transición de salida
-                messagebox.classList.remove('transition-none');
-                messagebox.classList.add('transition', 'duration-500'); // Añadimos transición
+                messagebox.style.style = '';
                 messagebox.style.opacity = '0';
                 messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
             }, 3000);
         }
         
-        // --- Lógica Condicional del Día ---
+        // --- Lógica de Inicialización ---
         window.onload = function() {
-            const today = new Date();
-            // getDay() devuelve 0 (Domingo) a 6 (Sábado).
-            // Lo ajustamos para que 0 sea Lunes, 1 Martes, etc.
-            let currentDayIndex = today.getDay() - 1; 
-            if (currentDayIndex === -1) { // Si es Domingo (0), lo ponemos al final (Día 6)
-                // Para efectos de esta rutina, consideramos que el Domingo no tiene tarjeta, 
-                // así que si es Domingo, ninguna tarjeta estará activa.
-                currentDayIndex = 6; // Un índice que no existe en las tarjetas Lunes-Sábado
-            } 
-            
-            // Días de la semana tal como aparecen en las cards (Lunes=0, Martes=1, ..., Sábado=5)
-            const daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-            const currentDayName = daysOfWeek[currentDayIndex];
-            
-            const dayCards = document.querySelectorAll('#day-cards-container > div');
-            let foundActiveCard = false;
-
-            dayCards.forEach(card => {
-                const cardDayName = card.getAttribute('data-day');
-                const targetURL = card.getAttribute('data-target');
-
-                // Limpiar clases de borde por defecto (si hubiera)
-                card.classList.remove('border-amber-400', 'hover:border-amber-400');
-                
-                if (cardDayName === currentDayName) {
-                    // === DÍA ACTUAL (VERDE) ===
-                    foundActiveCard = true;
-                    card.classList.add('border-emerald-500', 'hover:border-emerald-500', 'cursor-pointer');
-                    card.classList.remove('card-disabled'); // Aseguramos que no esté deshabilitada
-                    
-                    // Manejar el clic para redirigir
-                    card.onclick = () => {
-                        window.location.href = targetURL;
-                    };
-
-                    // Cambiar el color del texto del día a verde
-                    const dayText = card.querySelector('.day-name-text');
-                    if (dayText) {
-                        dayText.classList.remove('text-amber-400');
-                        dayText.classList.add('text-emerald-400');
-                    }
-                    
-                    showMessage(`¡Hoy es ${currentDayName}! Esta es tu rutina activa.`, 'success');
-                } else {
-                    // === OTROS DÍAS (ROJO Y NO PULSABLE) ===
-                    card.classList.add('border-red-600', 'card-disabled');
-                    card.onclick = () => {
-                        showMessage('Solo puedes ver la rutina del día actual.', 'error');
-                    };
-                    
-                    // Cambiar el color del texto del día a rojo pálido
-                    const dayText = card.querySelector('.day-name-text');
-                    if (dayText) {
-                        dayText.classList.remove('text-amber-400');
-                        dayText.classList.add('text-red-400');
-                    }
-                }
-            });
-
-            if (!foundActiveCard) {
-                // Si es domingo o un día fuera del rango de tarjetas
-                showMessage('No hay rutina programada para hoy. ¡Día de descanso!', 'error');
-            }
+            // El contenido ahora es estático, solo mostramos un mensaje de bienvenida.
+            showMessage('Selecciona un día para ver tu rutina.', 'success');
         };
     </script>
 </body>
