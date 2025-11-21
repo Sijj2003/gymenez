@@ -255,9 +255,9 @@
         </div>
         
         <div id="contact-modal" class="hidden text-center">
-            <h3 class="text-2xl font-bold text-white mb-4">¿Necesita un ajuste o notificar un incidente?</h3>
+            <h3 class="text-2xl font-bold text-white mb-4">¿Necesita un ajuste o notificar alguna dolencia?</h3>
             <p class="text-gray-300 mb-6">
-                Le invitamos a contactar a su entrenador para ajustar su rutina o notificar cualquier molestia o dolor experimentado.
+                Le invitamos a contactar a su entrenador para ajustar su rutina o notificar cualquier molestia o dolencia experimentada.
             </p>
             <div id="countdown" class="text-sm font-semibold text-red-500 mb-4">
                 Redireccionando en <span id="timer-count">25</span> segundos...
@@ -336,11 +336,12 @@
         const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
         const CONTACT_WHATSAPP = '584148780392'; 
         const REDIRECT_URL = 'routines.html';
-        const REDIRECT_TIMEOUT_SECONDS = 25; // <--- CAMBIADO A 25 SEGUNDOS
+        const REDIRECT_TIMEOUT_SECONDS = 25; // TEMPORIZADOR A 25 SEGUNDOS
 
         let userId = null;
+        let userName = null; // NUEVA VARIABLE PARA EL NOMBRE DE USUARIO
         let routineExercises = []; 
-        let redirectTimer = null; // Variable para almacenar el temporizador
+        let redirectTimer = null; 
         
         // Nombre del día actual
         const CURRENT_DAY = 'Lunes'; 
@@ -551,8 +552,11 @@
                 redirectTimer = null;
             }
             if (contacted) {
-                // Si el usuario eligió contactar, abrimos el link antes de redirigir
-                const message = encodeURIComponent(`Hola, mi ID de usuario es ${userId} y acabo de terminar mi rutina de ${CURRENT_DAY}. Me gustaría ponerme en contacto contigo para un ajuste o para notificar un dolor.`);
+                // Usar userName si está disponible, si no, userId. 
+                const identifier = userName || userId;
+                
+                // Mensaje de WhatsApp actualizado con "dolencia" y usando 'identifier'
+                const message = encodeURIComponent(`Hola, soy ${identifier} y acabo de terminar mi rutina de ${CURRENT_DAY}. Me gustaría ponerme en contacto contigo para un ajuste o para notificar alguna dolencia.`);
                 const whatsappUrl = `https://wa.me/${CONTACT_WHATSAPP}?text=${message}`;
                 window.open(whatsappUrl, '_blank');
             }
@@ -864,6 +868,9 @@
                 try {
                     const userSession = JSON.parse(storedSession);
                     userId = userSession._id || userSession.id; 
+                    
+                    // INTENTA OBTENER EL NOMBRE DE USUARIO, SI NO EXISTE USA EL ID
+                    userName = userSession.username || userSession.name || userId;
 
                     if (userId) {
                         loadRoutine(CURRENT_DAY); 
