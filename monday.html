@@ -245,7 +245,7 @@
                     <button type="submit" 
                             id="submit-survey-btn"
                             class="w-full py-3 rounded-xl text-lg font-bold bg-amber-400 text-black hover:bg-amber-300 transition duration-300 uppercase shadow-xl">
-                        ENVIAR
+                        ENVIAR Y FINALIZAR
                     </button>
                     <a href="#" id="skip-survey-link" class="text-gray-400 text-sm mt-3 inline-block hover:text-white transition duration-300">
                         Omitir encuesta
@@ -331,12 +331,13 @@
     <script type="module">
         // 🚀 URL BASE DE TU API.
         const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
+        const API_JOURNAL_URL = `${API_BASE_URL}/api/journal/save_session`; // <--- NUEVA RUTA DEL JOURNAL
         const CONTACT_WHATSAPP = '584148780392'; 
         const REDIRECT_URL = 'routines.html';
-        const REDIRECT_TIMEOUT_SECONDS = 25; // TEMPORIZADOR A 25 SEGUNDOS
+        const REDIRECT_TIMEOUT_SECONDS = 25; 
 
         let userId = null;
-        let userFullName = null; // Variable para nombre y apellido
+        let userFullName = null; 
         let routineExercises = []; 
         let redirectTimer = null; 
         
@@ -432,6 +433,65 @@
         window.openTutorial = openTutorial; 
 
 
+        // --- FUNCIONES DE PERSISTENCIA ---
+        
+        /**
+         * Guarda el resumen de la rutina completada y los datos de la encuesta en el servidor.
+         * @param {object | null} surveyData - Los datos recopilados de la encuesta.
+         */
+        async function saveRoutineJournal(surveyData) {
+            if (!userId) {
+                console.error("No se puede guardar el journal: userId no está definido.");
+                showMessage("Error: Sesión de usuario no encontrada para guardar el registro.", 'error');
+                return false;
+            }
+
+            // Filtrar y mapear solo los datos esenciales de los ejercicios.
+            // Solo incluimos ejercicios con estado 'completed' o 'skipped' para el registro,
+            // aunque en la lógica actual el botón "RUTINA TERMINADA" solo se activa si no hay 'pending'.
+            const summaryExercises = routineExercises.map(e => ({
+                name: e.exerciseName,
+                status: e.status, // 'completed', 'skipped', 'pending'
+                sets: e.sets,
+                reps: e.reps
+            }));
+
+            const journalData = {
+                userId: userId,
+                day: CURRENT_DAY,
+                exercises: summaryExercises,
+                survey: surveyData 
+            };
+            
+            showMessage("Guardando registro de rutina...", 'success');
+
+            try {
+                const response = await fetch(API_JOURNAL_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(journalData)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    console.error("Error al guardar el journal:", data.error);
+                    showMessage(`Error al guardar el journal: ${data.error || 'Fallo desconocido'}. Puede continuar.`, 'error');
+                    return false;
+                }
+                
+                showMessage("Registro de rutina guardado exitosamente.", 'success');
+                return true;
+
+            } catch (e) {
+                console.error("Error de red al guardar el journal:", e);
+                showMessage(`Error de red al guardar el journal: ${e.message}. Puede continuar.`, 'error');
+                return false;
+            }
+        }
+
         // --- FUNCIONES DE INTERACTIVIDAD ---
 
         /**
@@ -460,7 +520,7 @@
          */
         function applyButtonColor(buttonElement, baseColorClass, hoverColorClass, isActive) {
             // Esta línea remueve TODAS las clases de color conocidas para evitar conflictos
-            buttonElement.classList.remove('bg-green-600', 'hover:bg-green-500', 'bg-red-600', 'hover:bg-red-500', 'bg-amber-400', 'hover:bg-amber-300', 'text-black', 'bg-gray-700', 'hover:bg-gray-600');
+            buttonElement.classList.remove('bg-green-600', 'hover:bg-green-500', 'bg-red-600', 'hover:bg-red-500', 'bg-amber-400', 'hover:bg-amber-300', 'text-black', 'bg-gray-700', 'hover:bg-gray-600', 'text-white');
             
             if (isActive) {
                 // Estado Activo/Seleccionado: Gris Oscuro
@@ -468,7 +528,7 @@
             } else {
                 // Estado Inactivo: Color Base
                 buttonElement.classList.add(baseColorClass, hoverColorClass, 'text-white');
-                // Añadir color de texto negro si el fondo es amarillo (sólo para COMPLETER/SALTAR no es necesario)
+                // Añadir color de texto negro si el fondo es amarillo 
                 if(baseColorClass.includes('amber')) {
                      buttonElement.classList.add('text-black');
                      buttonElement.classList.remove('text-white');
@@ -686,10 +746,10 @@
 
 
         // 3. Manejar el envío del formulario
-        surveyForm.addEventListener('submit', (e) => {
+        surveyForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // Recopilar datos (Lógica de API simulada)
+            // Recopilar datos de la encuesta
             const formData = {
                 userId: userId,
                 day: CURRENT_DAY,
@@ -703,18 +763,22 @@
                 } : null
             };
 
-            console.log("Datos de la encuesta a enviar (Simulado):", formData);
-            showMessage("Encuesta enviada, un momento...", 'success');
+            // ⚠️ NUEVO: Guardar el journal antes de mostrar el modal
+            const saveSuccess = await saveRoutineJournal(formData); 
             
-            // 4. Mostrar el modal de contacto después de enviar
-            setTimeout(showContactModal, 1000); 
+            // Si el guardado es exitoso o falla, mostramos el modal para que el usuario pueda contactar.
+            setTimeout(showContactModal, 500); 
         });
 
         // 5. Manejar la omisión de la encuesta
-        skipSurveyLink.addEventListener('click', (e) => {
+        skipSurveyLink.addEventListener('click', async (e) => {
             e.preventDefault();
-            showMessage("Encuesta omitida.", 'error');
-            // Mostrar el modal de contacto inmediatamente
+            showMessage("Encuesta omitida. Guardando registro...", 'error');
+            
+            // ⚠️ NUEVO: Guardar el journal con datos de encuesta nulos (null).
+            const saveSuccess = await saveRoutineJournal(null); 
+            
+            // Si el guardado es exitoso o falla, mostramos el modal para que el usuario pueda contactar.
             setTimeout(showContactModal, 500); 
         });
 
@@ -859,7 +923,7 @@
                 }
                 
                 allExercises.forEach(e => {
-                    // Ahora usamos 'status' en lugar de 'isCompleted'
+                    // Estado inicial: 'pending'
                     e.status = 'pending'; 
                 });
 
