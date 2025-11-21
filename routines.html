@@ -109,8 +109,9 @@
             
             <div id="day-cards-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
                 
+                
                 <a href="monday.html" 
-                   data-day-name="lunes" 
+                   data-day-name="lunes"
                    class="glass-card routine-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
                     <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
@@ -123,7 +124,7 @@
                 </a>
                 
                 <a href="tuesday.html" 
-                   data-day-name="martes" 
+                   data-day-name="martes"
                    class="glass-card routine-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
                     <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
@@ -136,7 +137,7 @@
                 </a>
 
                 <a href="wednesday.html" 
-                   data-day-name="miércoles" 
+                   data-day-name="miércoles"
                    class="glass-card routine-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
                     <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
@@ -149,7 +150,7 @@
                 </a>
 
                 <a href="thursday.html" 
-                   data-day-name="jueves" 
+                   data-day-name="jueves"
                    class="glass-card routine-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
                     <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
@@ -162,7 +163,7 @@
                 </a>
                 
                 <a href="friday.html" 
-                   data-day-name="viernes" 
+                   data-day-name="viernes"
                    class="glass-card routine-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
                     <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
@@ -175,7 +176,7 @@
                 </a>
                 
                 <a href="saturday.html" 
-                   data-day-name="sábado" 
+                   data-day-name="sábado"
                    class="glass-card routine-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
                     <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
@@ -194,6 +195,10 @@
     </section>
 
     <script>
+        // --- CONFIGURACIÓN DE API ---
+        const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; // ⚠️ AJUSTAR ESTA URL A LA DE TU API DESPLEGADA
+        const USER_ID = sessionStorage.getItem('active_user_id'); // Asegúrate de que el userId esté guardado en sessionStorage
+        
         // --- Variables y Utilidades Globales ---
         const messagebox = document.getElementById('message-box');
         
@@ -201,18 +206,51 @@
         const DAY_NAMES = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
         const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
+        // Mapeo para traducir el nombre del día normalizado al nombre del archivo HTML
+        const DAY_FILE_MAP = {
+            'lunes': 'monday',
+            'martes': 'tuesday',
+            'miércoles': 'wednesday',
+            'jueves': 'thursday',
+            'viernes': 'friday',
+            'sábado': 'saturday'
+        };
+
+
         /**
-         * Simula la obtención de la última fecha de completado para un día de rutina.
-         * @param {string} dayName Nombre del día (ej: 'lunes').
+         * Llama al endpoint de la API para obtener el timestamp de la última vez que 
+         * se completó una rutina para el día dado.
+         * @param {string} dayName Nombre del día normalizado (ej: 'lunes').
          * @returns {Date | null} La fecha de la última vez que se completó, o null.
          */
-        function getLastCompletedDate(dayName) {
-            // Normalizamos el nombre del día a minúsculas y sin acentos para la clave de almacenamiento (ej: 'lunes')
-            const key = dayName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
-            const journal = JSON.parse(localStorage.getItem('gymenez_journal')) || {};
-            const timestamp = journal[key];
-            return timestamp ? new Date(timestamp) : null;
+        async function fetchLastCompletedDate(dayName) {
+            if (!USER_ID) return null; // No hay usuario logueado
+
+            try {
+                // Se asume que en el servidor se guarda el día con la primera letra en mayúscula (ej: Lunes)
+                const normalizedDayNameForApi = dayName.charAt(0).toUpperCase() + dayName.slice(1);
+                
+                const response = await fetch(`${API_BASE_URL}/api/journal/last_completed/${USER_ID}/${normalizedDayNameForApi}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status} al buscar la última completada.`);
+                }
+                
+                const data = await response.json();
+
+                if (data.success && data.lastCompletedTimestamp) {
+                    // El servidor devuelve el timestamp en milisegundos
+                    return new Date(data.lastCompletedTimestamp);
+                }
+
+                return null; // No hay registro
+            } catch (error) {
+                console.error("Error al obtener el journal de rutina:", error);
+                // No mostrar showMessage aquí para evitar spam de mensajes si falla en todas las tarjetas
+                return null;
+            }
         }
+
 
         // Función para mostrar mensajes de estado (éxito/error)
         function showMessage(message, type = 'success') {
@@ -230,46 +268,62 @@
             }, 3000);
         }
         
-        // --- Lógica de Manejo de Tarjetas ---
-        function updateRoutineCards() {
+        // --- Lógica de Manejo de Tarjetas (Asíncrona) ---
+        async function updateRoutineCards() {
+            if (!USER_ID) {
+                showMessage('⚠️ Debe iniciar sesión para ver el estado de sus rutinas.', 'error');
+                return;
+            }
+
             const today = new Date();
             const todayIndex = today.getDay();
-            // Nombre del día actual, normalizado para la comparación
             const todayNameNormalized = DAY_NAMES[todayIndex].normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
             const routineCards = document.querySelectorAll('.routine-card');
+            let fetchFailed = false;
 
-            routineCards.forEach(card => {
+            // Usamos Promise.all para cargar el estado de todas las tarjetas en paralelo
+            const updatePromises = Array.from(routineCards).map(async (card) => {
                 const dayLinkElement = card.querySelector('h3');
                 const daySVG = card.querySelector('svg');
-                // El nombre de la tarjeta, normalizado para la búsqueda en el journal (ej: 'lunes')
-                const cardDayNameNormalized = dayLinkElement.textContent.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                // Nombre de la tarjeta normalizado (ej: 'lunes')
+                const cardDayNameNormalized = card.getAttribute('data-day-name').trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                 
                 
                 // 1. Limpiar clases de estilo dinámico y restaurar base
                 card.classList.remove('border-green-500', 'border-red-500', 'cursor-not-allowed', 'opacity-50');
                 dayLinkElement.classList.remove('text-green-500', 'text-red-500');
                 
-                // Restaurar color base (Amarillo/Amber-400) al borde y texto 
                 card.classList.add('border-amber-400');
                 dayLinkElement.classList.add('text-amber-400');
 
                 daySVG.querySelectorAll('.bar, .weight').forEach(el => {
-                    el.setAttribute('fill', '#facc15'); // Color amarillo base: #facc15 (amber-400)
+                    el.setAttribute('fill', '#facc15'); // Color amarillo base
                 });
                 
-                card.style.pointerEvents = 'auto'; // Habilitar clics por defecto
-                card.setAttribute('href', `${cardDayNameNormalized}.html`); // Restaurar el enlace
+                card.style.pointerEvents = 'auto'; 
+                
+                // --- AJUSTE CLAVE: Usar el mapeo para el href ---
+                const englishFilePrefix = DAY_FILE_MAP[cardDayNameNormalized];
+                if (englishFilePrefix) {
+                    card.setAttribute('href', `${englishFilePrefix}.html`); // monday.html, tuesday.html, etc.
+                } else {
+                    card.setAttribute('href', '#'); // Si el día no está mapeado (ej: domingo si existiera)
+                }
 
 
-                // 2. Revisar si la rutina fue completada en los últimos 7 días.
-                const lastCompleted = getLastCompletedDate(cardDayNameNormalized);
+                // 2. Obtener el último completado REAL desde la API
+                const lastCompleted = await fetchLastCompletedDate(cardDayNameNormalized);
+                
+                if (lastCompleted === undefined) {
+                    fetchFailed = true; // Marcar si la obtención falló
+                    return; 
+                }
+                
                 let isRecentlyCompleted = false;
                 
                 if (lastCompleted) {
-                    // Calcular el punto en el tiempo hace 7 días calendario.
                     const sevenDaysAgo = today.getTime() - (7 * MS_PER_DAY);
                     
-                    // Si la fecha de completado es MÁS reciente que hace 7 días, se marca como completada.
                     if (lastCompleted.getTime() > sevenDaysAgo) {
                         isRecentlyCompleted = true;
                     }
@@ -285,11 +339,11 @@
                     dayLinkElement.classList.add('text-red-500');
                     
                     daySVG.querySelectorAll('.bar, .weight').forEach(el => {
-                        el.setAttribute('fill', '#ef4444'); // Color rojo: #ef4444 (red-500)
+                        el.setAttribute('fill', '#ef4444'); // Color rojo
                     });
                     
-                    card.style.pointerEvents = 'none'; // Deshabilitar clic
-                    card.setAttribute('href', '#'); // Anular el enlace 
+                    card.style.pointerEvents = 'none'; 
+                    card.setAttribute('href', '#'); // Anular el enlace
                     
                 } else if (cardDayNameNormalized === todayNameNormalized) {
                     // ESTILO VERDE: Día de Entrenamiento de Hoy (Solo si no está en rojo)
@@ -300,32 +354,25 @@
                     dayLinkElement.classList.add('text-green-500');
                     
                     daySVG.querySelectorAll('.bar, .weight').forEach(el => {
-                        el.setAttribute('fill', '#22c55e'); // Color verde: #22c55e (green-500)
+                        el.setAttribute('fill', '#22c55e'); // Color verde
                     });
                 } 
             });
+
+            // Esperar a que todas las promesas se completen
+            await Promise.all(updatePromises);
+            
+            if (!fetchFailed) {
+                showMessage('Rutinas cargadas. Selecciona un día para ver tu rutina.', 'success');
+            } else {
+                 showMessage('Error parcial al cargar el estado de las rutinas. Revisa la consola.', 'error');
+            }
         }
 
 
         // --- Lógica de Inicialización ---
         window.onload = function() {
             updateRoutineCards();
-            
-            // --- CÓDIGO OPCIONAL DE PRUEBA: Descomentar para probar el estado rojo ---
-            /*
-            // SIMULACIÓN: Marca la rutina de 'lunes' como completada hoy.
-            const journal = JSON.parse(localStorage.getItem('gymenez_journal')) || {};
-            journal['lunes'] = Date.now();
-            localStorage.setItem('gymenez_journal', JSON.stringify(journal));
-            
-            // Vuelve a correr la lógica
-            updateRoutineCards(); 
-
-            // Muestra un mensaje de prueba
-            showMessage('DEMO: La rutina de Lunes está en rojo (Simulación de completada hoy).', 'success');
-            */
-
-            showMessage('Selecciona un día para ver tu rutina.', 'success');
         };
     </script>
 </body>
