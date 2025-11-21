@@ -61,7 +61,7 @@
             padding: 1rem 1.5rem;
             border-radius: 0.75rem;
             font-weight: 600;
-            z-index: 1000;
+            z-index: 3000; /* Alto para estar sobre todo */
             opacity: 0;
             transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
             pointer-events: none;
@@ -128,8 +128,8 @@
             }
         }
         
-        /* Estilos de la Encuesta */
-        #survey-container {
+        /* Estilos de la Encuesta y Modal */
+        #survey-container, #contact-modal {
             width: 90%;
             max-width: 500px;
             background: rgba(13, 13, 26, 0.95); /* Fondo oscuro semitransparente */
@@ -143,10 +143,10 @@
             z-index: 2002;
         }
 
-        #survey-container.fade-in {
+        #survey-container.fade-in, #contact-modal.fade-in {
             opacity: 1;
         }
-
+        
         /* Estilo para inputs en la encuesta */
         .survey-input {
             width: 100%;
@@ -245,15 +245,39 @@
                     <button type="submit" 
                             id="submit-survey-btn"
                             class="w-full py-3 rounded-xl text-lg font-bold bg-amber-400 text-black hover:bg-amber-300 transition duration-300 uppercase shadow-xl">
-                        ENVIAR Y FINALIZAR
+                        ENVIAR
                     </button>
-                    <a href="routines.html" id="skip-survey-link" class="text-gray-400 text-sm mt-3 inline-block hover:text-white transition duration-300">
-                        Omitir encuesta y volver
+                    <a href="#" id="skip-survey-link" class="text-gray-400 text-sm mt-3 inline-block hover:text-white transition duration-300">
+                        Omitir encuesta
                     </a>
                 </div>
             </form>
         </div>
         
+        <div id="contact-modal" class="hidden text-center">
+            <h3 class="text-2xl font-bold text-white mb-4">¿Necesita un ajuste o notificar un incidente?</h3>
+            <p class="text-gray-300 mb-6">
+                Le invitamos a contactar a su entrenador para ajustar su rutina o notificar cualquier molestia o dolor experimentado.
+            </p>
+            <div id="countdown" class="text-sm font-semibold text-red-500 mb-4">
+                Redireccionando en <span id="timer-count">5</span> segundos...
+            </div>
+
+            <div class="flex space-x-4 justify-center">
+                <button id="contact-yes-btn" 
+                        class="px-6 py-3 rounded-xl text-lg font-bold bg-green-600 text-white hover:bg-green-500 transition duration-300 shadow-lg flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-2 5.517l-1.396-1.396a1 1 0 00-.707-.293H12c-.552 0-1 .448-1 1v2c0 .552.448 1 1 1h4c.552 0 1-.448 1-1v-2c0-.552-.448-1-1-1zm-4-4a1 1 0 00-1-1H7a1 1 0 100 2h4a1 1 0 001-1z" clip-rule="evenodd" />
+                    </svg>
+                    Sí, Contactar por WhatsApp
+                </button>
+                <button id="contact-no-btn" 
+                        class="px-6 py-3 rounded-xl text-lg font-bold bg-gray-700 text-white hover:bg-gray-600 transition duration-300 shadow-lg">
+                    No, Gracias
+                </button>
+            </div>
+        </div>
+
     </div>
 
     <audio id="fireworks-audio" preload="auto">
@@ -310,9 +334,12 @@
     <script type="module">
         // 🚀 URL BASE DE TU API.
         const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
-        
+        const CONTACT_WHATSAPP = '584148780392'; 
+        const REDIRECT_URL = 'routines.html';
+
         let userId = null;
         let routineExercises = []; 
+        let redirectTimer = null; // Variable para almacenar el temporizador
         
         // Nombre del día actual
         const CURRENT_DAY = 'Lunes'; 
@@ -327,15 +354,21 @@
         const finishRoutineBtn = document.getElementById('finish-routine-btn');
         const finishScreen = document.getElementById('finish-screen');
         const fireworksAudio = document.getElementById('fireworks-audio');
-        // Nuevos elementos de la encuesta
+        // Elementos de la encuesta
         const finishMessage = document.getElementById('finish-message');
         const surveyContainer = document.getElementById('survey-container');
         const surveyForm = document.getElementById('routine-survey-form');
+        const skipSurveyLink = document.getElementById('skip-survey-link');
         const dolorSi = document.getElementById('dolor-si');
         const dolorNo = document.getElementById('dolor-no');
         const dolorDetails = document.getElementById('dolor-details');
         const tipoDolorRadios = document.getElementsByName('tipo-dolor');
         const otroDolorContainer = document.getElementById('otro-dolor-container');
+        // Elementos del Modal de Contacto
+        const contactModal = document.getElementById('contact-modal');
+        const contactYesBtn = document.getElementById('contact-yes-btn');
+        const contactNoBtn = document.getElementById('contact-no-btn');
+        const timerCount = document.getElementById('timer-count');
 
 
         function showMessage(message, type = 'success') {
@@ -477,6 +510,57 @@
         window.toggleExerciseCompleted = (exerciseName) => toggleExerciseStatus(exerciseName, 'completed'); 
         window.toggleExerciseSkipped = (exerciseName) => toggleExerciseStatus(exerciseName, 'skipped'); 
 
+        /**
+         * Muestra el modal de contacto con el temporizador de 5 segundos.
+         */
+        function showContactModal() {
+            surveyContainer.classList.add('hidden');
+            contactModal.classList.remove('hidden');
+            
+            setTimeout(() => {
+                contactModal.classList.add('fade-in');
+            }, 50);
+
+            let count = 5;
+            timerCount.textContent = count;
+
+            // Limpiar cualquier temporizador anterior
+            if (redirectTimer) {
+                clearInterval(redirectTimer);
+            }
+
+            // Iniciar el temporizador de redirección
+            redirectTimer = setInterval(() => {
+                count--;
+                timerCount.textContent = count;
+
+                if (count <= 0) {
+                    clearInterval(redirectTimer);
+                    handleRedirect();
+                }
+            }, 1000);
+        }
+
+        /**
+         * Maneja la redirección final y limpia el temporizador.
+         */
+        function handleRedirect(contacted = false) {
+            if (redirectTimer) {
+                clearInterval(redirectTimer);
+                redirectTimer = null;
+            }
+            if (contacted) {
+                // Si el usuario eligió contactar, abrimos el link antes de redirigir
+                const message = encodeURIComponent(`Hola, mi ID de usuario es ${userId} y acabo de terminar mi rutina de ${CURRENT_DAY}. Me gustaría ponerme en contacto contigo para un ajuste o para notificar un dolor.`);
+                const whatsappUrl = `https://wa.me/${CONTACT_WHATSAPP}?text=${message}`;
+                window.open(whatsappUrl, '_blank');
+            }
+
+            showMessage("Volviendo a la pantalla principal...", 'success');
+            setTimeout(() => {
+                window.location.href = REDIRECT_URL;
+            }, 500); // Pequeña espera para mostrar el último mensaje
+        }
 
         /**
          * Muestra la animación de felicitación, oculta el mensaje y MUESTRA LA ENCUESTA.
@@ -513,7 +597,7 @@
                         setTimeout(() => {
                             surveyContainer.classList.add('fade-in');
                         }, 50); 
-                    }, 700); // Espera a que el mensaje se desvanezca
+                    }, 700); 
 
                     return;
                 }
@@ -573,17 +657,16 @@
         tipoDolorRadios.forEach(radio => radio.addEventListener('change', handleTipoDolorChange));
 
 
-        // 3. Manejar el envío del formulario (Aquí se enviaría a la API)
+        // 3. Manejar el envío del formulario
         surveyForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
-            // Recopilar datos
+            // Recopilar datos (Lógica de API simulada)
             const formData = {
                 userId: userId,
                 day: CURRENT_DAY,
                 costoRutina: document.getElementById('costo-rutina').value,
                 sintioDolor: dolorSi.checked,
-                // Si hubo dolor, recopilar detalles
                 dolorDetalles: dolorSi.checked ? {
                     zona: document.getElementById('zona-dolor').value,
                     nivel: document.getElementById('nivel-dolor').value,
@@ -592,18 +675,32 @@
                 } : null
             };
 
-            console.log("Datos de la encuesta a enviar:", formData);
+            console.log("Datos de la encuesta a enviar (Simulado):", formData);
+            showMessage("Encuesta enviada, un momento...", 'success');
             
-            // Aquí iría la lógica de API (ej: fetch(API_URL_SURVEY, { method: 'POST', body: JSON.stringify(formData) }))
-
-            // Mensaje y Redirección al finalizar
-            showMessage("Encuesta enviada. ¡Gracias por tu feedback!", 'success');
-            setTimeout(() => {
-                window.location.href = 'routines.html';
-            }, 1500); // Redirigir después de enviar y mostrar mensaje
+            // 4. Mostrar el modal de contacto después de enviar
+            setTimeout(showContactModal, 1000); 
         });
 
-        // --- FIN Funciones de Encuesta ---
+        // 5. Manejar la omisión de la encuesta
+        skipSurveyLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showMessage("Encuesta omitida.", 'error');
+            // Mostrar el modal de contacto inmediatamente
+            setTimeout(showContactModal, 500); 
+        });
+
+        // --- Lógica de los botones del Modal de Contacto ---
+
+        contactYesBtn.addEventListener('click', () => {
+            handleRedirect(true); // Redirige e inicia contacto por WhatsApp
+        });
+
+        contactNoBtn.addEventListener('click', () => {
+            handleRedirect(false); // Redirige sin iniciar contacto
+        });
+
+        // --- FIN Funciones de Encuesta y Contacto ---
         
         /**
          * Renderiza la lista de ejercicios en el DOM.
