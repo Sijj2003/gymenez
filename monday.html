@@ -279,8 +279,8 @@
          * Actualiza el estado visual del botón 'Rutina Terminada'.
          */
         function updateFinishButtonState() {
-            // Comprueba si TODOS los ejercicios están marcados como completados
-            const allCompleted = routineExercises.length > 0 && routineExercises.every(e => e.isCompleted);
+            // Comprueba si TODOS los ejercicios están marcados como completados (incluye saltados)
+            const allCompleted = routineExercises.length > 0 && routineExercises.every(e => e.status !== 'pending');
             
             finishRoutineBtn.disabled = !allCompleted;
             
@@ -297,35 +297,49 @@
         }
 
         /**
-         * Maneja el clic en el botón 'Completar' de un ejercicio.
+         * Maneja el clic en los botones de estado ('COMPLETAR' y 'SALTAR').
+         * statusType puede ser 'completed' o 'skipped'.
          */
-        function toggleExerciseCompleted(exerciseName) {
+        function toggleExerciseStatus(exerciseName, statusType) {
             const exercise = routineExercises.find(e => e.exerciseName === exerciseName);
             if (!exercise) return;
 
+            // Define el nuevo estado
+            const newStatus = exercise.status === statusType ? 'pending' : statusType;
+
             // 1. Alternar el estado en el modelo de datos
-            exercise.isCompleted = !exercise.isCompleted;
+            exercise.status = newStatus;
 
             // 2. Actualizar visualmente la tarjeta
             const cardId = exerciseName.replace(/\s/g, '-');
             const completedIndicator = document.getElementById(`completed-indicator-${cardId}`);
-            const completedButton = document.getElementById(`completed-button-${cardId}`);
+            const completeButton = document.getElementById(`completed-button-${cardId}`);
+            const skipButton = document.getElementById(`skip-button-${cardId}`);
+
+            // Resetear clases de botones e indicador
+            completedIndicator.classList.remove('bg-green-600', 'bg-red-600', 'bg-gray-700');
+            completeButton.classList.remove('bg-sky-600', 'hover:bg-sky-500', 'bg-gray-700', 'hover:bg-gray-600');
+            skipButton.classList.remove('bg-red-600', 'hover:bg-red-500', 'bg-gray-700', 'hover:bg-gray-600');
             
-            if (exercise.isCompleted) {
-                completedIndicator.classList.remove('bg-gray-700');
+            completeButton.textContent = 'COMPLETAR';
+            skipButton.textContent = 'SALTAR';
+
+            if (newStatus === 'completed') {
                 completedIndicator.classList.add('bg-green-600');
-                
-                completedButton.classList.remove('bg-sky-600', 'hover:bg-sky-500');
-                completedButton.classList.add('bg-gray-700', 'hover:bg-gray-600');
-                completedButton.textContent = 'HECHO';
+                completeButton.classList.add('bg-gray-700', 'hover:bg-gray-600');
+                skipButton.classList.add('bg-red-600', 'hover:bg-red-500'); // Mantener rojo o cambiar a pendiente si ya estaba marcado
+                completeButton.textContent = 'HECHO';
                 showMessage(`${exerciseName} marcado como completado.`, 'success');
-            } else {
-                completedIndicator.classList.remove('bg-green-600');
+            } else if (newStatus === 'skipped') {
+                completedIndicator.classList.add('bg-red-600');
+                skipButton.classList.add('bg-gray-700', 'hover:bg-gray-600');
+                completeButton.classList.add('bg-sky-600', 'hover:bg-sky-500'); // Mantener azul o cambiar a pendiente si ya estaba marcado
+                skipButton.textContent = 'SALTADO';
+                showMessage(`${exerciseName} marcado como saltado.`, 'error');
+            } else { // 'pending'
                 completedIndicator.classList.add('bg-gray-700');
-                
-                completedButton.classList.remove('bg-gray-700', 'hover:bg-gray-600');
-                completedButton.classList.add('bg-sky-600', 'hover:bg-sky-500');
-                completedButton.textContent = 'COMPLETAR';
+                completeButton.classList.add('bg-sky-600', 'hover:bg-sky-500');
+                skipButton.classList.add('bg-red-600', 'hover:bg-red-500');
                 showMessage(`${exerciseName} marcado como pendiente.`, 'error');
             }
 
@@ -333,7 +347,8 @@
             updateFinishButtonState();
         }
 
-        window.toggleExerciseCompleted = toggleExerciseCompleted; 
+        window.toggleExerciseCompleted = (exerciseName) => toggleExerciseStatus(exerciseName, 'completed'); 
+        window.toggleExerciseSkipped = (exerciseName) => toggleExerciseStatus(exerciseName, 'skipped'); 
 
 
         /**
@@ -415,12 +430,26 @@
                 const card = document.createElement('div');
                 card.className = 'glass-item-card p-4 rounded-xl shadow-lg';
                 
-                exercise.isCompleted = exercise.isCompleted || false; 
+                // Inicializar estado: 'pending', 'completed', 'skipped'
+                exercise.status = exercise.status || 'pending'; 
                 
                 const cardId = exercise.exerciseName.replace(/\s/g, '-');
-                const btnBgClass = exercise.isCompleted ? 'bg-gray-700 hover:bg-gray-600' : 'bg-sky-600 hover:bg-sky-500';
-                const btnText = exercise.isCompleted ? 'HECHO' : 'COMPLETAR';
-                const circleBgClass = exercise.isCompleted ? 'bg-green-600' : 'bg-gray-700';
+                
+                let completeBtnBgClass = 'bg-sky-600 hover:bg-sky-500';
+                let completeBtnText = 'COMPLETAR';
+                let skipBtnBgClass = 'bg-red-600 hover:bg-red-500';
+                let skipBtnText = 'SALTAR';
+                let circleBgClass = 'bg-gray-700';
+
+                if (exercise.status === 'completed') {
+                    completeBtnBgClass = 'bg-gray-700 hover:bg-gray-600';
+                    completeBtnText = 'HECHO';
+                    circleBgClass = 'bg-green-600';
+                } else if (exercise.status === 'skipped') {
+                    skipBtnBgClass = 'bg-gray-700 hover:bg-gray-600';
+                    skipBtnText = 'SALTADO';
+                    circleBgClass = 'bg-red-600';
+                }
                 
                 // Muestra la información de la base de datos
                 card.innerHTML = `
@@ -438,14 +467,21 @@
                                 <button 
                                     id="completed-button-${cardId}"
                                     onclick="toggleExerciseCompleted('${exercise.exerciseName.replace(/'/g, "\\'")}')" 
-                                    class="w-full px-3 py-1 text-sm font-semibold rounded-lg ${btnBgClass} text-white transition duration-300 shadow-md whitespace-nowrap">
-                                    ${btnText}
+                                    class="w-full px-3 py-1 text-sm font-semibold rounded-lg ${completeBtnBgClass} text-white transition duration-300 shadow-md whitespace-nowrap">
+                                    ${completeBtnText}
                                 </button>
                                 
                                 <button 
                                     onclick="openTutorial('${exercise.exerciseName.replace(/'/g, "\\'")}')" 
                                     class="w-full px-3 py-1 text-sm font-semibold rounded-lg bg-green-600 text-white hover:bg-green-500 transition duration-300 shadow-md whitespace-nowrap">
                                     TUTORIAL
+                                </button>
+                                
+                                <button 
+                                    id="skip-button-${cardId}"
+                                    onclick="toggleExerciseSkipped('${exercise.exerciseName.replace(/'/g, "\\'")}')" 
+                                    class="w-full px-3 py-1 text-sm font-semibold rounded-lg ${skipBtnBgClass} text-white transition duration-300 shadow-md whitespace-nowrap">
+                                    ${skipBtnText}
                                 </button>
                             </div>
 
@@ -497,7 +533,8 @@
                 }
                 
                 allExercises.forEach(e => {
-                    e.isCompleted = false; 
+                    // Ahora usamos 'status' en lugar de 'isCompleted'
+                    e.status = 'pending'; 
                 });
 
 
