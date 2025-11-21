@@ -86,23 +86,14 @@
                  0.75px  0.75px 0 #000;
         }
 
-        /* === NUEVOS ESTILOS PARA LA RUTINA DEL DÍA === */
-        /* Animación de Pulso y Brillo */
-        @keyframes pulse-grow {
-            0%, 100% {
-                transform: scale(1);
-                box-shadow: 0 0 10px rgba(16, 185, 129, 0.5), 0 4px 16px 0 rgba(0, 0, 0, 0.5); /* Sombra inicial */
-            }
-            50% {
-                transform: scale(1.03); /* Ligeramente más grande */
-                box-shadow: 0 0 25px rgba(16, 185, 129, 0.8), 0 6px 20px 0 rgba(0, 0, 0, 0.7); /* Sombra más brillante y grande */
-            }
-        }
-
-        /* Clase para la tarjeta del día actual */
+        /* === ESTILOS PARA LA RUTINA DEL DÍA (SIN ANIMACIÓN) === */
         .glass-card.today {
-            border-color: #10b981 !important; /* Verde esmeralda (emerald-500) */
-            animation: pulse-grow 2s infinite ease-in-out; /* Aplicar la animación */
+            /* Verde esmeralda (emerald-500) */
+            border-color: #10b981 !important; 
+            /* Se mantiene el box-shadow de hover para destacarla sutilmente */
+            box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.6); 
+            /* Para que no se mueva, aunque el hover también funciona */
+            transform: scale(1); 
         }
 
         /* Clase para el texto del día actual */
@@ -260,7 +251,7 @@
             }
         };
 
-        // --- NUEVA FUNCIÓN PARA RESALTAR LA RUTINA DE HOY ---
+        // --- FUNCIÓN PARA RESALTAR LA RUTINA DE HOY ---
         function highlightTodayRoutine() {
             // 1. Obtener el día de la semana actual en español
             const today = new Date();
@@ -285,7 +276,7 @@
                 const todayCard = document.querySelector(`[data-day="${todayDayName}"]`);
                 
                 if (todayCard) {
-                    // 3. Aplicar la clase de estilo y animación
+                    // 3. Aplicar la clase de estilo
                     todayCard.classList.add('today');
                 }
             }
