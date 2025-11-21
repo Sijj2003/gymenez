@@ -30,180 +30,146 @@
                 -0.5px  0.5px 0 #000,
                  0.5px  0.5px 0 #000;
         }
-        
-        /* Estilo específico para el efecto Glassmorphism en las tarjetas */
+
+        /* Estilo para las Tarjetas de Vidrio (Glassmorphism) */
         .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer; /* Indicador de elemento pulsable */
+            background-color: rgba(255, 255, 255, 0.05); /* Fondo muy transparente */
+            backdrop-filter: blur(10px); /* Efecto de desenfoque */
+            -webkit-backdrop-filter: blur(10px); /* Soporte para Safari */
+            border-radius: 12px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border: 2px solid; /* El borde que cambia de color */
+            transition: all 0.2s ease-in-out;
+            transform: scale(1);
+        }
+
+        .glass-card:hover {
+            box-shadow: 0 6px 40px rgba(250, 192, 40, 0.2);
+            transform: scale(1.02);
         }
         
-        /* === ESTILO UNIFICADO CON index.html DASHBOARD CARD === */
-        .glass-card:hover {
-            transform: translateY(-2px); /* Menos desplazamiento que antes */
-            box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.6); /* Sombra unificada */
-        }
-
-        /* Sombra/Borde para el texto del Header (Gris) */
-        .text-border-gray {
-            text-shadow: 0 0 3px #4b5563; 
-        }
-
-        /* Estilos para notificaciones (Unificado con index.html) */
+        /* Estilo para la Caja de Mensajes Flotante */
         #message-box {
             position: fixed;
-            top: 1rem;
+            top: 20px;
             left: 50%;
-            transform: translateX(-50%);
-            padding: 1rem 1.5rem;
-            border-radius: 0.75rem;
+            transform: translateX(-50%) translateY(-20px);
+            opacity: 0;
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: #fff;
             font-weight: 600;
             z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-            pointer-events: none;
-        }
-        .message-success { background-color: #10b981; color: white; } 
-        
-        /* Estilo de borde negro para el SVG (simulando un stroke) */
-        .dumbbell-svg .bar, .dumbbell-svg .weight {
-            stroke: black;
-            stroke-width: 1.5px; /* Ajusta el grosor del borde si es necesario */
-            stroke-linejoin: round; /* Suaviza las uniones de los bordes */
-            stroke-linecap: round;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            white-space: nowrap;
         }
 
-        /* Borde negro para el texto de los días (duplicado del body pero específico para esta clase) */
-        .day-name-text {
-            text-shadow: 
-                -0.75px -0.75px 0 #000,  
-                 0.75px -0.75px 0 #000,
-                -0.75px  0.75px 0 #000,
-                 0.75px  0.75px 0 #000;
+        .message-success {
+            background-color: #10b981; /* green-500 */
+        }
+        
+        .message-error {
+            background-color: #ef4444; /* red-500 */
+        }
+
+        /* Utilidad para evitar transición en cambios instantáneos */
+        .transition-none {
+            transition: none !important;
         }
     </style>
 </head>
 <body class="min-h-screen">
-
-    <div id="message-box"></div>
-    
-    <header class="flex justify-between items-center py-4 px-8 mb-4">
-        <h1 class="text-3xl font-extrabold uppercase tracking-wider text-border-gray">
-            <span class="text-amber-400">GYM</span><span class="text-white">ENEZ</span>
+    <section class="p-4 md:p-8 lg:p-12">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-white text-center mb-8 tracking-tighter">
+            <span class="text-amber-400">Rutinas</span> Semanales
         </h1>
         
-        <div class="flex space-x-4">
-            <a href="index.html" 
-               class="px-4 py-2 text-sm font-semibold rounded-full bg-sky-600 text-white hover:bg-sky-500 transition duration-300">
-                REGRESAR
+        <div id="message-box" class="message-success"></div>
+
+        <div id="day-cards-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 max-w-7xl mx-auto">
+
+            <a href="monday.html" class="glass-card flex flex-col items-center justify-center p-6 space-y-4 hover:border-amber-400 border-amber-400">
+                <svg class="dumbbell-svg w-12 h-12" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="15" y="45" width="70" height="10" rx="4" fill="#6b7280" class="bar"/>
+                    <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                    <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                </svg>
+                <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Lunes</h3>
             </a>
-        </div>
-    </header>
-    
-    <!-- Reduje el padding top para compensar la eliminación del h2 -->
-    <section id="routines-screen" class="min-h-screen p-4 sm:p-8 pt-0"> 
-        <div class="max-w-6xl mx-auto">
+
+            <a href="tuesday.html" class="glass-card flex flex-col items-center justify-center p-6 space-y-4 hover:border-amber-400 border-amber-400">
+                <svg class="dumbbell-svg w-12 h-12" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="15" y="45" width="70" height="10" rx="4" fill="#6b7280" class="bar"/>
+                    <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                    <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                </svg>
+                <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Martes</h3>
+            </a>
             
-            <!-- ELIMINADO: Título "Selecciona el Día de Entrenamiento" y su raya amarilla -->
+            <a href="wednesday.html" class="glass-card flex flex-col items-center justify-center p-6 space-y-4 hover:border-amber-400 border-amber-400">
+                <svg class="dumbbell-svg w-12 h-12" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="15" y="45" width="70" height="10" rx="4" fill="#6b7280" class="bar"/>
+                    <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                    <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                </svg>
+                <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Miércoles</h3>
+            </a>
 
-            <div id="day-cards-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-                
-                <!-- Definición del SVG de Mancuerna Estilizada para uso repetitivo -->
-                <!-- Ahora con color amarillo y clases para borde negro -->
-                <script>
-                    const dumbbellSVG = `
-                        <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Mango de la mancuerna --><rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
-                            <!-- Pesas izquierda --><rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
-                            <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
-                            <!-- Pesas derecha --><rect x="75" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
-                            <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
-                        </svg>
-                    `;
-                </script>
+            <a href="thursday.html" class="glass-card flex flex-col items-center justify-center p-6 space-y-4 hover:border-amber-400 border-amber-400">
+                <svg class="dumbbell-svg w-12 h-12" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="15" y="45" width="70" height="10" rx="4" fill="#6b7280" class="bar"/>
+                    <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                    <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                </svg>
+                <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Jueves</h3>
+            </a>
+            
+            <a href="friday.html" class="glass-card flex flex-col items-center justify-center p-6 space-y-4 hover:border-amber-400 border-amber-400">
+                <svg class="dumbbell-svg w-12 h-12" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="15" y="45" width="70" height="10" rx="4" fill="#6b7280" class="bar"/>
+                    <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                    <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                </svg>
+                <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Viernes</h3>
+            </a>
 
-
-                <!-- Tarjeta Lunes --><a href="monday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
-                    <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
-                        <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
-                        <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
-                        <rect x="75" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
-                        <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
-                    </svg>
-                    <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Lunes</h3>
-                </a>
-                
-                <!-- Tarjeta Martes --><a href="tuesday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
-                    <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
-                        <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
-                        <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
-                        <rect x="75" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
-                        <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
-                    </svg>
-                    <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Martes</h3>
-                </a>
-
-                <!-- Tarjeta Miércoles --><a href="wednesday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
-                    <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
-                        <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
-                        <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
-                        <rect x="75" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
-                        <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
-                    </svg>
-                    <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Miércoles</h3>
-                </a>
-
-                <!-- Tarjeta Jueves --><a href="thursday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
-                    <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
-                        <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
-                        <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
-                        <rect x="75" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
-                        <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
-                    </svg>
-                    <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Jueves</h3>
-                </a>
-                
-                <!-- Tarjeta Viernes --><a href="friday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
-                    <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
-                        <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
-                        <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
-                        <rect x="75" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
-                        <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
-                    </svg>
-                    <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Viernes</h3>
-                </a>
-                
-                <!-- Tarjeta Sábado --><a href="saturday.html" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
-                    <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
-                        <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
-                        <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
-                        <rect x="75" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
-                        <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
-                    </svg>
-                    <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Sábado</h3>
-                </a>
-                
-            </div>
-
+            <a href="saturday.html" class="glass-card flex flex-col items-center justify-center p-6 space-y-4 hover:border-amber-400 border-amber-400">
+                <svg class="dumbbell-svg w-12 h-12" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="15" y="45" width="70" height="10" rx="4" fill="#6b7280" class="bar"/>
+                    <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                    <rect x="90" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
+                </svg>
+                <h3 class="text-xl font-bold uppercase tracking-wider text-amber-400 day-name-text">Sábado</h3>
+            </a>
+            
         </div>
 
     </section>
 
     <script>
-        // --- Variables y Utilidades Globales (Mantenemos solo la caja de mensajes por si acaso) ---
-        const messagebox = document.getElementById('message-box');
+        // --- CONFIGURACIÓN DE ACCESO AL BACKEND (AJUSTAR ESTO EN SU ENTORNO REAL) ---
+        // ⚠️ IMPORTANTE: REEMPLAZA ESTAS VARIABLES CON LOS VALORES REALES DE TU APLICACIÓN
+        const BACKEND_BASE_URL = "https://tudominio.com/api"; // Ejemplo: "https://gymenez-api.pythonanywhere.com/api"
+        const USER_ID = "ID_DEL_USUARIO_ACTUAL"; // Debes obtener este ID al hacer login/cargar la sesión
 
-        // Función para mostrar mensajes de estado (éxito/error)
+        // --- Variables y Utilidades Globales ---
+        const messagebox = document.getElementById('message-box');
+        const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+        const SEVEN_DAYS_MS = 7 * ONE_DAY_MS;
+        // Objeto que almacenará los datos reales de la última sesión para cada día
+        let lastRoutineDates = {}; 
+
+        // Mapeo de días de la semana (1-6) a nombres y URLs (Mantenido)
+        const daysMap = {
+            1: { name: 'Lunes', url: 'monday.html' },
+            2: { name: 'Martes', url: 'tuesday.html' },
+            3: { name: 'Miércoles', url: 'wednesday.html' },
+            4: { name: 'Jueves', url: 'thursday.html' },
+            5: { name: 'Viernes', url: 'friday.html' },
+            6: { name: 'Sábado', url: 'saturday.html' }
+        };
+
+        // Función para mostrar mensajes de estado (éxito/error) (Sin cambios)
         function showMessage(message, type = 'success') {
             messagebox.textContent = message;
             messagebox.className = ''; 
@@ -219,10 +185,170 @@
             }, 3000);
         }
         
-        // --- Lógica de Inicialización ---
-        window.onload = function() {
-            // El contenido ahora es estático, solo mostramos un mensaje de bienvenida.
-            showMessage('Selecciona un día para ver tu rutina.', 'success');
+        // ====================================================================
+        // FUNCIÓN DE CONEXIÓN AL BACKEND
+        // ====================================================================
+
+        async function fetchLastRoutineDates() {
+            if (USER_ID === "ID_DEL_USUARIO_ACTUAL") {
+                console.error("ERROR: Debes configurar el USER_ID real antes de llamar al backend.");
+                showMessage("ERROR: ID de usuario no configurado. Rutinas Desbloqueadas.", 'error');
+                return true; 
+            }
+            
+            try {
+                const url = `${BACKEND_BASE_URL}/journal/last_sessions/${USER_ID}`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.success) {
+                    // lastRoutineDates ahora es un objeto como: {'Lunes': 1732152000000, 'Miércoles': 1731633600000}
+                    lastRoutineDates = data.lastRoutineDates; 
+                    return true;
+                } else {
+                    console.error("Error al obtener las fechas del journal:", data.error);
+                    showMessage("Error al cargar el historial de rutinas.", 'error');
+                    return false;
+                }
+            } catch (error) {
+                console.error("Error de red al llamar al backend:", error);
+                showMessage("Error de conexión con el servidor. Revisar URL.", 'error');
+                return false;
+            }
+        }
+
+        // ====================================================================
+        // LÓGICA DE BLOQUEO/DESBLOQUEO
+        // ====================================================================
+
+        /**
+         * Verifica el estado de una rutina (Bloqueada, Desbloqueada o Día Actual).
+         * @param {number} dayIndex - El índice del día (1=Lunes a 6=Sábado).
+         * @param {string} dayName - El nombre del día (e.g., 'Lunes').
+         * @returns {'current'|'locked'|'unlocked'} El estado del día.
+         */
+        function checkRoutineStatus(dayIndex, dayName) {
+            const today = new Date();
+            const todayIndex = today.getDay(); // 0=Domingo, 1=Lunes, ..., 6=Sábado
+            
+            // 1. Lógica del Día Actual (Verde)
+            if (dayIndex === todayIndex) {
+                return 'current';
+            }
+
+            // 2. Lógica de Bloqueo (Rojo)
+            // lastRoutineDates[dayName] es el timestamp en ms o undefined.
+            const lastTimestamp = lastRoutineDates[dayName];
+            
+            if (lastTimestamp) {
+                // Obtenemos la fecha en ms de hace 7 días
+                const sevenDaysAgo = today.getTime() - SEVEN_DAYS_MS;
+
+                // Si la última fecha guardada (lastTimestamp) es posterior a la de hace 7 días, está bloqueada.
+                if (lastTimestamp > sevenDaysAgo) {
+                    return 'locked';
+                }
+            }
+
+            // 3. Lógica de Desbloqueo (Ámbar por defecto)
+            return 'unlocked';
+        }
+
+        /**
+         * Aplica los estilos y la lógica de bloqueo a las tarjetas de rutina.
+         */
+        function updateRoutineCards() {
+            const dayCardsContainer = document.getElementById('day-cards-container');
+            const dayCards = dayCardsContainer.querySelectorAll('.glass-card');
+            
+            let currentDayFound = false;
+            
+            dayCards.forEach(card => {
+                const dayNameElement = card.querySelector('.day-name-text');
+                const dayName = dayNameElement.textContent.trim();
+                const originalHref = card.getAttribute('href') || card.getAttribute('data-href');
+                const svg = card.querySelector('.dumbbell-svg');
+
+                // Obtener el índice numérico del día (1 a 6)
+                const dayEntry = Object.entries(daysMap).find(([key, value]) => value.name === dayName);
+                const dayIndex = dayEntry ? parseInt(dayEntry[0]) : null;
+                
+                if (!dayIndex) return; 
+
+                const status = checkRoutineStatus(dayIndex, dayName);
+                
+                // Limpiar estilos previos de color
+                card.classList.remove('border-amber-400', 'border-red-600', 'border-green-600');
+                dayNameElement.classList.remove('text-amber-400', 'text-red-600', 'text-green-600');
+                svg.querySelectorAll('.bar, .weight').forEach(el => el.setAttribute('fill', '#facc15')); // Amarillo base
+                
+                // Aplicar estilos y lógica
+                if (status === 'current') {
+                    // Estilo Verde (Día Actual)
+                    card.classList.add('border-green-600');
+                    dayNameElement.classList.add('text-green-600');
+                    svg.querySelectorAll('.bar, .weight').forEach(el => el.setAttribute('fill', '#10b981')); // Green
+                    card.classList.remove('hover:border-amber-400'); 
+                    card.style.cursor = 'pointer';
+                    card.classList.remove('opacity-50');
+                    if (originalHref) card.setAttribute('href', originalHref);
+                    card.onclick = null;
+                    currentDayFound = true; 
+
+                } else if (status === 'locked') {
+                    // Estilo Rojo (Bloqueado)
+                    card.classList.add('border-red-600');
+                    dayNameElement.classList.add('text-red-600');
+                    card.classList.remove('hover:border-amber-400');
+                    card.style.cursor = 'not-allowed'; 
+                    card.classList.add('opacity-50'); 
+                    
+                    // DESHABILITAR el enlace y agregar mensaje
+                    if (originalHref) card.setAttribute('data-href', originalHref); // Guarda el href
+                    card.removeAttribute('href');
+                    card.onclick = (e) => {
+                        e.preventDefault();
+                        showMessage(`¡Rutina de ${dayName} ya completada! Vuelve en 7 días o el próximo ${dayName}.`, 'error');
+                    };
+                    
+                } else {
+                    // Estilo Ámbar por Defecto (Desbloqueado)
+                    card.classList.add('border-amber-400');
+                    dayNameElement.classList.add('text-amber-400');
+                    card.classList.add('hover:border-amber-400');
+                    card.style.cursor = 'pointer';
+                    card.classList.remove('opacity-50');
+                    
+                    // Asegurar que el enlace esté presente
+                    if (!card.hasAttribute('href') && originalHref) {
+                        card.setAttribute('href', originalHref);
+                        card.removeAttribute('data-href'); // Limpiar el guardado si existía
+                        card.onclick = null;
+                    }
+                }
+            });
+
+            // Mensaje de bienvenida
+            if (!currentDayFound) {
+                showMessage('¡Hoy es Domingo o un día fuera de la rutina! Selecciona un día desbloqueado.', 'error');
+            } else {
+                showMessage('Selecciona un día para ver tu rutina. El día de hoy está en verde.', 'success');
+            }
+        }
+
+        // --- Lógica de Inicialización (Espera la respuesta del backend) ---
+        window.onload = async function() {
+            showMessage('Cargando estado de rutinas...', 'success');
+            const dataLoaded = await fetchLastRoutineDates();
+            
+            // La función updateRoutineCards se ejecuta en cualquier caso.
+            // Si la carga falla, usa el objeto 'lastRoutineDates' vacío, desbloqueando todo (excepto el día actual).
+            updateRoutineCards(); 
+            
+            if (!dataLoaded && USER_ID !== "ID_DEL_USUARIO_ACTUAL") {
+                 showMessage('Advertencia: No se pudo verificar el historial de rutinas. Se muestran todos los días desbloqueados.', 'error');
+            }
         };
     </script>
 </body>
