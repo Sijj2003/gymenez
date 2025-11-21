@@ -260,7 +260,7 @@
                 Le invitamos a contactar a su entrenador para ajustar su rutina o notificar cualquier molestia o dolor experimentado.
             </p>
             <div id="countdown" class="text-sm font-semibold text-red-500 mb-4">
-                Redireccionando en <span id="timer-count">5</span> segundos...
+                Redireccionando en <span id="timer-count">25</span> segundos...
             </div>
 
             <div class="flex space-x-4 justify-center">
@@ -336,6 +336,7 @@
         const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
         const CONTACT_WHATSAPP = '584148780392'; 
         const REDIRECT_URL = 'routines.html';
+        const REDIRECT_TIMEOUT_SECONDS = 25; // <--- CAMBIADO A 25 SEGUNDOS
 
         let userId = null;
         let routineExercises = []; 
@@ -511,7 +512,7 @@
         window.toggleExerciseSkipped = (exerciseName) => toggleExerciseStatus(exerciseName, 'skipped'); 
 
         /**
-         * Muestra el modal de contacto con el temporizador de 5 segundos.
+         * Muestra el modal de contacto con el temporizador.
          */
         function showContactModal() {
             surveyContainer.classList.add('hidden');
@@ -521,7 +522,7 @@
                 contactModal.classList.add('fade-in');
             }, 50);
 
-            let count = 5;
+            let count = REDIRECT_TIMEOUT_SECONDS;
             timerCount.textContent = count;
 
             // Limpiar cualquier temporizador anterior
