@@ -257,7 +257,7 @@
         <div id="contact-modal" class="hidden text-center">
             <h3 class="text-2xl font-bold text-white mb-4">¿Necesita un ajuste o notificar alguna dolencia?</h3>
             <p class="text-gray-300 mb-6">
-                Le invitamos a contactar a su entrenador para ajustar su rutina o notificar cualquier molestia o dolencia experimentada.
+                Si deseas ajustar tu rutina o notificar alguna dolencia presentada te invitamos a contactar a uno de nuestros entrenadores.
             </p>
             <div id="countdown" class="text-sm font-semibold text-red-500 mb-4">
                 Redireccionando en <span id="timer-count">25</span> segundos...
@@ -265,15 +265,12 @@
 
             <div class="flex space-x-4 justify-center">
                 <button id="contact-yes-btn" 
-                        class="px-6 py-3 rounded-xl text-lg font-bold bg-green-600 text-white hover:bg-green-500 transition duration-300 shadow-lg flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-2 5.517l-1.396-1.396a1 1 0 00-.707-.293H12c-.552 0-1 .448-1 1v2c0 .552.448 1 1 1h4c.552 0 1-.448 1-1v-2c0-.552-.448-1-1-1zm-4-4a1 1 0 00-1-1H7a1 1 0 100 2h4a1 1 0 001-1z" clip-rule="evenodd" />
-                    </svg>
-                    Sí, Contactar por WhatsApp
+                        class="px-8 py-3 rounded-xl text-xl font-bold bg-green-600 text-white hover:bg-green-500 transition duration-300 shadow-lg">
+                    Sí
                 </button>
                 <button id="contact-no-btn" 
-                        class="px-6 py-3 rounded-xl text-lg font-bold bg-gray-700 text-white hover:bg-gray-600 transition duration-300 shadow-lg">
-                    No, Gracias
+                        class="px-8 py-3 rounded-xl text-xl font-bold bg-red-600 text-white hover:bg-red-500 transition duration-300 shadow-lg">
+                    No
                 </button>
             </div>
         </div>
@@ -339,7 +336,7 @@
         const REDIRECT_TIMEOUT_SECONDS = 25; // TEMPORIZADOR A 25 SEGUNDOS
 
         let userId = null;
-        let userName = null; // NUEVA VARIABLE PARA EL NOMBRE DE USUARIO
+        let userFullName = null; // Variable para nombre y apellido
         let routineExercises = []; 
         let redirectTimer = null; 
         
@@ -552,8 +549,8 @@
                 redirectTimer = null;
             }
             if (contacted) {
-                // Usar userName si está disponible, si no, userId. 
-                const identifier = userName || userId;
+                // Usamos userFullName (que ya contendrá Nombre y Apellido o el ID)
+                const identifier = userFullName || userId;
                 
                 // Mensaje de WhatsApp actualizado con "dolencia" y usando 'identifier'
                 const message = encodeURIComponent(`Hola, soy ${identifier} y acabo de terminar mi rutina de ${CURRENT_DAY}. Me gustaría ponerme en contacto contigo para un ajuste o para notificar alguna dolencia.`);
@@ -869,8 +866,16 @@
                     const userSession = JSON.parse(storedSession);
                     userId = userSession._id || userSession.id; 
                     
-                    // INTENTA OBTENER EL NOMBRE DE USUARIO, SI NO EXISTE USA EL ID
-                    userName = userSession.username || userSession.name || userId;
+                    // Lógica para obtener Nombre y Apellido
+                    const name = userSession.name || '';
+                    const apellido = userSession.apellido || '';
+                    
+                    if (name.trim() !== '' || apellido.trim() !== '') {
+                        userFullName = `${name.trim()} ${apellido.trim()}`.trim();
+                    } else {
+                        // Si no hay nombre/apellido, usamos el ID como identificador
+                        userFullName = userId;
+                    }
 
                     if (userId) {
                         loadRoutine(CURRENT_DAY); 
