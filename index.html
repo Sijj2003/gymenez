@@ -173,6 +173,11 @@
                 </button>
             </form>
             
+            <button id="register-request-btn"
+                    class="neon-button w-full py-3 mt-4 rounded-lg bg-gray-800 text-amber-400 font-bold text-lg hover:bg-gray-700 uppercase tracking-wider border-2 border-amber-400/50">
+                SOLICITAR REGISTRO
+            </button>
+            
             </div>
     </div>
 
@@ -350,6 +355,11 @@
         const screens = ['splash-screen', 'login-screen', 'dashboard-screen'];
         const messagebox = document.getElementById('message-box');
         const body = document.body;
+        
+        // --- CONSTANTES PARA WHATSAPP ---
+        const WHATSAPP_NUMBER = '+584148780392';
+        const WHATSAPP_MESSAGE = 'Hola, estoy interesado(a) en solicitar mi registro en GYMENEZ.';
+
 
         // Función para mostrar mensajes de estado (éxito/error)
         function showMessage(message, type = 'success') {
@@ -450,6 +460,13 @@
             btn.disabled = false;
             btn.textContent = originalText;
         }
+        
+        // FUNCIÓN PARA REDIRECCIONAR A WHATSAPP
+        function handleRegisterRequest() {
+            const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE);
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\d+]/g, '')}?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
+        }
 
         // --- Lógica de Inicialización ---
         window.onload = function() {
@@ -469,6 +486,8 @@
             // --- LISTENERS DE FORMULARIO ---
             document.getElementById('login-form').addEventListener('submit', handleLogin);
             document.getElementById('logout-button').addEventListener('click', handleLogout);
+            // LISTENER PARA EL NUEVO BOTÓN
+            document.getElementById('register-request-btn').addEventListener('click', handleRegisterRequest); 
         };
     </script>
 </body>
