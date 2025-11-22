@@ -291,6 +291,10 @@
 
         let CURRENT_USER_SESSION = null; 
 
+        // --- CONSTANTES PARA WHATSAPP ---
+        const WHATSAPP_NUMBER = '+584148780392';
+        const WHATSAPP_MESSAGE = 'Hola, estoy interesado(a) en solicitar mi registro en GYMENEZ.';
+
         /**
          * Llama a la API REST para iniciar sesión y obtener el token/objeto de usuario.
          */
@@ -372,11 +376,6 @@
         const screens = ['splash-screen', 'login-screen', 'dashboard-screen'];
         const messagebox = document.getElementById('message-box');
         const body = document.body;
-        
-        // --- CONSTANTES PARA WHATSAPP ---
-        const WHATSAPP_NUMBER = '+584148780392';
-        const WHATSAPP_MESSAGE = 'Hola, estoy interesado(a) en solicitar mi registro en GYMENEZ.';
-
 
         // Función para mostrar mensajes de estado (éxito/error)
         function showMessage(message, type = 'success') {
