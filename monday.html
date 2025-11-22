@@ -162,10 +162,61 @@
             font-weight: 600;
             color: #facc15; /* Amarillo de contraste */
         }
+        
+        /* ======================================= */
+        /* Estilos para Pantalla de Bloqueo (NUEVO) */
+        /* ======================================= */
+        #block-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(13, 13, 26, 0.95); /* Fondo oscuro semitransparente */
+            display: none; /* Inicialmente oculto */
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            z-index: 5000; /* MUY alto para estar sobre todo */
+            padding: 20px;
+        }
+
+        #block-message {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #facc15; /* Amarillo de contraste */
+            border: 2px solid #facc15;
+            padding: 1.5rem 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 0 20px rgba(250, 202, 21, 0.5);
+            line-height: 1.2;
+            animation: pulse-block 2s infinite;
+        }
+
+        @keyframes pulse-block {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.02); opacity: 0.9; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @media (min-width: 768px) {
+            #block-message {
+                font-size: 3rem;
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen">
 
+    <div id="block-overlay">
+        <div id="block-message">
+            Rutina realizada. <br> Regresa el próximo <span id="next-day-placeholder"></span>.
+        </div>
+        <p class="mt-8 text-gray-400 text-lg">
+            La rutina será desbloqueada al inicio de ese día.
+        </p>
+    </div>
     <div id="message-box"></div>
     
     <div id="finish-screen">
@@ -331,7 +382,8 @@
     <script type="module">
         // 🚀 URL BASE DE TU API.
         const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
-        const API_JOURNAL_URL = `${API_BASE_URL}/api/journal/save_session`; // <--- NUEVA RUTA DEL JOURNAL
+        const API_JOURNAL_URL = `${API_BASE_URL}/api/journal/save_session`; // <--- RUTA DEL JOURNAL
+        const API_CHECK_ACTIVITY_URL = `${API_BASE_URL}/api/journal/check_recent_activity`; // <--- NUEVA RUTA DE VERIFICACIÓN
         const CONTACT_WHATSAPP = '584148780392'; 
         const REDIRECT_URL = 'routines.html';
         const REDIRECT_TIMEOUT_SECONDS = 25; 
@@ -369,6 +421,11 @@
         const contactYesBtn = document.getElementById('contact-yes-btn');
         const contactNoBtn = document.getElementById('contact-no-btn');
         const timerCount = document.getElementById('timer-count');
+        
+        // --- NUEVAS REFERENCIAS DOM DE BLOQUEO ---
+        const blockOverlay = document.getElementById('block-overlay');
+        const nextDayPlaceholder = document.getElementById('next-day-placeholder');
+        // --- FIN NUEVAS REFERENCIAS DOM DE BLOQUEO ---
 
 
         function showMessage(message, type = 'success') {
@@ -594,6 +651,25 @@
 
         window.toggleExerciseCompleted = (exerciseName) => toggleExerciseStatus(exerciseName, 'completed'); 
         window.toggleExerciseSkipped = (exerciseName) => toggleExerciseStatus(exerciseName, 'skipped'); 
+        
+        /**
+         * Carga la sesión del usuario desde localStorage.
+         * ⚠️ NUEVA FUNCIÓN para aplicar el bloqueo total a la página.
+         */
+        function applyBlock(nextDay) {
+            nextDayPlaceholder.textContent = nextDay;
+            
+            // Ocultar contenido principal y mostrar overlay
+            document.querySelector('header').style.display = 'none';
+            document.getElementById('routine-detail').style.display = 'none';
+            blockOverlay.style.display = 'flex'; // Usar 'flex' para centrar el mensaje
+            
+            // Desactivar todos los listeners que pudieran quedar
+            finishRoutineBtn.disabled = true;
+            
+            showMessage(`Bloqueado: Regresa el próximo ${nextDay}.`, 'error');
+        }
+
 
         /**
          * Muestra el modal de contacto con el temporizador.
@@ -949,8 +1025,9 @@
 
         /**
          * Carga la sesión del usuario desde localStorage.
+         * ⚠️ MODIFICADA para incluir la comprobación de bloqueo.
          */
-        function loadSessionAndData() {
+        async function loadSessionAndData() {
             const storedSession = localStorage.getItem('userSession');
             
             if (storedSession) {
@@ -970,6 +1047,32 @@
                     }
 
                     if (userId) {
+                        
+                        // --- INICIO: NUEVA LÓGICA DE COMPROBACIÓN DE BLOQUEO ---
+                        const checkUrl = `${API_CHECK_ACTIVITY_URL}/${userId}`;
+                        let isBlocked = false;
+                        let nextDay = 'Lunes'; // Valor por defecto
+                        
+                        try {
+                            const response = await fetch(checkUrl);
+                            const data = await response.json();
+
+                            if (data.success && data.isBlocked) {
+                                isBlocked = true;
+                                nextDay = data.nextDay || 'Lunes';
+                            }
+                        } catch (e) {
+                            console.error("Error al verificar la actividad reciente:", e);
+                            showMessage("Advertencia: No se pudo verificar el estado de bloqueo. Continuando...", 'error');
+                            // Si falla la verificación, no bloqueamos por seguridad.
+                        }
+                        
+                        if (isBlocked) {
+                            applyBlock(nextDay);
+                            return; // Detener la carga de la rutina si está bloqueado.
+                        }
+                        // --- FIN: NUEVA LÓGICA DE COMPROBACIÓN DE BLOQUEO ---
+
                         loadRoutine(CURRENT_DAY); 
                         return;
                     }
