@@ -214,7 +214,7 @@
             Rutina realizada. <br> Regresa el próximo <span id="next-day-placeholder"></span>.
         </div>
         <p class="mt-8 text-gray-400 text-lg">
-            La rutina será desbloqueada al inicio de ese día.
+            La rutina será desbloqueada al inicio de ese día (00:01 AM UTC).
         </p>
     </div>
     <div id="message-box"></div>
@@ -382,8 +382,9 @@
     <script type="module">
         // 🚀 URL BASE DE TU API.
         const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
-        const API_JOURNAL_URL = `${API_BASE_URL}/api/journal/save_session`; // <--- RUTA DEL JOURNAL
-        const API_CHECK_ACTIVITY_URL = `${API_BASE_URL}/api/journal/check_recent_activity`; // <--- NUEVA RUTA DE VERIFICACIÓN
+        const API_JOURNAL_URL = `${API_BASE_URL}/api/journal/save_session`;
+        // ⚠️ RUTA MODIFICADA (ahora incluye el día en el backend)
+        const API_CHECK_ACTIVITY_URL = `${API_BASE_URL}/api/journal/check_block_status`; 
         const CONTACT_WHATSAPP = '584148780392'; 
         const REDIRECT_URL = 'routines.html';
         const REDIRECT_TIMEOUT_SECONDS = 25; 
@@ -653,8 +654,7 @@
         window.toggleExerciseSkipped = (exerciseName) => toggleExerciseStatus(exerciseName, 'skipped'); 
         
         /**
-         * Carga la sesión del usuario desde localStorage.
-         * ⚠️ NUEVA FUNCIÓN para aplicar el bloqueo total a la página.
+         * Aplica el bloqueo total a la página.
          */
         function applyBlock(nextDay) {
             nextDayPlaceholder.textContent = nextDay;
@@ -839,7 +839,7 @@
                 } : null
             };
 
-            // ⚠️ NUEVO: Guardar el journal antes de mostrar el modal
+            // Guardar el journal antes de mostrar el modal
             const saveSuccess = await saveRoutineJournal(formData); 
             
             // Si el guardado es exitoso o falla, mostramos el modal para que el usuario pueda contactar.
@@ -851,7 +851,7 @@
             e.preventDefault();
             showMessage("Encuesta omitida. Guardando registro...", 'error');
             
-            // ⚠️ NUEVO: Guardar el journal con datos de encuesta nulos (null).
+            // Guardar el journal con datos de encuesta nulos (null).
             const saveSuccess = await saveRoutineJournal(null); 
             
             // Si el guardado es exitoso o falla, mostramos el modal para que el usuario pueda contactar.
@@ -1025,7 +1025,7 @@
 
         /**
          * Carga la sesión del usuario desde localStorage.
-         * ⚠️ MODIFICADA para incluir la comprobación de bloqueo.
+         * MODIFICADA para incluir la comprobación de bloqueo con el día.
          */
         async function loadSessionAndData() {
             const storedSession = localStorage.getItem('userSession');
@@ -1048,10 +1048,11 @@
 
                     if (userId) {
                         
-                        // --- INICIO: NUEVA LÓGICA DE COMPROBACIÓN DE BLOQUEO ---
-                        const checkUrl = `${API_CHECK_ACTIVITY_URL}/${userId}`;
+                        // --- INICIO: LÓGICA DE COMPROBACIÓN DE BLOQUEO ---
+                        // ⚠️ FETCH URL MODIFICADA: enviamos el userId y el día de la rutina ('Lunes')
+                        const checkUrl = `${API_CHECK_ACTIVITY_URL}/${userId}/${CURRENT_DAY}`; 
                         let isBlocked = false;
-                        let nextDay = 'Lunes'; // Valor por defecto
+                        let nextDay = CURRENT_DAY; 
                         
                         try {
                             const response = await fetch(checkUrl);
@@ -1059,19 +1060,19 @@
 
                             if (data.success && data.isBlocked) {
                                 isBlocked = true;
-                                nextDay = data.nextDay || 'Lunes';
+                                // El backend devuelve el nombre del día de la rutina para el mensaje.
+                                nextDay = data.nextDay || CURRENT_DAY; 
                             }
                         } catch (e) {
                             console.error("Error al verificar la actividad reciente:", e);
                             showMessage("Advertencia: No se pudo verificar el estado de bloqueo. Continuando...", 'error');
-                            // Si falla la verificación, no bloqueamos por seguridad.
                         }
                         
                         if (isBlocked) {
                             applyBlock(nextDay);
                             return; // Detener la carga de la rutina si está bloqueado.
                         }
-                        // --- FIN: NUEVA LÓGICA DE COMPROBACIÓN DE BLOQUEO ---
+                        // --- FIN: LÓGICA DE COMPROBACIÓN DE BLOQUEO ---
 
                         loadRoutine(CURRENT_DAY); 
                         return;
