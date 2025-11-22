@@ -123,6 +123,19 @@
         .text-border-gray {
             text-shadow: 0 0 3px #4b5563; 
         }
+        
+        /* Estilo para los enlaces de ayuda (pequeños y pulsables) */
+        .help-link {
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 500;
+            color: #9ca3af; /* gray-400 */
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+        .help-link:hover {
+            color: #38bdf8; /* sky-400 */
+            text-shadow: 0 0 5px rgba(56, 189, 248, 0.5); /* Sombra sutil neon azul */
+        }
 
     </style>
     </head>
@@ -173,10 +186,14 @@
                 </button>
             </form>
             
-            <button id="register-request-btn"
-                    class="neon-button w-full py-3 mt-4 rounded-lg bg-gray-800 text-amber-400 font-bold text-lg hover:bg-gray-700 uppercase tracking-wider border-2 border-amber-400/50">
-                SOLICITAR REGISTRO
-            </button>
+            <div class="flex justify-between items-center mt-4 pt-2 border-t border-gray-700/50">
+                <span id="register-request-link" class="help-link">
+                    Solicitar Registro
+                </span>
+                <span id="forgot-password-link" class="help-link">
+                    Olvidé mi usuario/contraseña
+                </span>
+            </div>
             
             </div>
     </div>
@@ -468,6 +485,12 @@
             window.open(whatsappUrl, '_blank');
         }
 
+        // FUNCIÓN PARA RECUPERACIÓN DE CONTRASEÑA (Placeholder)
+        function handleForgotPassword() {
+            showMessage('Por favor, contacta a soporte para recuperar tus credenciales.', 'error');
+            // Aquí se podría añadir lógica para abrir un formulario o enviar un correo.
+        }
+
         // --- Lógica de Inicialización ---
         window.onload = function() {
             // Comprobar si hay una sesión guardada para evitar login
@@ -486,8 +509,10 @@
             // --- LISTENERS DE FORMULARIO ---
             document.getElementById('login-form').addEventListener('submit', handleLogin);
             document.getElementById('logout-button').addEventListener('click', handleLogout);
-            // LISTENER PARA EL NUEVO BOTÓN
-            document.getElementById('register-request-btn').addEventListener('click', handleRegisterRequest); 
+            
+            // LISTENERS PARA LOS NUEVOS ENLACES
+            document.getElementById('register-request-link').addEventListener('click', handleRegisterRequest); 
+            document.getElementById('forgot-password-link').addEventListener('click', handleForgotPassword);
         };
     </script>
 </body>
