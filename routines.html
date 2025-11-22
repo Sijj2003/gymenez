@@ -38,7 +38,7 @@
             -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.5s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             cursor: pointer; /* Indicador de elemento pulsable */
         }
         
@@ -68,7 +68,6 @@
             pointer-events: none;
         }
         .message-success { background-color: #10b981; color: white; } 
-        .message-error { background-color: #ef4444; color: white; } /* Color rojo para errores */
         
         /* Estilo de borde negro para el SVG (simulando un stroke) */
         .dumbbell-svg .bar, .dumbbell-svg .weight {
@@ -87,7 +86,7 @@
                  0.75px  0.75px 0 #000;
         }
 
-        /* === ESTILOS PARA LA RUTINA DEL DÍA ACTUAL (VERDE) === */
+        /* === ESTILOS PARA LA RUTINA DEL DÍA CON ANIMACIÓN === */
         /* Animación de Pulso y Brillo */
         @keyframes pulse-grow {
             0%, 100% {
@@ -115,38 +114,6 @@
         .today .dumbbell-svg .bar, .today .dumbbell-svg .weight {
             fill: #10b981 !important; /* SVG del día en verde */
         }
-        
-        /* === ESTILOS PARA LA RUTINA COMPLETADA (ROJO) === */
-        /* Animación de Advertencia (reutilizada para Completada/Rojo por solicitud del usuario) */
-        @keyframes pulse-warn {
-            0%, 100% {
-                transform: scale(1);
-                box-shadow: 0 0 10px rgba(239, 68, 68, 0.5), 0 4px 16px 0 rgba(0, 0, 0, 0.5); /* Sombra inicial */
-            }
-            50% {
-                transform: scale(1.03); /* Ligeramente más grande */
-                box-shadow: 0 0 25px rgba(239, 68, 68, 0.8), 0 6px 20px 0 rgba(0, 0, 0, 0.7); /* Sombra más brillante y grande */
-            }
-        }
-        
-        /* CLASE NUEVA: Clase para la tarjeta del día que SÍ tiene registro en 7 días (Ahora ROJO) */
-        .glass-card.completed-red { 
-            border-color: #ef4444 !important; /* Rojo (red-500) */
-            animation: pulse-warn 2s infinite ease-in-out; /* Aplicar la animación de advertencia */
-        }
-        
-        /* Clase para el texto del día completado (ROJO) */
-        .completed-red .day-name-text { 
-            color: #ef4444 !important; /* Texto del día en rojo */
-        }
-        
-        /* Clase para el SVG del día completado (ROJO) */
-        .completed-red .dumbbell-svg .bar, .completed-red .dumbbell-svg .weight { 
-            fill: #ef4444 !important; /* SVG del día en rojo */
-        }
-        
-        /* Se elimina el estilo .incomplete que ahora se reemplaza por .completed-red */
-        /* y se asegura que cualquier referencia a 'incomplete' sea limpia. */
         /* =========================================== */
     </style>
 </head>
@@ -219,7 +186,7 @@
                 </a>
 
                 <a href="thursday.html" data-day="Jueves" class="glass-card p-6 rounded-xl shadow-lg border-t-4 border-amber-400 hover:border-amber-400 flex flex-col items-center justify-center text-center">
-                    <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2003/svg">
+                    <svg class="w-16 h-16 mb-3 dumbbell-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="25" y="45" width="50" height="10" rx="3" fill="#facc15" class="bar"/>
                         <rect x="10" y="30" width="15" height="40" rx="5" fill="#facc15" class="weight"/>
                         <rect x="5" y="35" width="5" height="30" rx="2" fill="#facc15" class="weight"/>
@@ -260,10 +227,6 @@
     <script>
         // --- Variables y Utilidades Globales (Mantenemos solo la caja de mensajes por si acaso) ---
         const messagebox = document.getElementById('message-box');
-        
-        // Asumiendo que el ID del usuario se guarda en localStorage después del login
-        const USER_ID_KEY = 'currentUserId'; 
-        const API_BASE_URL = window.location.origin; // Asumiendo que la API está en el mismo dominio
 
         // Función para mostrar mensajes de estado (éxito/error)
         function showMessage(message, type = 'success') {
@@ -281,92 +244,51 @@
             }, 3000);
         }
         
-        // --- FUNCIÓN PRINCIPAL PARA RESALTAR/ADVERTIR (LÓGICA INVERTIDA) ---
-        async function checkRoutineStatusAndHighlight() {
-            const userId = localStorage.getItem(USER_ID_KEY);
-            if (!userId) {
-                showMessage('No se encontró el ID de usuario. Por favor, inicie sesión.', 'error');
-                return;
-            }
+        // --- Lógica de Inicialización ---
+        window.onload = function() {
+            // El contenido ahora es estático, solo mostramos un mensaje de bienvenida.
+            
+            highlightTodayRoutine(); // Ejecutar la nueva función
 
-            // Mapeo de índices de JS a nombres de días en español
-            const dayNamesMap = {
+            // Mensaje de bienvenida adaptado
+            const todayCard = document.querySelector('.glass-card.today');
+            if (todayCard) {
+                const dayName = todayCard.querySelector('.day-name-text').textContent;
+            } else {
+                showMessage('Selecciona un día para ver tu rutina.', 'success');
+            }
+        };
+
+        // --- FUNCIÓN PARA RESALTAR LA RUTINA DE HOY ---
+        function highlightTodayRoutine() {
+            // 1. Obtener el día de la semana actual en español
+            const today = new Date();
+            const dayIndex = today.getDay(); // 0 (Domingo) a 6 (Sábado)
+
+            // Mapeo de índices de JS a nombres de días en español (asumiendo rutina de Lunes a Sábado)
+            const daysMap = {
                 1: 'Lunes',
                 2: 'Martes',
                 3: 'Miércoles',
                 4: 'Jueves',
                 5: 'Viernes',
                 6: 'Sábado',
-                0: 'Domingo',
+                // 0: 'Domingo' - Asumimos que no hay rutina el domingo y no se resalta.
             };
-            
-            let journalStatus = {};
-            
-            try {
-                // 1. Obtener el estado del journal del backend
-                const response = await fetch(`${API_BASE_URL}/api/journal/status/${userId}`);
-                const data = await response.json();
 
-                if (data.success) {
-                    journalStatus = data.journalStatus;
-                } else {
-                    console.error("Error al obtener el estado del journal:", data.error);
-                    showMessage('Error al cargar el estado de rutinas.', 'error');
-                    return;
-                }
-            } catch (error) {
-                console.error("Fallo de red al obtener el estado del journal:", error);
-                showMessage('Error de conexión con el servidor de la API.', 'error');
-                return;
-            }
+            const todayDayName = daysMap[dayIndex];
 
-            // 2. Determinar el estado de cada tarjeta y aplicar las clases
-            const allCards = document.querySelectorAll('.glass-card');
-            const now = new Date();
-            const todayIndex = now.getDay(); // 0=Domingo, 1=Lunes, ..., 6=Sábado
-            const todayDayName = dayNamesMap[todayIndex];
-
-            allCards.forEach(card => {
-                const dayName = card.getAttribute('data-day');
-                // isCompleted es TRUE si se completó en los últimos 7 días.
-                const isCompleted = journalStatus[dayName] === true;
-
-                // Limpiamos las clases de estado previas
-                card.classList.remove('today', 'completed-red'); // Aseguramos que solo usamos la nueva clase
-
-                // Lógica PRINCIPAL de resaltado:
+            if (todayDayName) {
+                // 2. Buscar la tarjeta que coincide con el día de hoy
+                // Usamos el atributo 'data-day' que añadimos a las etiquetas <a>
+                const todayCard = document.querySelector(`[data-day="${todayDayName}"]`);
                 
-                // 1. COMPLETADO (ROJO) - Prioridad 1
-                // Se aplica si: El día SÍ está completado en los últimos 7 días.
-                if (isCompleted) {
-                    // Si el día está completado, se pone ROJO como solicitó el usuario.
-                    card.classList.add('completed-red');
+                if (todayCard) {
+                    // 3. Aplicar la clase de estilo y animación
+                    todayCard.classList.add('today');
                 }
-
-                // 2. Resaltado del Día Actual (VERDE) - Prioridad 2
-                // Se aplica si: Es el día de hoy, Y NO está marcado como completado (evitando doble color).
-                if (dayName === todayDayName && !isCompleted) {
-                    card.classList.add('today');
-                }
-            });
-        }
-        
-        // --- Lógica de Inicialización ---
-        window.onload = function() {
-            
-            // Función mejorada que revisa el estado del journal
-            checkRoutineStatusAndHighlight(); 
-
-            // Mensaje de bienvenida adaptado
-            const todayCard = document.querySelector('.glass-card.today');
-            if (todayCard) {
-                const dayName = todayCard.querySelector('.day-name-text').textContent;
-                showMessage(`¡Es ${dayName}! Tu rutina está lista.`, 'success');
-            } else {
-                showMessage('Selecciona un día para ver tu rutina.', 'success');
             }
-        };
-
+        }
     </script>
 </body>
 </html>
