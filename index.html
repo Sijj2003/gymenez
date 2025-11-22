@@ -191,7 +191,7 @@
                     Solicitar Registro
                 </span>
                 <span id="forgot-password-link" class="help-link">
-                    Olvidé mi usuario/contraseña
+                    Recuperar Usuario
                 </span>
             </div>
             
@@ -293,7 +293,8 @@
 
         // --- CONSTANTES PARA WHATSAPP ---
         const WHATSAPP_NUMBER = '+584148780392';
-        const WHATSAPP_MESSAGE = 'Hola, estoy interesado(a) en solicitar mi registro en GYMENEZ.';
+        const WHATSAPP_MESSAGE_REGISTER = 'Hola, estoy interesado(a) en solicitar mi registro en GYMENEZ.';
+        const WHATSAPP_MESSAGE_RECOVERY = 'Hola quisiera solicitar la recuperacion de usuario/contraseña';
 
         /**
          * Llama a la API REST para iniciar sesión y obtener el token/objeto de usuario.
@@ -477,17 +478,18 @@
             btn.textContent = originalText;
         }
         
-        // FUNCIÓN PARA REDIRECCIONAR A WHATSAPP
+        // FUNCIÓN PARA REDIRECCIONAR A WHATSAPP (Registro)
         function handleRegisterRequest() {
-            const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE);
+            const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE_REGISTER);
             const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\d+]/g, '')}?text=${encodedMessage}`;
             window.open(whatsappUrl, '_blank');
         }
 
-        // FUNCIÓN PARA RECUPERACIÓN DE CONTRASEÑA (Placeholder)
+        // FUNCIÓN PARA RECUPERACIÓN DE USUARIO/CONTRASEÑA (Ahora va a WhatsApp)
         function handleForgotPassword() {
-            showMessage('Por favor, contacta a soporte para recuperar tus credenciales.', 'error');
-            // Aquí se podría añadir lógica para abrir un formulario o enviar un correo.
+            const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE_RECOVERY);
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\d+]/g, '')}?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
         }
 
         // --- Lógica de Inicialización ---
