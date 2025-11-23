@@ -6,7 +6,6 @@
     <title>GYMENEZ</title>
     <link rel="icon" type="image/png" href="mini_logo.png">
     <link rel="shortcut icon" type="image/png" href="mini_logo.png">
-    <!-- ATENCIÓN: Esta librería cdn.tailwindcss.com no debe usarse en producción. -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -27,37 +26,18 @@
             
             /* === APLICADO: Borde negro para todas las letras (Text Stroke Effect) === */
             text-shadow: 
-                -0.5px -0.5px 0 #000,  
-                 0.5px -0.5px 0 #000,
-                -0.5px  0.5px 0 #000,
-                 0.5px  0.5px 0 #000;
-        }
-        
-        /* Estilo específico para el efecto Glassmorphism en las tarjetas */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .glass-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.6);
+                -0.5px -0.5px 0 #000,
+                0.5px -0.5px 0 #000,
+                -0.5px 0.5px 0 #000,
+                0.5px 0.5px 0 #000;
         }
 
-        /* Estilo para el botón con efecto NEON (AMARILLO/GRIS) */
-        .neon-button {
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px #fbbf24, 0 0 20px #fbbf24; 
-        }
-        .neon-button:hover {
-            box-shadow: 0 0 15px #fcd34d, 0 0 30px #fcd34d;
-            transform: scale(1.02);
+        /* Clase para el fondo del Dashboard */
+        .dashboard-bg {
+            background-image: url('FONDO_DASHBOARD.png');
         }
 
-        /* Splash Screen */
+        /* Estilos específicos para la pantalla de carga (Splash) */
         #splash-screen {
             position: fixed;
             top: 0;
@@ -65,719 +45,349 @@
             width: 100%;
             height: 100%;
             display: flex;
-            align-items: center;
+            flex-direction: column;
             justify-content: center;
-            background-color: #000000;
-            z-index: 100; 
-        }
-        
-        /* === ESTILOS PARA EL LOGO Y ANIMACIÓN (Simple Pulse sin Neon) === */
-        #splash-logo {
-            width: 250px;
-            height: auto;
-            animation: simple-pulse 1.5s infinite alternate; 
-            filter: none; 
-        }
-        
-        @keyframes simple-pulse {
-            from {
-                opacity: 0.8;
-                transform: scale(1.0);
-            }
-            to {
-                opacity: 1.0;
-                transform: scale(1.05); 
-            }
-        }
-        /* ======================================= */
-
-        /* Estilos para el mensaje de estado */
-        #message-box {
-            position: fixed;
-            top: 1rem;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 1rem 1.5rem;
-            border-radius: 0.75rem;
-            font-weight: 600;
+            align-items: center;
+            background-color: #0d0d1a;
             z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-            pointer-events: none;
-        }
-        .message-success { background-color: #10b981; color: white; } 
-        .message-error { background-color: #ef4444; color: white; } 
-        
-        /* Estilo específico para el logo del login (50% más grande) */
-        #login-logo-img {
-            width: 225px; 
-            height: auto;
-            margin: 0 auto;
+            transition: opacity 0.5s ease-out;
+            color: #9333ea; /* Color morado para el texto del splash */
         }
 
-        /* === FONDO ESPECÍFICO PARA EL DASHBOARD === */
-        .dashboard-background {
-            background-image: url('PROFILE_FONDO.png') !important;
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #9333ea; /* Color morado */
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
         }
 
-        /* === ESTILO: Sombra/Borde para el texto del Header (Gris) === */
-        .text-border-gray {
-            text-shadow: 0 0 3px #4b5563; 
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-        
-        /* Estilo para los enlaces de ayuda (pequeños y pulsables) */
-        .help-link {
-            font-size: 0.875rem; /* text-sm */
-            font-weight: 500;
-            color: #9ca3af; /* gray-400 */
-            transition: color 0.3s ease;
+
+        /* Estilo para el contenedor principal de formularios */
+        .form-container {
+            max-width: 400px;
+            padding: 2.5rem; /* p-10 */
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 1rem; /* rounded-xl */
+            box-shadow: 0 10px 25px rgba(147, 51, 234, 0.3); /* Sombra morada */
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Estilo para los botones principales (morado) */
+        .btn-primary {
+            background-color: #9333ea;
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
             cursor: pointer;
-        }
-        .help-link:hover {
-            color: #38bdf8; /* sky-400 */
-            text-shadow: 0 0 5px rgba(56, 189, 248, 0.5); /* Sombra sutil neon azul */
+            transition: background-color 0.2s, transform 0.1s;
         }
 
+        .btn-primary:hover {
+            background-color: #7e22ce;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        /* Estilo para enlaces y texto secundario */
+        .text-secondary {
+            color: #d8b4fe; /* Morado claro */
+        }
+
+        /* Input styling */
+        .input-field {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid #4a044e;
+            border-radius: 0.5rem;
+            background-color: #1f1f2e;
+            color: #e5e7eb;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-field:focus {
+            border-color: #9333ea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.5);
+        }
+
+        /* Utility classes for screen management */
+        .screen {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .active-screen {
+            display: flex;
+        }
     </style>
-    </head>
-<body class="min-h-screen flex items-center justify-center bg-[#0d0d1a] text-white">
+</head>
+<body class="min-h-screen">
 
-    <div id="message-box"></div>
-
-    <div id="splash-screen" class="z-[1000]">
+    <!-- Pantalla de Carga (Splash Screen) -->
+    <div id="splash-screen" class="active-screen">
         <div class="text-center">
-            <img id="splash-logo" 
-                src="LOADING.png" 
-                alt="Logo GYMENEZ Neon" 
-                class="mx-auto"
-            >
-            <div id="loading-text" class="mt-4 text-xl md:text-2xl font-semibold tracking-widest text-sky-400 z-10">
-                
-            </div>
+            <h1 class="text-5xl font-bold mb-4">GYMENEZ</h1>
+            <div class="spinner mb-4"></div>
+            <p class="text-lg">Cargando experiencia...</p>
         </div>
     </div>
 
-    <div id="login-screen" class="hidden min-h-screen w-full flex items-center justify-center p-4">
-        <div class="glass-card p-6 md:p-8 w-full max-w-sm mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-500/30">
-            <div class="text-center mb-6">
-                <div class="text-center mb-6">
-                    <img id="login-logo-img"
-                         src="LOGIN_LOGO.png" 
-                         alt="Logo GYMENEZ" 
-                         class="mx-auto"
-                    >
-                </div>
-            </div>
-
+    <!-- Pantalla de Inicio de Sesión (Login) -->
+    <div id="login-screen" class="screen justify-center items-center p-4">
+        <div class="form-container w-full">
+            <h2 class="text-3xl font-bold text-center mb-6 text-secondary">Iniciar Sesión</h2>
             <form id="login-form">
-                <div class="mb-6">
-                    <label for="login-email" class="block text-sm font-medium text-white mb-2">Correo Electrónico</label>
-                    <input type="email" id="login-email" name="email" value="" placeholder="tu.correo@ejemplo.com"
-                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition duration-300 placeholder-gray-400 text-base" required>
-                </div>
-                <div class="mb-8">
-                    <label for="login-password" class="block text-sm font-medium text-white mb-2">Contraseña</label>
-                     <input type="password" id="login-password" name="password" value="" placeholder=""
-                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition duration-300 placeholder-gray-400 text-base" required>
-                </div>
-
-                <button type="submit" id="login-btn"
-                        class="neon-button w-full py-3 rounded-lg bg-gray-800 text-amber-400 font-bold text-lg hover:bg-gray-700 uppercase tracking-wider border-2 border-amber-400/50">
-                    INGRESAR
-                </button>
+                <input type="email" id="email" class="input-field" placeholder="Correo Electrónico" required>
+                <input type="password" id="password" class="input-field" placeholder="Contraseña" required>
+                <button type="submit" class="btn-primary w-full mt-2">Acceder</button>
             </form>
-            
-            <div class="flex justify-between items-center mt-4 pt-2 border-t border-gray-700/50">
-                <span id="register-request-link" class="help-link">
-                    Solicitar Registro
-                </span>
-                <span id="forgot-password-link" class="help-link">
-                    Recuperar Usuario
-                </span>
+            <div id="login-message" class="text-center text-red-400 mt-4 h-6"></div>
+            <div class="mt-6 text-center text-sm">
+                <a href="#" id="forgot-password-link" class="text-secondary hover:underline mx-2">¿Olvidaste tu Contraseña?</a>
+                <span class="text-gray-400">|</span>
+                <a href="#" id="register-request-link" class="text-secondary hover:underline mx-2">Solicitar Registro</a>
             </div>
-            
-        </div>
-    </div>
-    
-    <!-- Modal para Sesión Activa (Aparece sobrepuesta en caso de error 403) -->
-    <div id="active-session-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[1000]">
-        <!-- CORRECCIÓN: max-h-[90vh] y overflow-y-auto para el scroll interno -->
-        <div class="glass-card p-6 md:p-8 w-full max-w-lg mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-500/30 text-center max-h-[90vh] overflow-y-auto">
-            <svg class="w-16 h-16 mx-auto mb-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-            </svg>
-            <h3 class="text-xl md:text-2xl font-bold mb-4 text-amber-400">Sesión Activa Detectada</h3>
-            <p class="text-white mb-6">Parece que ya hay una sesión iniciada con este usuario en otro dispositivo.</p>
-            
-            <div id="modal-options">
-                <p class="text-lg font-semibold mb-6">¿Deseas cerrarla y continuar aquí?</p>
-                <div class="flex justify-center space-x-4">
-                    <button id="modal-cancel-btn" 
-                            class="px-6 py-3 rounded-lg bg-red-600 text-white font-bold hover:bg-red-700 transition duration-300">
-                        No, Cancelar
-                    </button>
-                    <button id="modal-confirm-btn" 
-                            class="px-6 py-3 rounded-lg bg-amber-600 text-white font-bold hover:bg-amber-700 transition duration-300">
-                        Sí, Cerrar Sesión
-                    </button>
-                </div>
-            </div>
-
-            <!-- Formulario de Verificación (Inicialmente oculto) -->
-            <form id="force-logout-form" class="hidden mt-6 text-left">
-                <p class="text-sm text-gray-400 mb-4">Para confirmar el cierre, verifica tu identidad con los siguientes datos:</p>
-                
-                <!-- Mensaje de error local dentro del formulario -->
-                <div id="force-logout-message" class="hidden p-3 mb-4 rounded-lg bg-red-800/70 text-sm text-red-100 font-semibold text-center">
-                    <!-- Mensaje de error de validación incorrecta -->
-                </div>
-
-                <div class="mb-4">
-                    <label for="force-email" class="block text-sm font-medium text-white mb-2">Email Asociado</label>
-                    <input type="email" id="force-email" name="email" placeholder="tu.correo@ejemplo.com" readonly
-                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 transition bg-gray-700/50 cursor-not-allowed" required>
-                </div>
-                <div class="mb-4">
-                    <label for="force-name" class="block text-sm font-medium text-white mb-2">Primer Nombre</label>
-                    <input type="text" id="force-name" name="name" placeholder="Tu primer nombre"
-                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 transition" required>
-                </div>
-                <div class="mb-4">
-                    <label for="force-dob" class="block text-sm font-medium text-white mb-2">Fecha de Nacimiento (dd/mm/yyyy)</label>
-                    <!-- Campo con la corrección de formato. -->
-                    <input type="text" id="force-dob" name="dob" placeholder="01/01/1990" maxlength="10"
-                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 transition" required>
-                </div>
-                 <div class="mb-4">
-                    <label for="force-phone" class="block text-sm font-medium text-white mb-2">Teléfono (ej: 04149283757)</label>
-                    <input type="text" id="force-phone" name="phone" placeholder="0414..."
-                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 transition" required>
-                </div>
-                 <div class="mb-6">
-                    <label for="force-ci" class="block text-sm font-medium text-white mb-2">Cédula de Identidad (ej: 10584737)</label>
-                    <input type="text" id="force-ci" name="ci" placeholder="CI sin puntos ni guiones"
-                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 transition" required>
-                </div>
-
-                <button type="submit" id="force-logout-btn"
-                        class="neon-button w-full py-3 rounded-lg bg-gray-800 text-amber-400 font-bold text-lg hover:bg-gray-700 uppercase tracking-wider border-2 border-amber-400/50">
-                    Cerrar Sesión Activa
-                </button>
-                <button type="button" id="force-logout-cancel"
-                        class="mt-3 w-full py-3 rounded-lg bg-gray-600 text-white font-bold hover:bg-gray-700 transition duration-300">
-                    Cancelar
-                </button>
-            </form>
-
         </div>
     </div>
 
-
-    <div id="dashboard-screen" class="hidden min-h-screen w-full p-4 md:p-8">
-        <header class="flex justify-between items-center py-4 px-2 mb-8">
-            <h1 class="text-3xl font-extrabold uppercase tracking-wider text-border-gray">
-                <span class="text-amber-400">GYM</span><span class="text-white">ENEZ</span>
-            </h1>
-            
-            <div class="flex space-x-4">
-                <a href="profile.html" 
-                   class="px-4 py-2 text-sm font-semibold rounded-full bg-amber-600 text-white hover:bg-amber-500 transition duration-300">
-                    PROFILE
-                </a>
-                <button id="logout-button"
-                        class="px-4 py-2 text-sm font-semibold rounded-full bg-red-600 hover:bg-red-500 transition duration-300">
-                    Salir
-                </button>
-            </div>
+    <!-- Pantalla de Dashboard (Ruta Protegida) -->
+    <div id="dashboard-screen" class="screen flex-col justify-start items-center p-4 pt-10">
+        <div class="w-full max-w-4xl">
+            <header class="flex justify-between items-center mb-10 pb-4 border-b border-purple-800">
+                <h1 class="text-4xl font-extrabold text-secondary">GYMENEZ <span class="text-gray-400">Dashboard</span></h1>
+                <button id="logout-button" class="btn-primary bg-red-600 hover:bg-red-700">Cerrar Sesión</button>
             </header>
-
-        <div class="grid grid-cols-1 gap-6">
             
-            <a href="routines.html" class="col-span-1 block"> 
-                <div class="glass-card p-6 md:p-8 w-full rounded-2xl flex flex-col items-center justify-center text-center h-64 cursor-pointer border-t-2 border-amber-400/50 hover:border-amber-400">
-                    <svg class="w-16 h-16 mb-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2 0l-2-1m2 1h-2m2 0h-2M4 7l2 1m-2 0l2-1m-2 1h2m-2 0h2M4 7h16M7 4h10a3 3 0 013 3v2a3 3 0 01-3 3H7a3 3 0 01-3-3V7a3 3 0 013-3z"></path>
-                    </svg>
-                    <h2 class="text-4xl font-extrabold uppercase tracking-widest">
-                        <span class="text-amber-400">WORK</span><span class="text-white">OUT</span>
-                    </h2>
-                    <p class="text-base text-white mt-4">Comienza tu entrenamiento o explora tus rutinas.</p>
-                </div>
-            </a>
-            
-            <a href="schedule.html" class="col-span-1 block"> 
-                <div class="glass-card p-6 md:p-8 w-full rounded-2xl flex flex-col items-center justify-center text-center h-64 cursor-pointer border-t-2 border-amber-400/50 hover:border-amber-400">
-                    <svg class="w-16 h-16 mb-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h.01M13 11h.01M17 11h.01M7 16h.01M11 16h.01M15 16h.01M6 18h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                    </svg>
-                    <h2 class="text-4xl font-extrabold uppercase tracking-widest">
-                        <span class="text-amber-400">SCHE</span><span class="text-white">DULE</span>
-                    </h2>
-                    <p class="text-base text-white mt-4">Planifica y gestiona tus sesiones de entrenamiento grupales.</p>
-                </div>
-            </a>
-            <a href="goals.html" class="col-span-1 block"> 
-                <div class="glass-card p-6 md:p-8 w-full rounded-2xl flex flex-col items-center justify-center text-center h-64 cursor-pointer border-t-2 border-amber-400/50 hover:border-amber-400">
-                    <svg class="w-16 h-16 mb-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <h2 class="text-4xl font-extrabold uppercase tracking-widest">
-                        <span class="text-amber-400">GO</span><span class="text-white">ALS</span>
-                    </h2>
-                    <p class="text-base text-white mt-4">Hazle seguimiento a tus objetivos y ve tu progreso.</p>
-                </div>
-            </a>
+            <div id="logout-message" class="text-center text-red-400 mb-4 h-6 font-semibold"></div>
 
-            <a href="eats.html" class="col-span-1 block"> 
-                <div class="glass-card p-6 md:p-8 w-full rounded-2xl flex flex-col items-center justify-center text-center h-64 cursor-pointer border-t-2 border-amber-400/50 hover:border-amber-400">
-                    <svg class="w-16 h-16 mb-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2zM7 7h.01M17 7h.01M12 7h.01"/>
-                    </svg>
-                    <h2 class="text-4xl font-extrabold uppercase tracking-widest">
-                        <span class="text-amber-400">GYMENEZ </span><span class="text-white">EATS</span>
-                    </h2>
-                    <p class="text-base text-white mt-4">Planes de nutrición personalizados y gestión alimenticia para potenciar tus resultados.</p>
+            <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Tarjeta de Perfil -->
+                <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-purple-700">
+                    <h3 class="text-2xl font-semibold mb-3 text-secondary">Mi Perfil</h3>
+                    <p class="text-gray-300">Aquí verás tu información personal, progreso y métricas de salud.</p>
+                    <button class="mt-4 btn-primary bg-purple-600 hover:bg-purple-700 text-sm">Ver Detalles</button>
                 </div>
-            </a>
 
-            <a href="pulse.html" class="col-span-1 block"> 
-                <div class="glass-card p-6 md:p-8 w-full rounded-2xl flex flex-col items-center justify-center text-center h-64 cursor-pointer border-t-2 border-amber-400/50 hover:border-amber-400">
-                    <svg class="w-16 h-16 mb-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z"></path>
-                    </svg>
-                    <h2 class="text-4xl font-extrabold uppercase tracking-widest">
-                        <span class="text-amber-400">GYMENEZ </span><span class="text-white">PULSE</span>
-                    </h2>
-                    <p class="text-base text-white mt-4">Tu centro de mensajería exclusivo.</p>
+                <!-- Tarjeta de Rutina del Día -->
+                <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-purple-700">
+                    <h3 class="text-2xl font-semibold mb-3 text-secondary">Rutina de Hoy</h3>
+                    <p class="text-gray-300">Entrenamiento de fuerza y cardio. ¡Vamos a por ello!</p>
+                    <button class="mt-4 btn-primary bg-purple-600 hover:bg-purple-700 text-sm">Iniciar Rutina</button>
                 </div>
-            </a>
-            
-            </div>
+
+                <!-- Tarjeta de Historial -->
+                <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-purple-700">
+                    <h3 class="text-2xl font-semibold mb-3 text-secondary">Historial</h3>
+                    <p class="text-gray-300">Revisa tus rutinas completadas y las encuestas de bienestar.</p>
+                    <button class="mt-4 btn-primary bg-purple-600 hover:bg-purple-700 text-sm">Ver Historial</button>
+                </div>
+
+                <!-- Mensaje de Bienvenida -->
+                <div class="md:col-span-2 lg:col-span-3 bg-gray-900 p-8 rounded-xl shadow-2xl border-4 border-purple-500 text-center">
+                    <p class="text-xl font-light">¡Bienvenido de nuevo! Tu bienestar es nuestra prioridad.</p>
+                </div>
+            </main>
+        </div>
     </div>
-
 
     <script>
-        // --- CONFIGURACIÓN DE SEGURIDAD Y SESIÓN ---
-        const localDeviceId = crypto.randomUUID();
+        // --- CONSTANTES ---
+        const SPLASH_DURATION_MS = 2500;
+        const LOGIN_API_URL = 'https://gymenez-api.pythonanywhere.com/api/login';
+        const WHATSAPP_NUMBER = '+584120000000'; // Número de WhatsApp de ejemplo
+        const WHATSAPP_MESSAGE_REGISTER = "Hola, me gustaría solicitar el registro para la aplicación GYMENEZ. Mi correo es [TU CORREO AQUÍ].";
+        const WHATSAPP_MESSAGE_RECOVERY = "Hola, necesito ayuda para recuperar mi contraseña de GYMENEZ. Mi correo es [TU CORREO AQUÍ].";
 
-        // 🚀 URL BASE DE TU API. SIN LA BARRA FINAL (/)
-        const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
+        // --- FUNCIONES DE NAVEGACIÓN Y UTILIDAD ---
 
-        let CURRENT_USER_SESSION = null; 
-        let sessionCheckerInterval = null; // Variable para almacenar el ID del intervalo de chequeo
-
-        // --- CONSTANTES PARA WHATSAPP ---
-        const WHATSAPP_NUMBER = '+584148780392';
-        const WHATSAPP_MESSAGE_REGISTER = 'Hola, estoy interesado(a) en solicitar mi registro en GYMENEZ.';
-        const WHATSAPP_MESSAGE_RECOVERY = 'Hola quisiera solicitar la recuperacion de usuario/contraseña';
-
-        /**
-         * Llama a la API REST para iniciar sesión y obtener el token/objeto de usuario.
-         */
-        async function apiLogin(email, password, deviceId) {
-            console.log(`API: Llamada a ${API_BASE_URL}/api/login para ${email}`);
-            
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/login`, { 
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password, deviceId })
-                });
-
-                const data = await response.json();
-
-                if (!response.ok || !data.success) {
-                    // El error 403 (FORBIDDEN) de la API indica que la sesión está activa.
-                    return { success: false, error: data.error || 'Error de conexión con la API o credenciales inválidas.' };
-                }
-
-                CURRENT_USER_SESSION = data.user;
-                // Guardar la sesión en localStorage para que el perfil pueda acceder
-                localStorage.setItem('userSession', JSON.stringify(data.user)); 
-                return { success: true, user: data.user };
-
-            } catch (e) {
-                console.error("Error en la conexión fetch:", e);
-                return { success: false, error: 'No se pudo conectar con el servidor API REST. Verifica la URL o la política CORS.' };
-            }
-        }
-
-        /**
-         * Llama a la API REST para cerrar sesión y limpiar el activeSessionId en la DB.
-         */
-        async function apiLogout() {
-            console.log(`API: Llamada a ${API_BASE_URL}/api/logout`);
-            
-            try {
-                // Si CURRENT_USER_SESSION es nulo, intenta recuperarlo del almacenamiento
-                let userId = (CURRENT_USER_SESSION && (CURRENT_USER_SESSION._id || CURRENT_USER_SESSION.id));
-                
-                if (!userId) {
-                    const storedSession = localStorage.getItem('userSession');
-                    if (storedSession) {
-                        const storedUser = JSON.parse(storedSession);
-                        userId = storedUser._id || storedUser.id;
-                    }
-                }
-
-                if (userId) {
-                    await fetch(`${API_BASE_URL}/api/logout`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ userId: userId })
-                    });
-                }
-                
-            } catch (e) {
-                console.error("Error al intentar cerrar sesión en el servidor:", e);
-            } finally {
-                CURRENT_USER_SESSION = null;
-                localStorage.removeItem('userSession'); // Limpiar sesión local siempre
-                return { success: true }; 
-            }
-        }
-        
-        /**
-         * NUEVO: Llama a la API para verificar si el deviceId actual sigue siendo el activo.
-         */
-        async function apiVerifySession(userId, deviceId) {
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/verify_session`, { 
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ userId, deviceId })
-                });
-
-                const data = await response.json();
-                
-                // Si la respuesta no es 200/ok o success es false, la sesión es inválida
-                // Nota: El backend devolverá 403 si la sesión fue sobrescrita.
-                if (response.status === 403 || !data.success) {
-                    return { isValid: false, message: data.error || 'Sesión invalidada remotamente.' };
-                }
-                
-                return { isValid: true };
-
-            } catch (e) {
-                console.warn("API: Falló el chequeo de sesión (posiblemente servidor offline).", e);
-                // Si falla la conexión, por precaución, asumimos que sigue válida para no desconectar
-                return { isValid: true }; 
-            }
-        }
-
-        // Función simplificada, ya que no se necesita la data de rutinas para el dashboard.
-        async function loadDashboardData() {
-            if (!CURRENT_USER_SESSION) return;
-            console.log("Dashboard cargado solo con los accesos directos.");
-        }
-
-
-        // --- Variables y Utilidades Globales ---
-        const SPLASH_DURATION_MS = 3000; 
-        const screens = ['splash-screen', 'login-screen', 'dashboard-screen'];
-        const messagebox = document.getElementById('message-box');
-        const body = document.body;
-
-        // Función para mostrar mensajes de estado (éxito/error)
-        function showMessage(message, type = 'success') {
-            messagebox.textContent = message;
-            messagebox.className = ''; 
-            messagebox.classList.add('transition-none');
-            messagebox.classList.add('message-' + type);
-            messagebox.style.opacity = '1';
-            messagebox.style.transform = 'translateX(-50%) translateY(0)';
-            
-            setTimeout(() => {
-                messagebox.style.style = '';
-                messagebox.style.opacity = '0';
-                messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
-            }, 3000);
-        }
-        
-        /**
-         * Muestra un mensaje de error dentro del formulario de cierre forzado.
-         */
-        function showForceLogoutMessage(message, type = 'error') {
-            const msgBox = document.getElementById('force-logout-message');
-            if (message) {
-                msgBox.textContent = message;
-                // Clases Tailwind para el fondo rojo/texto blanco
-                msgBox.className = `p-3 mb-4 rounded-lg font-semibold text-center ${type === 'error' ? 'bg-red-800/70 text-red-100' : 'bg-green-800/70 text-green-100'}`;
-                msgBox.classList.remove('hidden');
-            } else {
-                msgBox.classList.add('hidden'); // Ocultar si el mensaje está vacío
-            }
-        }
-
-
-        // Función de navegación entre pantallas
-        function navigateTo(targetId) {
-            screens.forEach(id => {
-                const screen = document.getElementById(id);
-                if (screen) {
-                    screen.classList.add('hidden');
-                }
+        // Función para generar un ID único (UUID v4 simplificado)
+        function generateSessionId() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
             });
-            const targetScreen = document.getElementById(targetId);
-            if (targetScreen) {
-                targetScreen.classList.remove('hidden');
-                targetScreen.style.opacity = '0';
-                targetScreen.style.transition = 'opacity 0.5s ease-in';
-                requestAnimationFrame(() => {
-                    targetScreen.style.opacity = '1';
-                });
-                
-                // Lógica para cambiar el fondo y manejar el chequeo de sesión
-                if (targetId === 'dashboard-screen') {
-                    body.classList.add('dashboard-background');
-                    const storedSession = localStorage.getItem('userSession');
-                    if (storedSession) {
-                        CURRENT_USER_SESSION = JSON.parse(storedSession);
-                    }
+        }
 
-                    if (CURRENT_USER_SESSION) {
-                        loadDashboardData(); 
-                        // Iniciar el chequeo periódico de sesión al entrar en el dashboard
-                        startSessionChecker(); 
-                    }
+        function navigateTo(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active-screen');
+            });
+            const screen = document.getElementById(screenId);
+            if (screen) {
+                screen.classList.add('active-screen');
+                // Cambiar el fondo del cuerpo si vamos al dashboard
+                if (screenId === 'dashboard-screen') {
+                    document.body.classList.add('dashboard-bg');
                 } else {
-                    body.classList.remove('dashboard-background');
-                    // Detener el chequeo de sesión al salir del dashboard
-                    stopSessionChecker(); 
+                    document.body.classList.remove('dashboard-bg');
                 }
             }
         }
-        
-        // ===============================================
-        // LÓGICA DE CIERRE DE SESIÓN FORZADO (Heartbeat)
-        // ===============================================
-        
-        // Intervalo de chequeo de sesión (15 segundos)
-        const SESSION_CHECK_INTERVAL_MS = 15000; 
 
-        function startSessionChecker() {
-            if (sessionCheckerInterval) {
-                clearInterval(sessionCheckerInterval);
-            }
-            // Ejecutar el chequeo inmediatamente y luego cada 15 segundos
-            checkSessionValidity(); 
-            sessionCheckerInterval = setInterval(checkSessionValidity, SESSION_CHECK_INTERVAL_MS);
-            console.log(`Chequeo de sesión iniciado cada ${SESSION_CHECK_INTERVAL_MS/1000}s.`);
+        function transitionToLogin() {
+            const splash = document.getElementById('splash-screen');
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                splash.style.display = 'none';
+                navigateTo('login-screen');
+            }, 500); // Esperar la transición de opacidad
         }
 
-        function stopSessionChecker() {
-            if (sessionCheckerInterval) {
-                clearInterval(sessionCheckerInterval);
-                sessionCheckerInterval = null;
-                console.log("Chequeo de sesión detenido.");
+        // --- GESTIÓN DE SESIÓN ---
+
+        /**
+         * @description Maneja la lógica de inicio de sesión, incluyendo la obtención
+         * de un token y un ID de sesión único para la gestión multi-dispositivo.
+         * ESTA ES LA FUNCIÓN CLAVE DONDE SE CORRIGE EL MANEJO DEL LOCAL STORAGE.
+         */
+        async function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const messageElement = document.getElementById('login-message');
+            messageElement.textContent = 'Iniciando sesión...';
+
+            try {
+                // 1. Simulación de llamada API al Backend (TU BACKEND REAL DEBE ESTAR AQUÍ)
+                const response = await fetch(LOGIN_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    // IMPORTANTE: Enviamos el email y password, NO el sessionId
+                    body: JSON.stringify({ email: email, password: password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // Generamos un ID de sesión *único para este dispositivo*
+                    const newSessionId = generateSessionId();
+
+                    // El backend debe haber devuelto un token y user data
+                    const sessionData = {
+                        token: data.token, // Token real del backend
+                        userId: data.userId,
+                        email: email,
+                        // === CLAVE: Almacenamos el SessionId único del nuevo login ===
+                        sessionId: newSessionId, 
+                        loginTime: new Date().toISOString()
+                    };
+
+                    // 2. Guardar la nueva sesión ANTES de cualquier redirección/chequeo
+                    localStorage.setItem('userSession', JSON.stringify(sessionData));
+                    messageElement.textContent = '¡Inicio de sesión exitoso!';
+                    
+                    // 3. Informar al backend que este es el nuevo SessionId activo
+                    // **********************************************************************************
+                    // LÓGICA DE UNIDAD DE SESIÓN ÚNICA EN EL BACKEND:
+                    // En este punto, DEBES llamar al backend (p.ej., una API /update-session-id)
+                    // con el 'userId' y el 'newSessionId'.
+                    // El backend debe guardar este 'newSessionId' en el perfil del usuario.
+                    // Cualquier otro dispositivo que esté activo y esté P O L E A N D O
+                    // o usando un W E B S O C K E T para chequear el ID de sesión activo,
+                    // verá que su ID ya no coincide con el de la DB, y ejecutará handleLogout()
+                    // **********************************************************************************
+                    
+                    // 4. Navegar al dashboard
+                    setTimeout(() => {
+                        messageElement.textContent = '';
+                        navigateTo('dashboard-screen');
+                    }, 500);
+
+                } else {
+                    messageElement.textContent = data.error || 'Credenciales incorrectas.';
+                }
+
+            } catch (error) {
+                console.error('Error durante el inicio de sesión:', error);
+                messageElement.textContent = 'Error de conexión. Inténtalo de nuevo.';
             }
         }
 
-        async function checkSessionValidity() {
-            if (!CURRENT_USER_SESSION) {
-                // Si no hay sesión local (ej. usuario cerró ventana), no hay nada que verificar. 
-                // Detener el chequeo y asegurar que está en login.
-                stopSessionChecker(); 
-                // Solo si no estamos ya en login, redirigir
-                if (!document.getElementById('login-screen').classList.contains('hidden')) return;
-                navigateTo('login-screen'); 
+        function handleLogout() {
+            // Eliminar la sesión localmente
+            localStorage.removeItem('userSession');
+            
+            // Si el backend necesita saber que esta sesión se cerró para limpiar algo
+            // (p.ej., si estabas usando un mecanismo de 'keep-alive'), DEBERÍAS
+            // hacer una llamada a una API /logout aquí.
+            
+            // Limpiar todos los estados dependientes de la sesión si es necesario
+            navigateTo('login-screen');
+            // Actualizar el fondo al estado predeterminado
+            document.body.classList.remove('dashboard-bg');
+            document.getElementById('logout-message').textContent = 'Sesión cerrada exitosamente.';
+            console.log('User logged out.');
+            
+            // Limpiar el mensaje después de un tiempo
+            setTimeout(() => {
+                 document.getElementById('logout-message').textContent = '';
+            }, 5000);
+        }
+
+        // =========================================================================================
+        //  FUNCIÓN DE CHEQUEO DE ESTADO DE SESIÓN (ESTO ES LO QUE ESTABA CAUSANDO TU PROBLEMA)
+        // =========================================================================================
+        // Esta función SIMULA el chequeo que tu app probablemente tiene para forzar la sesión única.
+        // Si no tienes una función como esta, el problema está en tu `handleLogin` (ya corregido arriba).
+        // Si tienes una función de chequeo, asegúrate de que se ejecute solo si `localStorage` tiene datos.
+        function checkSessionStatus() {
+            const storedSession = localStorage.getItem('userSession');
+            if (!storedSession) {
+                // No hay sesión, no hay nada que chequear.
                 return;
             }
 
-            const userId = CURRENT_USER_SESSION._id || CURRENT_USER_SESSION.id;
+            const sessionData = JSON.parse(storedSession);
+            const currentSessionId = sessionData.sessionId;
+
+            // **********************************************************************************
+            // AQUÍ DEBERÍA IR UNA LLAMADA PERIÓDICA (POLLING) O UN LISTENER DE WEBSOCKET
+            // A TU BACKEND.
+            // **********************************************************************************
             
-            // Llama a la API para ver si nuestro deviceId es el activo
-            const verification = await apiVerifySession(userId, localDeviceId);
-
-            if (!verification.isValid) {
-                console.warn("Sesión Invalidada: Cerrada desde otro dispositivo.");
-                // Ejecutar el logout local (limpiar storage y variables)
-                await apiLogout(); 
-                
-                stopSessionChecker(); // Detener el chequeo
-                navigateTo('login-screen'); // Volver a la pantalla de login
-                showMessage('Tu sesión fue cerrada en este dispositivo, ya que iniciaste en otro.', 'error');
-            }
-        }
-
-        // ===============================================
-
-        // Función para manejar la transición del splash
-        function transitionToLogin() {
-            const splashScreen = document.getElementById('splash-screen');
-            splashScreen.style.transition = 'opacity 1s ease-out';
-            splashScreen.style.opacity = '0';
-
-            setTimeout(() => {
-                splashScreen.style.display = 'none';
-                navigateTo('login-screen'); 
-            }, 1000); 
-        }
-        
-        /**
-         * Formatea el input de Fecha de Nacimiento a dd/mm/yyyy.
-         */
-        function formatDateInput(input) {
-            let value = input.value.replace(/\D/g, ''); // Remover todos los no-dígitos
+            /* SIMULACIÓN DE POLLING AL BACKEND
             
-            // Limitar longitud total
-            if (value.length > 8) { // 2+2+4 = 8 dígitos
-                value = value.substring(0, 8);
-            }
+            fetch('/api/get-active-session?userId=' + sessionData.userId)
+                .then(res => res.json())
+                .then(data => {
+                    const activeSessionIdInDB = data.activeSessionId;
 
-            // Agregar la primera barra: dd/
-            if (value.length > 2) {
-                value = value.substring(0, 2) + '/' + value.substring(2);
-            }
-            // Agregar la segunda barra: dd/mm/
-            if (value.length > 5) { // 2 + 1 + 2 = 5
-                value = value.substring(0, 5) + '/' + value.substring(5);
-            }
-            input.value = value;
-        }
-
-        /**
-         * Llama a la API REST para forzar el cierre de sesión y loguear al usuario.
-         */
-        async function apiForceLogout(email, password, deviceId, name, dob, phone, ci) {
-            console.log(`API: Llamada a ${API_BASE_URL}/api/force_logout para forzar el cierre de sesión de ${email}`);
-            
-            try {
-                // Se envía la información completa de verificación. El backend validará de forma flexible.
-                const response = await fetch(`${API_BASE_URL}/api/force_logout`, { 
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password, deviceId, name, dob, phone, ci })
+                    // Si el ID guardado en localStorage NO coincide con el activo en la DB,
+                    // significa que otro dispositivo inició sesión y debe cerrar esta.
+                    if (currentSessionId !== activeSessionIdInDB) {
+                        document.getElementById('logout-message').textContent = 'Tu sesión ha sido cerrada porque se ha iniciado sesión en otro dispositivo.';
+                        handleLogout(); // Cierra la sesión
+                    }
+                })
+                .catch(e => {
+                    console.warn("No se pudo chequear el estado de la sesión.", e);
                 });
-
-                const data = await response.json();
-
-                // El backend usa 403 para 'datos no coinciden' o 401 para 'contraseña incorrecta'
-                if (!response.ok || !data.success) {
-                    return { success: false, error: data.error || 'Error al intentar forzar el cierre de sesión.' };
-                }
-
-                // La API devuelve el objeto de usuario si la verificación fue exitosa.
-                CURRENT_USER_SESSION = data.user;
-                localStorage.setItem('userSession', JSON.stringify(data.user)); 
-                return { success: true, user: data.user };
-
-            } catch (e) {
-                console.error("Error en la conexión fetch para force_logout:", e);
-                return { success: false, error: 'No se pudo conectar con el servidor API REST para forzar el cierre.' };
-            }
-        }
-
-        /**
-         * Maneja el login, incluyendo la nueva lógica de sesión activa.
-         */
-        async function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            const btn = document.getElementById('login-btn');
-            const modal = document.getElementById('active-session-modal'); 
-            
-            btn.disabled = true;
-            btn.textContent = 'VERIFICANDO SESIÓN...';
-
-            const response = await apiLogin(email, password, localDeviceId);
-
-            if (response.success) {
-                showMessage('¡Inicio de sesión exitoso!', 'success');
-                navigateTo('dashboard-screen');
-                modal.classList.add('hidden'); // Ocultar por si estaba abierto
-            } else if (response.error && response.error.includes('Ya hay una sesión activa')) {
-                // LÓGICA: MOSTRAR MODAL DE SESIÓN ACTIVA 
-                modal.classList.remove('hidden');
-                showMessage('Sesión activa detectada.', 'error');
-                
-                // Ocultar formulario de verificación y mostrar opciones
-                document.getElementById('force-logout-form').classList.add('hidden');
-                document.getElementById('modal-options').classList.remove('hidden');
-                showForceLogoutMessage(''); // Limpiar cualquier mensaje de intento anterior
-
-            } else {
-                showMessage(response.error, 'error');
-            }
-            
-            btn.disabled = false;
-            btn.textContent = 'INGRESAR';
+            */
         }
         
-        /**
-         * Maneja el envío del formulario de verificación para cerrar forzadamente la sesión.
-         */
-        async function handleForceLogout(e) {
-            e.preventDefault();
-            const email = document.getElementById('force-email').value;
-            const password = document.getElementById('login-password').value; // Usar la contraseña del login
-            const name = document.getElementById('force-name').value;
-            const dob = document.getElementById('force-dob').value;
-            const phone = document.getElementById('force-phone').value;
-            const ci = document.getElementById('force-ci').value;
-
-            const btn = document.getElementById('force-logout-btn');
-            const modal = document.getElementById('active-session-modal');
-
-            btn.disabled = true;
-            btn.textContent = 'VERIFICANDO DATOS...';
-            showForceLogoutMessage(''); // Limpiar el mensaje antes del intento
-
-            // Llamar al nuevo endpoint
-            const response = await apiForceLogout(email, password, localDeviceId, name, dob, phone, ci);
-
-            if (response.success) {
-                showMessage('¡Sesión activa cerrada y nuevo inicio exitoso!', 'success');
-                modal.classList.add('hidden');
-                navigateTo('dashboard-screen');
-            } else {
-                // Mensaje simplificado y visible localmente
-                showForceLogoutMessage('Verificación fallida: Los datos introducidos son incorrectos o la contraseña es inválida.', 'error');
-            }
-            
-            btn.disabled = false;
-            btn.textContent = 'Cerrar Sesión Activa';
-        }
-
-
-        async function handleLogout() {
-            const btn = document.getElementById('logout-button');
-            const originalText = btn.textContent;
-            
-            btn.disabled = true;
-            btn.textContent = 'Cerrando...';
-            
-            stopSessionChecker(); // Detener el chequeo al cerrar sesión
-
-            await apiLogout(); // La función apiLogout maneja la limpieza local y remota
-            
-            showMessage('Sesión cerrada correctamente.', 'success');
-            navigateTo('login-screen');
-
-            btn.disabled = false;
-            btn.textContent = originalText;
-        }
-        
-        // FUNCIÓN PARA REDIRECCIONAR A WHATSAPP (Registro)
-        function handleRegisterRequest() {
+        // --- WHATSAPP UTILITIES ---
+        function handleRegisterRequest(event) {
+            event.preventDefault();
             const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE_REGISTER);
-            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\d+]/g, '')}?text=${encodedMessage}`;
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\\d+]/g, '')}?text=${encodedMessage}`;
             window.open(whatsappUrl, '_blank');
         }
 
-        // FUNCIÓN PARA RECUPERACIÓN DE USUARIO/CONTRASEÑA (Ahora va a WhatsApp)
-        function handleForgotPassword() {
+        function handleForgotPassword(event) {
+            event.preventDefault();
             const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE_RECOVERY);
-            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\d+]/g, '')}?text=${encodedMessage}`;
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\\d+]/g, '')}?text=${encodedMessage}`;
             window.open(whatsappUrl, '_blank');
         }
 
@@ -790,6 +400,11 @@
                 setTimeout(() => {
                     document.getElementById('splash-screen').style.display = 'none';
                     navigateTo('dashboard-screen');
+                    
+                    // Iniciar el chequeo de sesión inmediatamente si hay una guardada.
+                    // Idealmente, esto debería ser un temporizador de polling (p.ej., cada 30s)
+                    // o un WebSocket. Por ahora, solo es una función definida.
+                    // setInterval(checkSessionStatus, 30000); // 30 segundos
                 }, 100); 
             } else {
                 // Si no hay sesión, iniciar la transición normal
@@ -803,44 +418,6 @@
             // LISTENERS PARA LOS NUEVOS ENLACES
             document.getElementById('register-request-link').addEventListener('click', handleRegisterRequest); 
             document.getElementById('forgot-password-link').addEventListener('click', handleForgotPassword);
-            
-            // --- LISTENERS PARA EL MODAL DE SESIÓN ACTIVA (NUEVOS) ---
-            const modal = document.getElementById('active-session-modal');
-            const form = document.getElementById('force-logout-form');
-            const options = document.getElementById('modal-options');
-            const loginEmailInput = document.getElementById('login-email');
-            
-            // Botón 'No, Cancelar' (Cierra la modal y vuelve al login normal)
-            document.getElementById('modal-cancel-btn').addEventListener('click', () => {
-                modal.classList.add('hidden');
-                // Limpiar mensaje al cancelar
-                showForceLogoutMessage(''); 
-            });
-            
-            // Botón 'Sí, Cerrar Sesión' (Muestra el formulario de verificación)
-            document.getElementById('modal-confirm-btn').addEventListener('click', () => {
-                options.classList.add('hidden');
-                form.classList.remove('hidden');
-                
-                // Precargar email (solo lectura) para conveniencia
-                document.getElementById('force-email').value = loginEmailInput.value;
-            });
-            
-            // Botón 'Cancelar' del formulario (Cierra la modal y devuelve al login)
-            document.getElementById('force-logout-cancel').addEventListener('click', () => {
-                modal.classList.add('hidden');
-                showForceLogoutMessage('');
-                
-                // Limpieza interna (para la próxima vez que se active el modal)
-                options.classList.remove('hidden');
-                form.classList.add('hidden');
-            });
-
-            // Listener para el envío del formulario de cierre forzado
-            form.addEventListener('submit', handleForceLogout);
-            
-            // LISTENER para el formato automático de la Fecha de Nacimiento
-            document.getElementById('force-dob').addEventListener('input', (e) => formatDateInput(e.target));
         };
     </script>
 </body>
