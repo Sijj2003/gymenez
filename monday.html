@@ -906,8 +906,7 @@
             finishRoutineContainer.classList.add('hidden'); 
 
             // ==================================================
-            // 🚨 NUEVA LÓGICA DE BLOQUEO (SEMANAL/DÍA ESPECÍFICO) 🚨
-            // Se calcula el momento exacto del próximo desbloqueo.
+            // 🚨 LÓGICA DE BLOQUEO (SEMANAL/DÍA ESPECÍFICO) 🚨
             // ==================================================
             const API_LAST_SESSION_URL = `${API_BASE_URL}/api/journal/last_session/${userId}/${dayName}`;
             
@@ -951,7 +950,6 @@
                             daysToAdd = 7;
                         } else {
                             // Caso raro: se completó la rutina antes de las 00:01 AM. 
-                            // Ya debería estar desbloqueada si el 'now' es posterior a 00:01 AM.
                             daysToAdd = 0;
                         }
                     }
@@ -962,7 +960,6 @@
 
                     // --- 2. Decisión de Bloqueo Final ---
                     // Si la hora actual es anterior a la hora de desbloqueo, está BLOQUEADO.
-                    // (Comparación de milisegundos)
                     let isBlocked = now.getTime() < nextUnlockDate.getTime();
                     
                     if (isBlocked) {
@@ -970,22 +967,38 @@
                         loadingSpinner.classList.add('hidden');
                         noDataMessage.classList.remove('hidden');
                         
-                        const completionTime = lastCompletionDate.toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
-                        const unlockTime = nextUnlockDate.toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+                        // Nuevo formato profesional para la fecha y hora
+                        const completionTime = lastCompletionDate.toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' });
+                        const unlockTime = nextUnlockDate.toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' });
 
-                        // Mensaje solicitado: "rutina completada vuelve cuando te toque nuevamente"
+                        // === INICIO DEL MENSAJE PROFESIONAL CORREGIDO ===
                         noDataMessage.innerHTML = `
-                            <p class="text-xl">
-                                <span class="text-red-400 font-bold">Rutina Completada</span>
-                            </p>
-                            <p class="mt-2 text-lg font-semibold">Vuelve cuando te toque nuevamente.</p>
-                            <p class="mt-4 text-sm text-gray-400">
-                                Próximo desbloqueo: <span class="text-amber-400 font-bold">${unlockTime}</span>
-                            </p>
-                            <p class="mt-1 text-xs text-gray-500">Última sesión: ${completionTime}</p>
+                            <div class="p-6 bg-gray-800 bg-opacity-70 rounded-xl shadow-2xl border-l-4 border-red-500 mx-auto max-w-sm">
+                                <h3 class="text-2xl font-bold text-red-400 mb-3 uppercase">Rutina Bloqueada</h3>
+                                <p class="text-white mb-4">
+                                    Ha completado esta sesión satisfactoriamente.
+                                </p>
+                                
+                                <p class="text-sm text-gray-400 mt-2">
+                                    Última sesión completada:
+                                    <span class="font-semibold text-gray-300 block">${completionTime}</span>
+                                </p>
+                                
+                                <p class="text-base text-amber-400 mt-4 font-bold">
+                                    Disponible nuevamente el:
+                                    <span class="text-white block text-lg">${unlockTime}</span>
+                                </p>
+                                
+                                <p class="text-xs text-gray-500 mt-5">
+                                    El sistema aplica un bloqueo de 7 días, habilitando la rutina a las 00:01 AM del día asignado.
+                                </p>
+                            </div>
                         `;
                         
-                        showMessage("Rutina completada vuelve cuando te toque nuevamente.", 'error'); 
+                        // Mensaje de notificación temporal
+                        showMessage(`Sesión ${dayName} completada. Disponible el ${unlockTime}.`, 'error');
+                        // === FIN DEL MENSAJE PROFESIONAL CORREGIDO ===
+
                         return; // 🛑 Detener la carga de la rutina
                     }
                     // Si no está bloqueado (isBlocked es false), el código continúa a cargar la rutina.
