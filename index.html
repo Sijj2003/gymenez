@@ -131,10 +131,19 @@
             color: #9ca3af; /* gray-400 */
             transition: color 0.3s ease;
             cursor: pointer;
+            /* Flex-grow-1 para distribuir espacio equitativamente */
+            flex-grow: 1; 
+            text-align: center;
         }
         .help-link:hover {
             color: #38bdf8; /* sky-400 */
             text-shadow: 0 0 5px rgba(56, 189, 248, 0.5); /* Sombra sutil neon azul */
+        }
+        /* Ajuste específico para que el contenedor de enlaces maneje tres elementos */
+        #login-help-links {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px; /* Espacio entre los enlaces */
         }
 
     </style>
@@ -157,7 +166,7 @@
     </div>
 
     <div id="login-screen" class="hidden min-h-screen w-full flex items-center justify-center p-4">
-        <div class="glass-card p-6 md:p-8 w-full max-w-sm mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-500/30">
+        <div class="glass-card p-6 md:p-8 w-full max-w-lg mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-500/30">
             <div class="text-center mb-6">
                 <div class="text-center mb-6">
                     <img id="login-logo-img"
@@ -186,9 +195,12 @@
                 </button>
             </form>
             
-            <div class="flex justify-between items-center mt-4 pt-2 border-t border-gray-700/50">
+            <div id="login-help-links" class="mt-4 pt-2 border-t border-gray-700/50">
                 <span id="register-request-link" class="help-link">
                     Solicitar Registro
+                </span>
+                <span id="trainer-access-link" class="help-link">
+                    Acceso Entrenadores
                 </span>
                 <span id="forgot-password-link" class="help-link">
                     Recuperar Usuario
@@ -855,6 +867,11 @@
             const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\d+]/g, '')}?text=${encodedMessage}`;
             window.open(whatsappUrl, '_blank');
         }
+        
+        // NUEVA FUNCIÓN: REDIRECCIÓN AL LOGIN DE ENTRENADORES
+        function handleTrainerAccess() {
+            window.location.href = 'trainer.html'; 
+        }
 
         // --- Lógica de Inicialización ---
         window.onload = function() {
@@ -875,9 +892,12 @@
             document.getElementById('login-form').addEventListener('submit', handleLogin);
             document.getElementById('logout-button').addEventListener('click', handleLogout);
             
-            // LISTENERS PARA LOS NUEVOS ENLACES
+            // LISTENERS PARA LOS ENLACES DE AYUDA
             document.getElementById('register-request-link').addEventListener('click', handleRegisterRequest); 
             document.getElementById('forgot-password-link').addEventListener('click', handleForgotPassword);
+            
+            // NUEVO LISTENER: Acceso para Entrenadores
+            document.getElementById('trainer-access-link').addEventListener('click', handleTrainerAccess); 
             
             // --- LISTENERS PARA EL MODAL DE SESIÓN ACTIVA (NUEVOS) ---
             const modal = document.getElementById('active-session-modal');
