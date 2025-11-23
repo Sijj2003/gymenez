@@ -331,7 +331,7 @@
     <script type="module">
         // 🚀 URL BASE DE TU API.
         const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
-        const API_JOURNAL_URL = `${API_BASE_URL}/api/journal/save_session`; // <--- NUEVA RUTA DEL JOURNAL
+        const API_JOURNAL_URL = `${API_BASE_URL}/api/journal/save_session`; // <--- RUTA DE GUARDADO
         const CONTACT_WHATSAPP = '584148780392'; 
         const REDIRECT_URL = 'routines.html';
         const REDIRECT_TIMEOUT_SECONDS = 25; 
@@ -763,7 +763,7 @@
                 } : null
             };
 
-            // ⚠️ NUEVO: Guardar el journal antes de mostrar el modal
+            // Guardar el journal antes de mostrar el modal
             const saveSuccess = await saveRoutineJournal(formData); 
             
             // Si el guardado es exitoso o falla, mostramos el modal para que el usuario pueda contactar.
@@ -775,7 +775,7 @@
             e.preventDefault();
             showMessage("Encuesta omitida. Guardando registro...", 'error');
             
-            // ⚠️ NUEVO: Guardar el journal con datos de encuesta nulos (null).
+            // Guardar el journal con datos de encuesta nulos (null).
             const saveSuccess = await saveRoutineJournal(null); 
             
             // Si el guardado es exitoso o falla, mostramos el modal para que el usuario pueda contactar.
@@ -891,7 +891,7 @@
 
 
         /**
-         * Carga la rutina del día actual usando la API REST.
+         * Carga la rutina del día actual usando la API REST, con chequeo de bloqueo.
          */
         async function loadRoutine(dayName) {
             if (!userId) {
@@ -904,6 +904,77 @@
             loadingSpinner.classList.remove('hidden');
             exercisesContainer.innerHTML = ''; 
             finishRoutineContainer.classList.add('hidden'); 
+
+            // ==================================================
+            // 🚨 NUEVA LÓGICA DE BLOQUEO POR DÍA Y HORA 🚨
+            // ==================================================
+            const API_LAST_SESSION_URL = `${API_BASE_URL}/api/journal/last_session/${userId}/${dayName}`;
+            
+            try {
+                const response = await fetch(API_LAST_SESSION_URL);
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    console.warn(`[CHECK LOCK WARNING] Fallo al obtener el último registro. Continuando con la carga: ${data.error || 'Fallo desconocido'}`);
+                }
+                
+                const lastCompletedTimestampSec = data.lastCompletedTimestamp; // Timestamp UNIX en segundos
+
+                if (lastCompletedTimestampSec) {
+                    const now = new Date();
+                    const lastCompletionDate = new Date(lastCompletedTimestampSec * 1000); // Convertir a milisegundos
+
+                    // Mapeo de días de la semana (Lunes=1, Martes=2, ..., Sábado=6, Domingo=0 - según JS getDay())
+                    const dayMap = { 'Lunes': 1, 'Martes': 2, 'Miércoles': 3, 'Jueves': 4, 'Viernes': 5, 'Sábado': 6, 'Domingo': 0 };
+                    
+                    const requiredDayOfWeek = dayMap[dayName]; // Día numérico requerido
+                    const currentDayOfWeek = now.getDay(); 
+
+                    let isLocked = true; // Por defecto, si hay un registro previo, se asume bloqueado
+
+                    // La rutina se desbloquea si:
+                    // 1. Es el día correcto (Ej: Lunes)
+                    // 2. Y son las 00:01 horas o más tarde
+                    if (requiredDayOfWeek === currentDayOfWeek) {
+                         // Chequea si la hora actual es 00 y los minutos son 01 o más (o si la hora es 1 o más)
+                         const isAfterMidnight = now.getHours() >= 1 || (now.getHours() === 0 && now.getMinutes() >= 1);
+                         
+                         if (isAfterMidnight) {
+                            isLocked = false; // Desbloqueado por el día de la semana.
+                         }
+                    }
+                    
+                    if (isLocked) {
+                        // Muestra el mensaje de bloqueo y detiene la carga
+                        loadingSpinner.classList.add('hidden');
+                        noDataMessage.classList.remove('hidden');
+                        
+                        const completionTime = lastCompletionDate.toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+                        const nextDayName = Object.keys(dayMap).find(key => dayMap[key] === requiredDayOfWeek) || dayName;
+                        
+                        // Mensaje solicitado: "rutina completada vuelve cuando te toque nuevamente"
+                        noDataMessage.innerHTML = `
+                            <p class="text-xl">
+                                <span class="text-red-400 font-bold">Rutina Completada</span>
+                            </p>
+                            <p class="mt-2 text-lg font-semibold">Vuelve cuando te toque nuevamente.</p>
+                            <p class="mt-4 text-sm text-gray-400">Próximo desbloqueo: <span class="text-amber-400 font-bold">${nextDayName}</span> a las 00:01 horas.</p>
+                            <p class="mt-1 text-xs text-gray-500">Última sesión: ${completionTime}</p>
+                        `;
+                        
+                        showMessage("Rutina completada vuelve cuando te toque nuevamente.", 'error'); 
+                        return; // 🛑 Detener la carga de la rutina
+                    }
+                    // Si no está bloqueado (isLocked es false), el código continúa a cargar la rutina.
+                }
+            } catch (e) {
+                console.error("Error al verificar el último registro de rutina:", e);
+                // Si la verificación falla, se asume que se puede cargar la rutina por seguridad.
+                showMessage(`Advertencia: Error al chequear historial de rutina: ${e.message}. Continuando...`, 'error');
+            }
+            // ==================================================
+            // 🚀 CONTINUAR CON LA CARGA DE LA RUTINA ORIGINAL 🚀
+            // ==================================================
 
             const API_URL = `${API_BASE_URL}/api/routines/day/${userId}/${dayName}`; 
             
