@@ -223,6 +223,9 @@
             <form id="force-logout-form" class="hidden mt-6 text-left">
                 <p class="text-sm text-gray-400 mb-4">Para confirmar el cierre, verifica tu identidad con los siguientes datos:</p>
                 
+                <div id="force-logout-message" class="hidden p-3 mb-4 rounded-lg bg-red-800/70 text-sm text-red-100 font-semibold text-center">
+                    </div>
+
                 <div class="mb-4">
                     <label for="force-email" class="block text-sm font-medium text-white mb-2">Email Asociado</label>
                     <input type="email" id="force-email" name="email" placeholder="tu.correo@ejemplo.com" readonly
@@ -458,6 +461,22 @@
                 messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
             }, 3000);
         }
+        
+        /**
+         * Muestra un mensaje de error dentro del formulario de cierre forzado.
+         */
+        function showForceLogoutMessage(message, type = 'error') {
+            const msgBox = document.getElementById('force-logout-message');
+            if (message) {
+                msgBox.textContent = message;
+                // Clases Tailwind para el fondo rojo/texto blanco
+                msgBox.className = `p-3 mb-4 rounded-lg font-semibold text-center ${type === 'error' ? 'bg-red-800/70 text-red-100' : 'bg-green-800/70 text-green-100'}`;
+                msgBox.classList.remove('hidden');
+            } else {
+                msgBox.classList.add('hidden'); // Ocultar si el mensaje está vacío
+            }
+        }
+
 
         // Función de navegación entre pantallas
         function navigateTo(targetId) {
@@ -506,7 +525,7 @@
         }
         
         /**
-         * 🚨 CORRECCIÓN APLICADA: Formatea el input de Fecha de Nacimiento a dd/mm/yyyy.
+         * Formatea el input de Fecha de Nacimiento a dd/mm/yyyy.
          */
         function formatDateInput(input) {
             let value = input.value.replace(/\D/g, ''); // Remover todos los no-dígitos
@@ -580,13 +599,14 @@
                 navigateTo('dashboard-screen');
                 modal.classList.add('hidden'); // Ocultar por si estaba abierto
             } else if (response.error && response.error.includes('Ya hay una sesión activa')) {
-                // 🚨 NUEVA LÓGICA: MOSTRAR MODAL DE SESIÓN ACTIVA 🚨
+                // LÓGICA: MOSTRAR MODAL DE SESIÓN ACTIVA 
                 modal.classList.remove('hidden');
                 showMessage('Sesión activa detectada.', 'error');
                 
                 // Ocultar formulario de verificación y mostrar opciones
                 document.getElementById('force-logout-form').classList.add('hidden');
                 document.getElementById('modal-options').classList.remove('hidden');
+                showForceLogoutMessage(''); // Limpiar cualquier mensaje de intento anterior
 
             } else {
                 showMessage(response.error, 'error');
@@ -613,6 +633,7 @@
 
             btn.disabled = true;
             btn.textContent = 'VERIFICANDO DATOS...';
+            showForceLogoutMessage(''); // Limpiar el mensaje antes del intento
 
             // Llamar al nuevo endpoint
             const response = await apiForceLogout(email, password, localDeviceId, name, dob, phone, ci);
@@ -622,8 +643,8 @@
                 modal.classList.add('hidden');
                 navigateTo('dashboard-screen');
             } else {
-                // Mostrar el error específico de la API (incluyendo el 403 de verificación fallida)
-                showMessage(response.error, 'error');
+                // Mostrar el error localmente en el formulario
+                showForceLogoutMessage(response.error, 'error');
             }
             
             btn.disabled = false;
@@ -693,6 +714,8 @@
             // Botón 'No, Cancelar' (Cierra la modal y vuelve al login normal)
             document.getElementById('modal-cancel-btn').addEventListener('click', () => {
                 modal.classList.add('hidden');
+                // Limpiar mensaje al cancelar
+                showForceLogoutMessage(''); 
             });
             
             // Botón 'Sí, Cerrar Sesión' (Muestra el formulario de verificación)
@@ -704,16 +727,21 @@
                 document.getElementById('force-email').value = loginEmailInput.value;
             });
             
-            // Botón 'Cancelar' del formulario (Vuelve a las opciones de la modal)
+            // 🚨 CORRECCIÓN APLICADA AQUÍ: 
+            // Botón 'Cancelar' del formulario (Cierra la modal y devuelve al login)
             document.getElementById('force-logout-cancel').addEventListener('click', () => {
-                form.classList.add('hidden');
+                modal.classList.add('hidden');
+                showForceLogoutMessage('');
+                
+                // Limpieza interna (para la próxima vez que se active el modal)
                 options.classList.remove('hidden');
+                form.classList.add('hidden');
             });
 
             // Listener para el envío del formulario de cierre forzado
             form.addEventListener('submit', handleForceLogout);
             
-            // 🚨 LISTENER DE CORRECCIÓN: para el formato automático de la Fecha de Nacimiento
+            // LISTENER DE CORRECCIÓN: para el formato automático de la Fecha de Nacimiento
             document.getElementById('force-dob').addEventListener('input', (e) => formatDateInput(e.target));
         };
     </script>
