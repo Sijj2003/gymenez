@@ -24,12 +24,7 @@
             /* Transición para un cambio de fondo suave */
             transition: background-image 1s ease-in-out; 
             
-            /* === APLICADO: Borde negro para todas las letras (Text Stroke Effect) === */
-            text-shadow: 
-                -0.5px -0.5px 0 #000,
-                0.5px -0.5px 0 #000,
-                -0.5px 0.5px 0 #000,
-                0.5px 0.5px 0 #000;
+            /* Se eliminó el borde negro para todas las letras a solicitud del usuario */
         }
 
         /* Clase para el fondo del Dashboard */
@@ -249,7 +244,6 @@
         /**
          * @description Maneja la lógica de inicio de sesión, incluyendo la obtención
          * de un token y un ID de sesión único para la gestión multi-dispositivo.
-         * ESTA ES LA FUNCIÓN CLAVE DONDE SE CORRIGE EL MANEJO DEL LOCAL STORAGE.
          */
         async function handleLogin(event) {
             event.preventDefault();
@@ -259,26 +253,30 @@
             messageElement.textContent = 'Iniciando sesión...';
 
             try {
-                // 1. Simulación de llamada API al Backend (TU BACKEND REAL DEBE ESTAR AQUÍ)
+                // Generamos el ID de sesión *único para este dispositivo* ANTES de la llamada al backend
+                const newSessionId = generateSessionId();
+                
+                // 1. Llamada API al Backend (Incluyendo el newSessionId como deviceId)
+                // Esto es crucial para que el backend sepa QUÉ ID debe marcar como activo.
                 const response = await fetch(LOGIN_API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    // IMPORTANTE: Enviamos el email y password, NO el sessionId
-                    body: JSON.stringify({ email: email, password: password })
+                    body: JSON.stringify({ 
+                        email: email, 
+                        password: password,
+                        deviceId: newSessionId // Usamos newSessionId como deviceId
+                    })
                 });
 
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                    // Generamos un ID de sesión *único para este dispositivo*
-                    const newSessionId = generateSessionId();
-
-                    // El backend debe haber devuelto un token y user data
+                    // El backend debe haber devuelto user data
                     const sessionData = {
-                        token: data.token, // Token real del backend
-                        userId: data.userId,
+                        token: data.token || 'simulated-token', // Simulación si el backend no devuelve token
+                        userId: data.user.id,
                         email: email,
-                        // === CLAVE: Almacenamos el SessionId único del nuevo login ===
+                        // CLAVE: Almacenamos el SessionId único del nuevo login
                         sessionId: newSessionId, 
                         loginTime: new Date().toISOString()
                     };
@@ -287,22 +285,29 @@
                     localStorage.setItem('userSession', JSON.stringify(sessionData));
                     messageElement.textContent = '¡Inicio de sesión exitoso!';
                     
-                    // 3. Informar al backend que este es el nuevo SessionId activo
-                    // **********************************************************************************
-                    // LÓGICA DE UNIDAD DE SESIÓN ÚNICA EN EL BACKEND:
-                    // En este punto, DEBES llamar al backend (p.ej., una API /update-session-id)
-                    // con el 'userId' y el 'newSessionId'.
-                    // El backend debe guardar este 'newSessionId' en el perfil del usuario.
-                    // Cualquier otro dispositivo que esté activo y esté P O L E A N D O
-                    // o usando un W E B S O C K E T para chequear el ID de sesión activo,
-                    // verá que su ID ya no coincide con el de la DB, y ejecutará handleLogout()
-                    // **********************************************************************************
-                    
-                    // 4. Navegar al dashboard
+                    // 3. Navegar al dashboard
                     setTimeout(() => {
                         messageElement.textContent = '';
                         navigateTo('dashboard-screen');
                     }, 500);
+
+                } else if (response.status === 403) {
+                     // Caso: Sesión activa en otro dispositivo (403 del backend)
+                    messageElement.textContent = 'Sesión ya activa. ¿Forzar cierre e iniciar aquí?';
+                    
+                    // Aquí podríamos mostrar un modal para preguntar si desea forzar el cierre.
+                    // Por simplicidad, agregaremos un botón de forzar cierre temporalmente.
+                    // Nota: En un entorno real, usarías un modal o un botón mejor integrado.
+                    const forceButtonHtml = `
+                        <button id="force-login-button" class="btn-primary bg-orange-600 hover:bg-orange-700 w-full mt-4">
+                            Sí, Forzar Cierre
+                        </button>
+                    `;
+                    messageElement.insertAdjacentHTML('afterend', forceButtonHtml);
+
+                    document.getElementById('force-login-button')?.addEventListener('click', () => {
+                        handleForceLogin(email, password, newSessionId);
+                    });
 
                 } else {
                     messageElement.textContent = data.error || 'Credenciales incorrectas.';
@@ -314,14 +319,79 @@
             }
         }
 
+        /**
+         * @description Maneja la lógica de inicio de sesión forzado.
+         * En un entorno real, esta llamada requeriría datos de verificación.
+         * Para el ejemplo, usaremos solo email, password y deviceId.
+         */
+        async function handleForceLogin(email, password, deviceId) {
+            const messageElement = document.getElementById('login-message');
+            messageElement.textContent = 'Forzando cierre de sesión...';
+            // Eliminar botón de forzar
+            document.getElementById('force-login-button')?.remove();
+
+            try {
+                // Llamada API al Backend para forzar el cierre
+                const FORCE_LOGIN_API_URL = 'https://gymenez-api.pythonanywhere.com/api/force_logout';
+                
+                // NOTA: EL BACKEND REAL DEBERÍA PEDIR DATOS ADICIONALES (Cédula, nombre, etc.)
+                // para la verificación de identidad antes de permitir un force_logout.
+                // Aquí usamos solo lo básico para el ejemplo.
+                const response = await fetch(FORCE_LOGIN_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: email, 
+                        password: password,
+                        deviceId: deviceId,
+                        // Datos de ejemplo que el backend espera
+                        name: 'ExampleName', 
+                        dob: '01/01/2000',
+                        phone: '1234567890',
+                        ci: '12345678'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // Si el forzado es exitoso, procedemos a guardar la nueva sesión
+                    const sessionData = {
+                        token: data.token || 'simulated-token-forced', 
+                        userId: data.user.id,
+                        email: email,
+                        sessionId: deviceId, // Usar el deviceId generado
+                        loginTime: new Date().toISOString()
+                    };
+
+                    localStorage.setItem('userSession', JSON.stringify(sessionData));
+                    messageElement.textContent = '¡Sesión forzada exitosa! Accediendo...';
+                    
+                    setTimeout(() => {
+                        messageElement.textContent = '';
+                        navigateTo('dashboard-screen');
+                    }, 500);
+                } else {
+                    messageElement.textContent = data.error || 'Fallo al forzar el cierre de sesión. Verifica tus datos.';
+                }
+
+            } catch (error) {
+                console.error('Error durante el inicio de sesión forzado:', error);
+                messageElement.textContent = 'Error de conexión al intentar forzar el cierre.';
+            }
+        }
+
         function handleLogout() {
             // Eliminar la sesión localmente
             localStorage.removeItem('userSession');
             
-            // Si el backend necesita saber que esta sesión se cerró para limpiar algo
-            // (p.ej., si estabas usando un mecanismo de 'keep-alive'), DEBERÍAS
-            // hacer una llamada a una API /logout aquí.
-            
+            // Lógica para notificar al backend (opcional pero recomendado)
+            const storedSession = localStorage.getItem('userSession');
+            if (storedSession) {
+                const sessionData = JSON.parse(storedSession);
+                // NOTA: Idealmente, llamar a /api/logout con sessionData.userId
+            }
+
             // Limpiar todos los estados dependientes de la sesión si es necesario
             navigateTo('login-screen');
             // Actualizar el fondo al estado predeterminado
@@ -336,45 +406,50 @@
         }
 
         // =========================================================================================
-        //  FUNCIÓN DE CHEQUEO DE ESTADO DE SESIÓN (ESTO ES LO QUE ESTABA CAUSANDO TU PROBLEMA)
+        //  FUNCIÓN DE CHEQUEO DE ESTADO DE SESIÓN (HEARTBEAT)
         // =========================================================================================
-        // Esta función SIMULA el chequeo que tu app probablemente tiene para forzar la sesión única.
-        // Si no tienes una función como esta, el problema está en tu `handleLogin` (ya corregido arriba).
-        // Si tienes una función de chequeo, asegúrate de que se ejecute solo si `localStorage` tiene datos.
-        function checkSessionStatus() {
+        
+        /**
+         * @description Chequeo periódico (heartbeat) para verificar si el sessionId
+         * de este dispositivo sigue siendo el 'activeSessionId' en el backend.
+         */
+        async function checkSessionStatus() {
             const storedSession = localStorage.getItem('userSession');
             if (!storedSession) {
-                // No hay sesión, no hay nada que chequear.
+                // Si ya no hay sesión local, no hay nada que chequear.
                 return;
             }
 
             const sessionData = JSON.parse(storedSession);
             const currentSessionId = sessionData.sessionId;
-
-            // **********************************************************************************
-            // AQUÍ DEBERÍA IR UNA LLAMADA PERIÓDICA (POLLING) O UN LISTENER DE WEBSOCKET
-            // A TU BACKEND.
-            // **********************************************************************************
+            const userId = sessionData.userId;
             
-            /* SIMULACIÓN DE POLLING AL BACKEND
+            const VERIFY_SESSION_API_URL = 'https://gymenez-api.pythonanywhere.com/api/verify_session';
             
-            fetch('/api/get-active-session?userId=' + sessionData.userId)
-                .then(res => res.json())
-                .then(data => {
-                    const activeSessionIdInDB = data.activeSessionId;
-
-                    // Si el ID guardado en localStorage NO coincide con el activo en la DB,
-                    // significa que otro dispositivo inició sesión y debe cerrar esta.
-                    if (currentSessionId !== activeSessionIdInDB) {
-                        document.getElementById('logout-message').textContent = 'Tu sesión ha sido cerrada porque se ha iniciado sesión en otro dispositivo.';
-                        handleLogout(); // Cierra la sesión
-                    }
-                })
-                .catch(e => {
-                    console.warn("No se pudo chequear el estado de la sesión.", e);
+            try {
+                const response = await fetch(VERIFY_SESSION_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: userId, deviceId: currentSessionId })
                 });
-            */
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    // Si el backend devuelve un error (p.ej., 403) o data.success es false,
+                    // significa que otra sesión sobrescribió la activa.
+                    document.getElementById('logout-message').textContent = 'Tu sesión fue cerrada porque se ha iniciado sesión en otro dispositivo.';
+                    handleLogout(); // Cierra la sesión
+                } else {
+                    // Sesión OK, no hacer nada.
+                }
+
+            } catch (error) {
+                // Si falla la conexión, mostramos un warning, pero no cerramos la sesión
+                console.warn("No se pudo chequear el estado de la sesión.", error);
+            }
         }
+
         
         // --- WHATSAPP UTILITIES ---
         function handleRegisterRequest(event) {
@@ -401,10 +476,9 @@
                     document.getElementById('splash-screen').style.display = 'none';
                     navigateTo('dashboard-screen');
                     
-                    // Iniciar el chequeo de sesión inmediatamente si hay una guardada.
-                    // Idealmente, esto debería ser un temporizador de polling (p.ej., cada 30s)
-                    // o un WebSocket. Por ahora, solo es una función definida.
-                    // setInterval(checkSessionStatus, 30000); // 30 segundos
+                    // Iniciar el chequeo de sesión (Heartbeat) cada 30 segundos
+                    // Esto detecta si otra sesión cerró esta de forma remota.
+                    setInterval(checkSessionStatus, 30000);
                 }, 100); 
             } else {
                 // Si no hay sesión, iniciar la transición normal
