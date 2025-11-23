@@ -3,27 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Función en Desarrollo | GYMENEZ</title>
+    <title>GYMENEZ - Entrenadores</title>
     <link rel="icon" type="image/png" href="mini_logo.png">
     <link rel="shortcut icon" type="image/png" href="mini_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         
-        /* Tema de Fondo Minimalista: Base Oscura (Tomado de routines.html) */
+        /* Tema de Fondo Minimalista: Base Oscura (DEFAULT/LOGIN) */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0d0d1a;
-            /* Usamos el mismo fondo del Dashboard (PROFILE_FONDO) */
-            background-image: url('PROFILE_FONDO.png');
+            /* Fondo Inicial (LOGIN) */
+            background-image: url('FONDO.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
             color: #e5e7eb; 
+            /* Transición para un cambio de fondo suave */
             transition: background-image 1s ease-in-out; 
-
-            /* Borde negro para todas las letras (Text Stroke Effect) */
+            
+            /* === APLICADO: Borde negro para todas las letras (Text Stroke Effect) === */
             text-shadow: 
                 -0.5px -0.5px 0 #000,  
                  0.5px -0.5px 0 #000,
@@ -31,7 +32,7 @@
                  0.5px  0.5px 0 #000;
         }
         
-        /* Estilo específico para el efecto Glassmorphism en las tarjetas (Tomado de routines.html) */
+        /* Estilo específico para el efecto Glassmorphism en las tarjetas */
         .glass-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(15px);
@@ -39,63 +40,241 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            /* Cursor no es necesario en esta página, pero lo mantenemos para consistencia */
-            /* cursor: pointer; */ 
         }
-        
-        /* Sombra/Borde para el texto del Header (Gris) (Tomado de routines.html) */
-        .text-border-gray {
-            text-shadow: 0 0 3px #4b5563; 
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.6);
         }
 
-        /* Estilos específicos para la tarjeta de 'Próximamente' */
-        .coming-soon-icon {
-            filter: drop-shadow(0 0 5px rgba(250, 202, 25, 0.8));
+        /* Estilo para el botón con efecto NEON (AMARILLO/GRIS) */
+        .neon-button {
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px #fbbf24, 0 0 20px #fbbf24; 
+        }
+        .neon-button:hover {
+            box-shadow: 0 0 15px #fcd34d, 0 0 30px #fcd34d;
+            transform: scale(1.02);
+        }
+
+        /* Estilo específico para el logo del login (50% más grande) */
+        #login-logo-img {
+            width: 225px; 
+            height: auto;
+            margin: 0 auto;
+        }
+
+        /* Estilos para el mensaje de estado (Mantiene el mensaje superior para errores/éxito genérico) */
+        #message-box {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            pointer-events: none;
+        }
+        .message-success { background-color: #10b981; color: white; } 
+        .message-error { background-color: #ef4444; color: white; } 
+
+        /* Estilo para los enlaces de ayuda (pequeños y pulsables) */
+        .help-link {
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 500;
+            color: #9ca3af; /* gray-400 */
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+        .help-link:hover {
+            color: #38bdf8; /* sky-400 */
+            text-shadow: 0 0 5px rgba(56, 189, 248, 0.5); /* Sombra sutil neon azul */
         }
 
     </style>
-</head>
-<body class="min-h-screen flex flex-col">
+    </head>
+<body class="min-h-screen flex items-center justify-center bg-[#0d0d1a] text-white" style="background-image: url('FONDO.png');">
 
-    <header class="flex justify-between items-center py-4 px-8 mb-10">
-        <h1 class="text-3xl font-extrabold uppercase tracking-wider text-border-gray">
-            <span class="text-amber-400">GYM</span><span class="text-white">ENEZ</span>
-        </h1>
-        
-        <div class="flex space-x-4">
-            <a href="index.html" 
-               class="px-4 py-2 text-sm font-semibold rounded-full bg-sky-600 text-white hover:bg-sky-500 transition duration-300">
-                REGRESAR
-            </a>
-        </div>
-    </header>
-    
-    <main class="flex-grow flex items-center justify-center p-4">
-        <div class="max-w-xl w-full">
+    <div id="message-box"></div>
+
+    <div id="login-screen" class="min-h-screen w-full flex items-center justify-center p-4">
+        <div class="glass-card p-6 md:p-8 w-full max-w-sm mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-500/30">
             
-            <div class="glass-card p-8 md:p-12 rounded-2xl shadow-2xl text-center border-t-4 border-sky-400">
-                
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20 mx-auto mb-6 text-amber-400 coming-soon-icon" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.707 15.707c-.19.19-.44.293-.707.293s-.517-.103-.707-.293l-3-3c-.39-.39-.39-1.02 0-1.41s1.02-.39 1.41 0L11 15.58V7c0-.55.45-1 1-1s1 .45 1 1v8.58l1.79-1.79c.39-.39 1.02-.39 1.41 0s.39 1.02 0 1.41l-3 3z"/>
-                </svg>
+            <h2 class="text-3xl font-extrabold text-center mb-6 tracking-wider text-amber-400 uppercase">
+                Acceso Entrenadores
+            </h2>
+            
+            <div class="text-center mb-6">
+                <img id="login-logo-img"
+                     src="LOGIN_LOGO.png" 
+                     alt="Logo GYMENEZ" 
+                     class="mx-auto"
+                >
+            </div>
 
+            <form id="trainer-login-form">
+                <div class="mb-6">
+                    <label for="login-email" class="block text-sm font-medium text-white mb-2">Correo Electrónico</label>
+                    <input type="email" id="login-email" name="email" value="" placeholder="tu.correo@ejemplo.com"
+                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition duration-300 placeholder-gray-400 text-base" required>
+                </div>
+                <div class="mb-8">
+                    <label for="login-password" class="block text-sm font-medium text-white mb-2">Contraseña</label>
+                     <input type="password" id="login-password" name="password" value="" placeholder=""
+                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition duration-300 placeholder-gray-400 text-base" required>
+                </div>
 
-                <h2 class="text-3xl md:text-4xl font-extrabold mb-4 uppercase text-amber-400">
-                    Función en Desarrollo
-                </h2>
-                
-                <p class="text-lg text-gray-300 mb-6">
-                    Agradecemos tu interés. Estamos trabajando arduamente para brindarte una **experiencia de usuario excepcional** con esta nueva funcionalidad.
-                </p>
-                
-                <p class="text-lg font-semibold text-sky-400">
-                    **¡Próximamente disponible!**
-                </p>
-
+                <button type="submit" id="trainer-login-btn"
+                        class="neon-button w-full py-3 rounded-lg bg-gray-800 text-amber-400 font-bold text-lg hover:bg-gray-700 uppercase tracking-wider border-2 border-amber-400/50">
+                    INGRESAR
+                </button>
+            </form>
+            
+            <div class="flex justify-between items-center mt-4 pt-2 border-t border-gray-700/50">
+                <span id="return-to-client-login" class="help-link">
+                    &larr; Volver al Acceso General
+                </span>
+                <span id="forgot-password-link" class="help-link">
+                    Recuperar Contraseña
+                </span>
             </div>
             
         </div>
-    </main>
+    </div>
+    
+    <script>
+        // --- CONFIGURACIÓN DE SEGURIDAD Y SESIÓN (Versión Entrenadores) ---
+        const DEVICE_ID_KEY = 'gymen_trainer_device_id'; // Clave específica para entrenadores
+        let localDeviceId = localStorage.getItem(DEVICE_ID_KEY);
 
-    </body>
+        if (!localDeviceId) {
+            localDeviceId = crypto.randomUUID();
+            localStorage.setItem(DEVICE_ID_KEY, localDeviceId);
+        }
+        
+        // 🚀 URL BASE DE TU API. SIN LA BARRA FINAL (/)
+        const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
+        
+        // --- CONSTANTES PARA WHATSAPP ---
+        const WHATSAPP_NUMBER = '+584148780392';
+        const WHATSAPP_MESSAGE_RECOVERY = 'Hola quisiera solicitar la recuperación de usuario/contraseña para *Entrenadores*.';
+
+
+        // --- Variables y Utilidades Globales ---
+        const messagebox = document.getElementById('message-box');
+
+        // Función para mostrar mensajes de estado (éxito/error) EN LA PARTE SUPERIOR
+        function showMessage(message, type = 'success') {
+            messagebox.textContent = message;
+            messagebox.className = ''; 
+            messagebox.classList.add('transition-none');
+            messagebox.classList.add('message-' + type);
+            messagebox.style.opacity = '1';
+            messagebox.style.transform = 'translateX(-50%) translateY(0)';
+            
+            setTimeout(() => {
+                messagebox.style.style = '';
+                messagebox.style.opacity = '0';
+                messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
+            }, 3000);
+        }
+
+
+        /**
+         * Llama a la API REST para iniciar sesión del entrenador.
+         * *NOTA*: Se asume que habrá un endpoint /api/trainer_login en el backend.
+         */
+        async function apiTrainerLogin(email, password, deviceId) {
+            console.log(`API: Llamada a ${API_BASE_URL}/api/trainer_login para ${email}. Device ID: ${deviceId}`);
+            
+            try {
+                // *** CAMBIAR EL ENDPOINT A 'api/trainer_login' ***
+                const response = await fetch(`${API_BASE_URL}/api/trainer_login`, { 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password, deviceId })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    return { success: false, error: data.error || 'Error de conexión con la API, credenciales inválidas o no eres entrenador.' };
+                }
+
+                // Guardar la sesión del entrenador en localStorage (con una clave distinta)
+                localStorage.setItem('trainerSession', JSON.stringify(data.trainer)); 
+                return { success: true, trainer: data.trainer };
+
+            } catch (e) {
+                console.error("Error en la conexión fetch:", e);
+                return { success: false, error: 'No se pudo conectar con el servidor API REST. Verifica la URL o la política CORS.' };
+            }
+        }
+
+        /**
+         * Maneja el login del entrenador.
+         */
+        async function handleTrainerLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const btn = document.getElementById('trainer-login-btn');
+            
+            btn.disabled = true;
+            btn.textContent = 'INGRESANDO...';
+
+            // Llama a la API de login del entrenador (se asume un endpoint dedicado)
+            const response = await apiTrainerLogin(email, password, localDeviceId);
+
+            if (response.success) {
+                showMessage('¡Acceso de Entrenador exitoso!', 'success');
+                
+                // *** REDIRECCIONAR AL DASHBOARD DEL ENTRENADOR ***
+                // Se asume que tendrás una página "trainer_dashboard.html"
+                window.location.href = 'trainer_dashboard.html'; 
+
+            } else {
+                showMessage(response.error, 'error');
+            }
+            
+            btn.disabled = false;
+            btn.textContent = 'INGRESAR';
+        }
+
+
+        // FUNCIÓN PARA REDIRECCIONAR A WHATSAPP (Recuperación Entrenadores)
+        function handleForgotPassword() {
+            const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE_RECOVERY);
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\d+]/g, '')}?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
+        }
+        
+        // FUNCIÓN PARA VOLVER AL LOGIN GENERAL
+        function handleReturnToClientLogin() {
+            window.location.href = 'index.html';
+        }
+
+
+        // --- Lógica de Inicialización ---
+        window.onload = function() {
+            // Verificar si ya hay una sesión de entrenador guardada para saltar el login
+            const storedSession = localStorage.getItem('trainerSession');
+            if (storedSession) {
+                // *** REDIRECCIONAR AL DASHBOARD DEL ENTRENADOR ***
+                // Asumiendo que existe una página "trainer_dashboard.html"
+                window.location.href = 'trainer_dashboard.html'; 
+                return; // Detener la ejecución para no adjuntar listeners
+            }
+
+            // LISTENERS
+            document.getElementById('trainer-login-form').addEventListener('submit', handleTrainerLogin);
+            document.getElementById('forgot-password-link').addEventListener('click', handleForgotPassword);
+            document.getElementById('return-to-client-login').addEventListener('click', handleReturnToClientLogin);
+        };
+    </script>
+</body>
 </html>
