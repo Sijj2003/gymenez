@@ -351,14 +351,21 @@
 
     <script>
         // --- CONFIGURACIÓN DE SEGURIDAD Y SESIÓN ---
-        const localDeviceId = crypto.randomUUID();
+        // 🛠️ CORRECCIÓN CLAVE: Persistir el Device ID en localStorage
+        const DEVICE_ID_KEY = 'gymen_device_id';
+        let localDeviceId = localStorage.getItem(DEVICE_ID_KEY);
 
+        if (!localDeviceId) {
+            localDeviceId = crypto.randomUUID();
+            localStorage.setItem(DEVICE_ID_KEY, localDeviceId);
+        }
+        // Ahora localDeviceId es constante para este dispositivo/navegador.
+        
         // 🚀 URL BASE DE TU API. SIN LA BARRA FINAL (/)
         const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
 
         let CURRENT_USER_SESSION = null; 
         let sessionCheckerInterval = null; // Variable para almacenar el ID del intervalo de chequeo
-        // 🛠️ CORRECCIÓN: Variable de control para ignorar el primer chequeo de Heartbeat después del login.
         let isFirstCheckIgnored = false; 
 
         // --- CONSTANTES PARA WHATSAPP ---
@@ -370,7 +377,7 @@
          * Llama a la API REST para iniciar sesión y obtener el token/objeto de usuario.
          */
         async function apiLogin(email, password, deviceId) {
-            console.log(`API: Llamada a ${API_BASE_URL}/api/login para ${email}`);
+            console.log(`API: Llamada a ${API_BASE_URL}/api/login para ${email}. Device ID: ${deviceId}`);
             
             try {
                 const response = await fetch(`${API_BASE_URL}/api/login`, { 
@@ -560,12 +567,12 @@
             if (sessionCheckerInterval) {
                 clearInterval(sessionCheckerInterval);
             }
-            // 🛠️ CORRECCIÓN: Establecer el flag para ignorar el primer chequeo.
+            // Establecer el flag para ignorar el primer chequeo.
             isFirstCheckIgnored = true; 
             // Ejecutar el chequeo inmediatamente y luego cada 15 segundos
             checkSessionValidity(); 
             sessionCheckerInterval = setInterval(checkSessionValidity, SESSION_CHECK_INTERVAL_MS);
-            console.log(`Chequeo de sesión iniciado cada ${SESSION_CHECK_INTERVAL_MS/1000}s.`);
+            console.log(`Chequeo de sesión iniciado cada ${SESSION_CHECK_INTERVAL_MS/1000}s. Device ID: ${localDeviceId}`);
         }
 
         function stopSessionChecker() {
@@ -577,7 +584,7 @@
         }
 
         async function checkSessionValidity() {
-            // 🛠️ CORRECCIÓN: Ignorar el primer chequeo del Heartbeat después del login.
+            // Ignorar el primer chequeo del Heartbeat después del login/recarga.
             if (isFirstCheckIgnored) {
                 console.log("Heartbeat: Primer chequeo ignorado después del login exitoso.");
                 isFirstCheckIgnored = false; // Solo se ignora una vez
@@ -650,7 +657,7 @@
          * Llama a la API REST para forzar el cierre de sesión y loguear al usuario.
          */
         async function apiForceLogout(email, password, deviceId, name, dob, phone, ci) {
-            console.log(`API: Llamada a ${API_BASE_URL}/api/force_logout para forzar el cierre de sesión de ${email}`);
+            console.log(`API: Llamada a ${API_BASE_URL}/api/force_logout para forzar el cierre de sesión de ${email}. Device ID: ${deviceId}`);
             
             try {
                 // Se envía la información completa de verificación. El backend validará de forma flexible.
