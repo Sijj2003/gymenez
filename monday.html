@@ -967,11 +967,12 @@
                         loadingSpinner.classList.add('hidden');
                         noDataMessage.classList.remove('hidden');
                         
-                        // Nuevo formato profesional para la fecha y hora
+                        // Formato profesional para la fecha (sin hora)
                         const completionTime = lastCompletionDate.toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' });
-                        const unlockTime = nextUnlockDate.toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' });
+                        const unlockDate = nextUnlockDate.toLocaleDateString('es-ES', { dateStyle: 'long' }); // Solo la fecha
+                        const unlockTime = nextUnlockDate.toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' }); // Necesario para el showMessage
 
-                        // === INICIO DEL MENSAJE PROFESIONAL CORREGIDO ===
+                        // === INICIO DEL MENSAJE PROFESIONAL CORREGIDO (Solo fecha de desbloqueo, sin mensaje técnico) ===
                         noDataMessage.innerHTML = `
                             <div class="p-6 bg-gray-800 bg-opacity-70 rounded-xl shadow-2xl border-l-4 border-red-500 mx-auto max-w-sm">
                                 <h3 class="text-2xl font-bold text-red-400 mb-3 uppercase">Rutina Bloqueada</h3>
@@ -986,17 +987,13 @@
                                 
                                 <p class="text-base text-amber-400 mt-4 font-bold">
                                     Disponible nuevamente el:
-                                    <span class="text-white block text-lg">${unlockTime}</span>
-                                </p>
-                                
-                                <p class="text-xs text-gray-500 mt-5">
-                                    El sistema aplica un bloqueo de 7 días, habilitando la rutina a las 00:01 AM del día asignado.
+                                    <span class="text-white block text-lg">${unlockDate}</span>
                                 </p>
                             </div>
                         `;
                         
                         // Mensaje de notificación temporal
-                        showMessage(`Sesión ${dayName} completada. Disponible el ${unlockTime}.`, 'error');
+                        showMessage(`Sesión ${dayName} completada. Próxima disponibilidad: ${unlockTime}.`, 'error');
                         // === FIN DEL MENSAJE PROFESIONAL CORREGIDO ===
 
                         return; // 🛑 Detener la carga de la rutina
