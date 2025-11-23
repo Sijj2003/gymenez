@@ -1,281 +1,280 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GYMENEZ - Administración</title>
-    <link rel="icon" type="image/png" href="mini_logo.png">
-    <link rel="shortcut icon" type="image/png" href="mini_logo.png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        
-        /* Tema de Fondo Minimalista: Base Oscura (DEFAULT/LOGIN) */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0d0d1a;
-            /* Fondo Inicial (LOGIN) */
-            background-image: url('FONDO.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            color: #e5e7eb; 
-            /* Transición para un cambio de fondo suave */
-            transition: background-image 1s ease-in-out; 
-            
-            /* === APLICADO: Borde negro para todas las letras (Text Stroke Effect) === */
-            text-shadow: 
-                -0.5px -0.5px 0 #000,  
-                 0.5px -0.5px 0 #000,
-                -0.5px  0.5px 0 #000,
-                 0.5px  0.5px 0 #000;
-        }
-        
-        /* Estilo específico para el efecto Glassmorphism en las tarjetas */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .glass-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.6);
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GYMENEZ - Administración</title>
+    <link rel="icon" type="image/png" href="mini_logo.png">
+    <link rel="shortcut icon" type="image/png" href="mini_logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        /* Tema de Fondo Minimalista: Base Oscura (DEFAULT/LOGIN) */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0d1a;
+            /* Fondo Inicial (LOGIN) */
+            background-image: url('FONDO.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #e5e7eb; 
+            /* Transición para un cambio de fondo suave */
+            transition: background-image 1s ease-in-out; 
+            
+            /* === APLICADO: Borde negro para todas las letras (Text Stroke Effect) === */
+            text-shadow: 
+                -0.5px -0.5px 0 #000,  
+                 0.5px -0.5px 0 #000,
+                -0.5px  0.5px 0 #000,
+                 0.5px  0.5px 0 #000;
+        }
+        
+        /* Estilo específico para el efecto Glassmorphism en las tarjetas */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.6);
+        }
 
-        /* Estilo para el botón con efecto NEON (AMARILLO/GRIS) */
-        .neon-button {
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px #fbbf24, 0 0 20px #fbbf24; 
-        }
-        .neon-button:hover {
-            box-shadow: 0 0 15px #fcd34d, 0 0 30px #fcd34d;
-            transform: scale(1.02);
-        }
+        /* Estilo para el botón con efecto NEON (AMARILLO/GRIS) */
+        .neon-button {
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px #fbbf24, 0 0 20px #fbbf24; 
+        }
+        .neon-button:hover {
+            box-shadow: 0 0 15px #fcd34d, 0 0 30px #fcd34d;
+            transform: scale(1.02);
+        }
 
-        /* Estilo específico para el logo del login (50% más grande) */
-        #login-logo-img {
-            width: 225px; 
-            height: auto;
-            margin: 0 auto;
-        }
+        /* Estilo específico para el logo del login (50% más grande) */
+        #login-logo-img {
+            width: 225px; 
+            height: auto;
+            margin: 0 auto;
+        }
 
-        /* Estilos para el mensaje de estado */
-        #message-box {
-            position: fixed;
-            top: 1rem;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 1rem 1.5rem;
-            border-radius: 0.75rem;
-            font-weight: 600;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-            pointer-events: none;
-        }
-        .message-success { background-color: #10b981; color: white; } 
-        .message-error { background-color: #ef4444; color: white; } 
+        /* Estilos para el mensaje de estado */
+        #message-box {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            pointer-events: none;
+        }
+        .message-success { background-color: #10b981; color: white; } 
+        .message-error { background-color: #ef4444; color: white; } 
 
-        /* Estilo para los enlaces de ayuda (pequeños y pulsables) */
-        .help-link {
-            font-size: 0.875rem; /* text-sm */
-            font-weight: 500;
-            color: #9ca3af; /* gray-400 */
-            transition: color 0.3s ease;
-            cursor: pointer;
-        }
-        .help-link:hover {
-            color: #38bdf8; /* sky-400 */
-            text-shadow: 0 0 5px rgba(56, 189, 248, 0.5); /* Sombra sutil neon azul */
-        }
+        /* Estilo para los enlaces de ayuda (pequeños y pulsables) */
+        .help-link {
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 500;
+            color: #9ca3af; /* gray-400 */
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+        .help-link:hover {
+            color: #38bdf8; /* sky-400 */
+            text-shadow: 0 0 5px rgba(56, 189, 248, 0.5); /* Sombra sutil neon azul */
+        }
 
-    </style>
-    </head>
+    </style>
+    </head>
 <body class="min-h-screen flex items-center justify-center bg-[#0d0d1a] text-white" style="background-image: url('FONDO.png');">
 
-    <div id="message-box"></div>
+    <div id="message-box"></div>
 
-    <div id="login-screen" class="min-h-screen w-full flex items-center justify-center p-4">
-        <div class="glass-card p-6 md:p-8 w-full max-w-sm mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-500/30">
-            
-            <h2 class="text-3xl font-extrabold text-center mb-6 tracking-wider text-sky-400 uppercase">
-                Acceso Administrador
-            </h2>
-            
-            <div class="text-center mb-6">
-                <img id="login-logo-img"
-                     src="LOGIN_LOGO.png" 
-                     alt="Logo GYMENEZ" 
-                     class="mx-auto"
-                >
-            </div>
+    <div id="login-screen" class="min-h-screen w-full flex items-center justify-center p-4">
+        <div class="glass-card p-6 md:p-8 w-full max-w-sm mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-500/30">
+            
+            <h2 class="text-3xl font-extrabold text-center mb-6 tracking-wider text-sky-400 uppercase">
+                Acceso Administrador
+            </h2>
+            
+            <div class="text-center mb-6">
+                <img id="login-logo-img"
+                     src="LOGIN_LOGO.png" 
+                     alt="Logo GYMENEZ" 
+                     class="mx-auto"
+                >
+            </div>
 
-            <form id="admin-login-form">
-                <div class="mb-6">
-                    <label for="login-email" class="block text-sm font-medium text-white mb-2">Correo Electrónico</label>
-                    <input type="email" id="login-email" name="email" value="" placeholder="admin.correo@gymen.com"
-                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition duration-300 placeholder-gray-400 text-base" required>
-                </div>
-                <div class="mb-8">
-                    <label for="login-password" class="block text-sm font-medium text-white mb-2">Contraseña</label>
-                     <input type="password" id="login-password" name="password" value="" placeholder=""
-                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition duration-300 placeholder-gray-400 text-base" required>
-                </div>
+            <form id="admin-login-form">
+                <div class="mb-6">
+                    <label for="login-email" class="block text-sm font-medium text-white mb-2">Correo Electrónico</label>
+                    <input type="email" id="login-email" name="email" value="" placeholder="admin.correo@gymen.com"
+                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition duration-300 placeholder-gray-400 text-base" required>
+                </div>
+                <div class="mb-8">
+                    <label for="login-password" class="block text-sm font-medium text-white mb-2">Contraseña</label>
+                     <input type="password" id="login-password" name="password" value="" placeholder=""
+                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition duration-300 placeholder-gray-400 text-base" required>
+                </div>
 
-                <button type="submit" id="admin-login-btn"
-                        class="neon-button w-full py-3 rounded-lg bg-gray-800 text-sky-400 font-bold text-lg hover:bg-gray-700 uppercase tracking-wider border-2 border-sky-400/50">
-                    INGRESAR
-                </button>
-            </form>
-            
-            <div class="flex justify-between items-center mt-4 pt-2 border-t border-gray-700/50">
-                <span id="return-to-client-login" class="help-link">
-                    &larr; Volver al Acceso General
-                </span>
-                <span id="forgot-password-link" class="help-link">
-                    Recuperar Contraseña
-                </span>
-            </div>
-            
-        </div>
-    </div>
-    
-    <script>
-        // --- CONFIGURACIÓN DE SEGURIDAD Y SESIÓN ---
-        const DEVICE_ID_KEY = 'gymen_admin_device_id'; // Clave específica para Administradores
-        let localDeviceId = localStorage.getItem(DEVICE_ID_KEY);
+                <button type="submit" id="admin-login-btn"
+                        class="neon-button w-full py-3 rounded-lg bg-gray-800 text-sky-400 font-bold text-lg hover:bg-gray-700 uppercase tracking-wider border-2 border-sky-400/50">
+                    INGRESAR
+                </button>
+            </form>
+            
+            <div class="flex justify-between items-center mt-4 pt-2 border-t border-gray-700/50">
+                <span id="return-to-client-login" class="help-link">
+                    &larr; Volver al Acceso General
+                </span>
+                <span id="forgot-password-link" class="help-link">
+                    Recuperar Contraseña
+                </span>
+            </div>
+            
+        </div>
+    </div>
+    
+    <script>
+        // --- CONFIGURACIÓN DE SEGURIDAD Y SESIÓN ---
+        const DEVICE_ID_KEY = 'gymen_admin_device_id'; // Clave específica para Administradores
+        let localDeviceId = localStorage.getItem(DEVICE_ID_KEY);
 
-        if (!localDeviceId) {
-            localDeviceId = crypto.randomUUID();
-            localStorage.setItem(DEVICE_ID_KEY, localDeviceId);
-        }
-        
-        // 🚀 URL BASE DE TU API. SIN LA BARRA FINAL (/)
-        const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
-        
-        // --- CONSTANTES PARA WHATSAPP ---
-        const WHATSAPP_NUMBER = '+584148780392';
-        const WHATSAPP_MESSAGE_RECOVERY = 'Hola quisiera solicitar la recuperación de usuario/contraseña para *Administradores*.';
-
-
-        // --- Variables y Utilidades Globales ---
-        const messagebox = document.getElementById('message-box');
-
-        // Función para mostrar mensajes de estado (éxito/error) EN LA PARTE SUPERIOR
-        function showMessage(message, type = 'success') {
-            messagebox.textContent = message;
-            messagebox.className = ''; 
-            messagebox.classList.add('transition-none');
-            messagebox.classList.add('message-' + type);
-            messagebox.style.opacity = '1';
-            messagebox.style.transform = 'translateX(-50%) translateY(0)';
-            
-            setTimeout(() => {
-                messagebox.style.style = '';
-                messagebox.style.opacity = '0';
-                messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
-            }, 3000);
-        }
+        if (!localDeviceId) {
+            localDeviceId = crypto.randomUUID();
+            localStorage.setItem(DEVICE_ID_KEY, localDeviceId);
+        }
+        
+        // 🚀 URL BASE DE TU API. SIN LA BARRA FINAL (/)
+        const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
+        
+        // --- CONSTANTES PARA WHATSAPP ---
+        const WHATSAPP_NUMBER = '+584148780392';
+        const WHATSAPP_MESSAGE_RECOVERY = 'Hola quisiera solicitar la recuperación de usuario/contraseña para *Administradores*.';
 
 
-        /**
-         * Llama a la API REST para iniciar sesión del administrador.
-         * *NOTA*: Se asume que habrá un endpoint /api/admin_login en el backend.
-         */
-        async function apiAdminLogin(email, password, deviceId) {
-            // *** ESTA LÍNEA FUE MODIFICADA: Ahora apunta a '/api/admin/login' ***
-            console.log(`API: Llamada a ${API_BASE_URL}/api/admin/login para ${email}. Device ID: ${deviceId}`);
-            
-            try {
-                // *** CAMBIAR EL ENDPOINT A 'api/admin/login' para coincidir con el servidor ***
-                const response = await fetch(`${API_BASE_URL}/api/admin/login`, { 
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password, deviceId })
-                });
+        // --- Variables y Utilidades Globales ---
+        const messagebox = document.getElementById('message-box');
 
-                const data = await response.json();
-
-                if (!response.ok || !data.success) {
-                    return { success: false, error: data.error || 'Error de conexión con la API, credenciales inválidas o no eres administrador.' };
-                }
-
-                // Guardar la sesión del administrador en localStorage (con una clave distinta)
-                localStorage.setItem('adminSession', JSON.stringify(data.admin)); 
-                return { success: true, admin: data.admin };
-
-            } catch (e) {
-                console.error("Error en la conexión fetch:", e);
-                return { success: false, error: 'No se pudo conectar con el servidor API REST. Verifica la URL o la política CORS.' };
-            }
-        }
-
-        /**
-         * Maneja el login del administrador.
-         */
-        async function handleAdminLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            const btn = document.getElementById('admin-login-btn');
-            
-            btn.disabled = true;
-            btn.textContent = 'INGRESANDO...';
-
-            // Llama a la API de login del administrador (se asume un endpoint dedicado)
-            const response = await apiAdminLogin(email, password, localDeviceId);
-
-            if (response.success) {
-                showMessage('¡Acceso de Administrador exitoso!', 'success');
-                
-                // *** REDIRECCIONAR AL DASHBOARD DEL ADMINISTRADOR ***
-                // Se asume que tendrás una página "admin_dashboard.html"
-                window.location.href = 'admin_dashboard.html'; 
-
-            } else {
-                showMessage(response.error, 'error');
-            }
-            
-            btn.disabled = false;
-            btn.textContent = 'INGRESAR';
-        }
+        // Función para mostrar mensajes de estado (éxito/error) EN LA PARTE SUPERIOR
+        function showMessage(message, type = 'success') {
+            messagebox.textContent = message;
+            messagebox.className = ''; 
+            messagebox.classList.add('transition-none');
+            messagebox.classList.add('message-' + type);
+            messagebox.style.opacity = '1';
+            messagebox.style.transform = 'translateX(-50%) translateY(0)';
+            
+            setTimeout(() => {
+                messagebox.style.style = '';
+                messagebox.style.opacity = '0';
+                messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
+            }, 3000);
+        }
 
 
-        // FUNCIÓN PARA REDIRECCIONAR A WHATSAPP (Recuperación Administradores)
-        function handleForgotPassword() {
-            const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE_RECOVERY);
-            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\d+]/g, '')}?text=${encodedMessage}`;
-            window.open(whatsappUrl, '_blank');
-        }
-        
-        // FUNCIÓN PARA VOLVER AL LOGIN GENERAL
-        function handleReturnToClientLogin() {
-            window.location.href = 'index.html';
-        }
+        /**
+         * Llama a la API REST para iniciar sesión del administrador.
+         * *NOTA*: Se asume que habrá un endpoint /api/admin_login en el backend.
+         */
+        async function apiAdminLogin(email, password, deviceId) {
+            console.log(`API: Llamada a ${API_BASE_URL}/api/admin_login para ${email}. Device ID: ${deviceId}`);
+            
+            try {
+                // *** CAMBIAR EL ENDPOINT A 'api/admin_login' ***
+                const response = await fetch(`${API_BASE_URL}/api/admin_login`, { 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password, deviceId })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    return { success: false, error: data.error || 'Error de conexión con la API, credenciales inválidas o no eres administrador.' };
+                }
+
+                // Guardar la sesión del administrador en localStorage (con una clave distinta)
+                localStorage.setItem('adminSession', JSON.stringify(data.admin)); 
+                return { success: true, admin: data.admin };
+
+            } catch (e) {
+                console.error("Error en la conexión fetch:", e);
+                return { success: false, error: 'No se pudo conectar con el servidor API REST. Verifica la URL o la política CORS.' };
+            }
+        }
+
+        /**
+         * Maneja el login del administrador.
+         */
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const btn = document.getElementById('admin-login-btn');
+            
+            btn.disabled = true;
+            btn.textContent = 'INGRESANDO...';
+
+            // Llama a la API de login del administrador (se asume un endpoint dedicado)
+            const response = await apiAdminLogin(email, password, localDeviceId);
+
+            if (response.success) {
+                showMessage('¡Acceso de Administrador exitoso!', 'success');
+                
+                // *** REDIRECCIONAR AL DASHBOARD DEL ADMINISTRADOR ***
+                // Se asume que tendrás una página "admin_dashboard.html"
+                window.location.href = 'admin_dashboard.html'; 
+
+            } else {
+                showMessage(response.error, 'error');
+            }
+            
+            btn.disabled = false;
+            btn.textContent = 'INGRESAR';
+        }
 
 
-        // --- Lógica de Inicialización ---
-        window.onload = function() {
-            // Verificar si ya hay una sesión de administrador guardada para saltar el login
-            const storedSession = localStorage.getItem('adminSession');
-            if (storedSession) {
-                // *** REDIRECCIONAR AL DASHBOARD DEL ADMINISTRADOR ***
-                // Asumiendo que existe una página "admin_dashboard.html"
-                window.location.href = 'admin_dashboard.html'; 
-                return; // Detener la ejecución para no adjuntar listeners
-            }
+        // FUNCIÓN PARA REDIRECCIONAR A WHATSAPP (Recuperación Administradores)
+        function handleForgotPassword() {
+            const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE_RECOVERY);
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\d+]/g, '')}?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
+        }
+        
+        // FUNCIÓN PARA VOLVER AL LOGIN GENERAL
+        function handleReturnToClientLogin() {
+            window.location.href = 'index.html';
+        }
 
-            // LISTENERS
-            document.getElementById('admin-login-form').addEventListener('submit', handleAdminLogin);
-            document.getElementById('forgot-password-link').addEventListener('click', handleForgotPassword);
-            document.getElementById('return-to-client-login').addEventListener('click', handleReturnToClientLogin);
-        };
-    </script>
+
+        // --- Lógica de Inicialización ---
+        window.onload = function() {
+            // Verificar si ya hay una sesión de administrador guardada para saltar el login
+            const storedSession = localStorage.getItem('adminSession');
+            if (storedSession) {
+                // *** REDIRECCIONAR AL DASHBOARD DEL ADMINISTRADOR ***
+                // Asumiendo que existe una página "admin_dashboard.html"
+                window.location.href = 'admin_dashboard.html'; 
+                return; // Detener la ejecución para no adjuntar listeners
+            }
+
+            // LISTENERS
+            document.getElementById('admin-login-form').addEventListener('submit', handleAdminLogin);
+            document.getElementById('forgot-password-link').addEventListener('click', handleForgotPassword);
+            document.getElementById('return-to-client-login').addEventListener('click', handleReturnToClientLogin);
+        };
+    </script>
 </body>
 </html>
