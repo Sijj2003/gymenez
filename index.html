@@ -195,7 +195,71 @@
                 </span>
             </div>
             
+        </div>
+    </div>
+    
+    <div id="active-session-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[1000]">
+        <div class="glass-card p-6 md:p-8 w-full max-w-lg mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-500/30 text-center">
+            <svg class="w-16 h-16 mx-auto mb-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+            <h3 class="text-xl md:text-2xl font-bold mb-4 text-amber-400">Sesión Activa Detectada</h3>
+            <p class="text-white mb-6">Parece que ya hay una sesión iniciada con este usuario en otro dispositivo.</p>
+            
+            <div id="modal-options">
+                <p class="text-lg font-semibold mb-6">¿Deseas cerrarla y continuar aquí?</p>
+                <div class="flex justify-center space-x-4">
+                    <button id="modal-cancel-btn" 
+                            class="px-6 py-3 rounded-lg bg-red-600 text-white font-bold hover:bg-red-700 transition duration-300">
+                        No, Cancelar
+                    </button>
+                    <button id="modal-confirm-btn" 
+                            class="px-6 py-3 rounded-lg bg-amber-600 text-white font-bold hover:bg-amber-700 transition duration-300">
+                        Sí, Cerrar Sesión
+                    </button>
+                </div>
             </div>
+
+            <form id="force-logout-form" class="hidden mt-6 text-left">
+                <p class="text-sm text-gray-400 mb-4">Para confirmar el cierre, verifica tu identidad con los siguientes datos:</p>
+                
+                <div class="mb-4">
+                    <label for="force-email" class="block text-sm font-medium text-white mb-2">Email Asociado</label>
+                    <input type="email" id="force-email" name="email" placeholder="tu.correo@ejemplo.com"
+                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 transition" required>
+                </div>
+                <div class="mb-4">
+                    <label for="force-name" class="block text-sm font-medium text-white mb-2">Primer Nombre</label>
+                    <input type="text" id="force-name" name="name" placeholder="Tu primer nombre"
+                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 transition" required>
+                </div>
+                <div class="mb-4">
+                    <label for="force-dob" class="block text-sm font-medium text-white mb-2">Fecha de Nacimiento (dd/mm/yyyy)</label>
+                    <input type="text" id="force-dob" name="dob" placeholder="01/01/1990"
+                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 transition" required>
+                </div>
+                 <div class="mb-4">
+                    <label for="force-phone" class="block text-sm font-medium text-white mb-2">Teléfono (ej: 04149283757)</label>
+                    <input type="text" id="force-phone" name="phone" placeholder="0414..."
+                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 transition" required>
+                </div>
+                 <div class="mb-6">
+                    <label for="force-ci" class="block text-sm font-medium text-white mb-2">Cédula de Identidad (ej: 10584737)</label>
+                    <input type="text" id="force-ci" name="ci" placeholder="CI sin puntos ni guiones"
+                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 transition" required>
+                </div>
+
+                <button type="submit" id="force-logout-btn"
+                        class="neon-button w-full py-3 rounded-lg bg-gray-800 text-amber-400 font-bold text-lg hover:bg-gray-700 uppercase tracking-wider border-2 border-amber-400/50">
+                    Cerrar Sesión Activa
+                </button>
+                <button type="button" id="force-logout-cancel"
+                        class="mt-3 w-full py-3 rounded-lg bg-gray-600 text-white font-bold hover:bg-gray-700 transition duration-300">
+                    Cancelar
+                </button>
+            </form>
+
+        </div>
     </div>
 
 
@@ -439,12 +503,50 @@
                 navigateTo('login-screen'); 
             }, 1000); 
         }
+        
+        /**
+         * Llama a la API REST para forzar el cierre de sesión y loguear al usuario.
+         * (NUEVA FUNCIÓN)
+         */
+        async function apiForceLogout(email, password, deviceId, name, dob, phone, ci) {
+            console.log(`API: Llamada a ${API_BASE_URL}/api/force_logout para forzar el cierre de sesión de ${email}`);
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/force_logout`, { 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password, deviceId, name, dob, phone, ci })
+                });
 
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    return { success: false, error: data.error || 'Error al intentar forzar el cierre de sesión.' };
+                }
+
+                // La API devuelve el objeto de usuario si la verificación fue exitosa.
+                CURRENT_USER_SESSION = data.user;
+                localStorage.setItem('userSession', JSON.stringify(data.user)); 
+                return { success: true, user: data.user };
+
+            } catch (e) {
+                console.error("Error en la conexión fetch para force_logout:", e);
+                return { success: false, error: 'No se pudo conectar con el servidor API REST para forzar el cierre.' };
+            }
+        }
+
+        /**
+         * Maneja el login, incluyendo la nueva lógica de sesión activa.
+         * (FUNCIÓN MODIFICADA)
+         */
         async function handleLogin(e) {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             const btn = document.getElementById('login-btn');
+            const modal = document.getElementById('active-session-modal'); // Referencia al modal
             
             btn.disabled = true;
             btn.textContent = 'VERIFICANDO SESIÓN...';
@@ -454,6 +556,16 @@
             if (response.success) {
                 showMessage('¡Inicio de sesión exitoso!', 'success');
                 navigateTo('dashboard-screen');
+                modal.classList.add('hidden'); // Ocultar por si estaba abierto
+            } else if (response.error && response.error.includes('Ya hay una sesión activa')) {
+                // 🚨 NUEVA LÓGICA: MOSTRAR MODAL DE SESIÓN ACTIVA 🚨
+                modal.classList.remove('hidden');
+                showMessage('Sesión activa detectada.', 'error');
+                
+                // Ocultar formulario de verificación y mostrar opciones
+                document.getElementById('force-logout-form').classList.add('hidden');
+                document.getElementById('modal-options').classList.remove('hidden');
+
             } else {
                 showMessage(response.error, 'error');
             }
@@ -461,6 +573,43 @@
             btn.disabled = false;
             btn.textContent = 'INGRESAR';
         }
+        
+        /**
+         * Maneja el envío del formulario de verificación para cerrar forzadamente la sesión.
+         * (NUEVA FUNCIÓN)
+         */
+        async function handleForceLogout(e) {
+            e.preventDefault();
+            const email = document.getElementById('force-email').value;
+            const password = document.getElementById('login-password').value; // Usar la contraseña del login
+            const name = document.getElementById('force-name').value;
+            const dob = document.getElementById('force-dob').value;
+            const phone = document.getElementById('force-phone').value;
+            const ci = document.getElementById('force-ci').value;
+
+            const btn = document.getElementById('force-logout-btn');
+            const modal = document.getElementById('active-session-modal');
+
+            btn.disabled = true;
+            btn.textContent = 'VERIFICANDO DATOS...';
+
+            // Llamar al nuevo endpoint
+            const response = await apiForceLogout(email, password, localDeviceId, name, dob, phone, ci);
+
+            if (response.success) {
+                showMessage('¡Sesión activa cerrada y nuevo inicio exitoso!', 'success');
+                modal.classList.add('hidden');
+                navigateTo('dashboard-screen');
+            } else {
+                showMessage(response.error, 'error');
+                // Opcional: limpiar el formulario si falla
+                // document.getElementById('force-logout-form').reset();
+            }
+            
+            btn.disabled = false;
+            btn.textContent = 'Cerrar Sesión Activa';
+        }
+
 
         async function handleLogout() {
             const btn = document.getElementById('logout-button');
@@ -514,6 +663,35 @@
             // LISTENERS PARA LOS NUEVOS ENLACES
             document.getElementById('register-request-link').addEventListener('click', handleRegisterRequest); 
             document.getElementById('forgot-password-link').addEventListener('click', handleForgotPassword);
+            
+            // --- LISTENERS PARA EL MODAL DE SESIÓN ACTIVA (NUEVOS) ---
+            const modal = document.getElementById('active-session-modal');
+            const form = document.getElementById('force-logout-form');
+            const options = document.getElementById('modal-options');
+            const loginEmailInput = document.getElementById('login-email');
+            
+            // Botón 'No, Cancelar' (Cierra la modal y vuelve al login normal)
+            document.getElementById('modal-cancel-btn').addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+            
+            // Botón 'Sí, Cerrar Sesión' (Muestra el formulario de verificación)
+            document.getElementById('modal-confirm-btn').addEventListener('click', () => {
+                options.classList.add('hidden');
+                form.classList.remove('hidden');
+                
+                // Precargar email para conveniencia
+                document.getElementById('force-email').value = loginEmailInput.value;
+            });
+            
+            // Botón 'Cancelar' del formulario (Vuelve a las opciones de la modal)
+            document.getElementById('force-logout-cancel').addEventListener('click', () => {
+                form.classList.add('hidden');
+                options.classList.remove('hidden');
+            });
+
+            // Listener para el envío del formulario de cierre forzado
+            form.addEventListener('submit', handleForceLogout);
         };
     </script>
 </body>
