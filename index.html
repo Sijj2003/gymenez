@@ -6,6 +6,7 @@
     <title>GYMENEZ</title>
     <link rel="icon" type="image/png" href="mini_logo.png">
     <link rel="shortcut icon" type="image/png" href="mini_logo.png">
+    <!-- ATENCIÓN: Esta librería cdn.tailwindcss.com no debe usarse en producción. -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -198,7 +199,9 @@
         </div>
     </div>
     
+    <!-- Modal para Sesión Activa (Aparece sobrepuesta en caso de error 403) -->
     <div id="active-session-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[1000]">
+        <!-- CORRECCIÓN: max-h-[90vh] y overflow-y-auto para el scroll interno -->
         <div class="glass-card p-6 md:p-8 w-full max-w-lg mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-500/30 text-center max-h-[90vh] overflow-y-auto">
             <svg class="w-16 h-16 mx-auto mb-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
@@ -220,11 +223,14 @@
                 </div>
             </div>
 
+            <!-- Formulario de Verificación (Inicialmente oculto) -->
             <form id="force-logout-form" class="hidden mt-6 text-left">
                 <p class="text-sm text-gray-400 mb-4">Para confirmar el cierre, verifica tu identidad con los siguientes datos:</p>
                 
+                <!-- Mensaje de error local dentro del formulario -->
                 <div id="force-logout-message" class="hidden p-3 mb-4 rounded-lg bg-red-800/70 text-sm text-red-100 font-semibold text-center">
-                    </div>
+                    <!-- Mensaje de error de validación incorrecta -->
+                </div>
 
                 <div class="mb-4">
                     <label for="force-email" class="block text-sm font-medium text-white mb-2">Email Asociado</label>
@@ -238,6 +244,7 @@
                 </div>
                 <div class="mb-4">
                     <label for="force-dob" class="block text-sm font-medium text-white mb-2">Fecha de Nacimiento (dd/mm/yyyy)</label>
+                    <!-- Campo con la corrección de formato. -->
                     <input type="text" id="force-dob" name="dob" placeholder="01/01/1990" maxlength="10"
                            class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 transition" required>
                 </div>
@@ -357,6 +364,7 @@
         const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
 
         let CURRENT_USER_SESSION = null; 
+        let sessionCheckerInterval = null; // Variable para almacenar el ID del intervalo de chequeo
 
         // --- CONSTANTES PARA WHATSAPP ---
         const WHATSAPP_NUMBER = '+584148780392';
@@ -433,6 +441,36 @@
             }
         }
         
+        /**
+         * NUEVO: Llama a la API para verificar si el deviceId actual sigue siendo el activo.
+         */
+        async function apiVerifySession(userId, deviceId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/verify_session`, { 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ userId, deviceId })
+                });
+
+                const data = await response.json();
+                
+                // Si la respuesta no es 200/ok o success es false, la sesión es inválida
+                // Nota: El backend devolverá 403 si la sesión fue sobrescrita.
+                if (response.status === 403 || !data.success) {
+                    return { isValid: false, message: data.error || 'Sesión invalidada remotamente.' };
+                }
+                
+                return { isValid: true };
+
+            } catch (e) {
+                console.warn("API: Falló el chequeo de sesión (posiblemente servidor offline).", e);
+                // Si falla la conexión, por precaución, asumimos que sigue válida para no desconectar
+                return { isValid: true }; 
+            }
+        }
+
         // Función simplificada, ya que no se necesita la data de rutinas para el dashboard.
         async function loadDashboardData() {
             if (!CURRENT_USER_SESSION) return;
@@ -495,7 +533,7 @@
                     targetScreen.style.opacity = '1';
                 });
                 
-                // Lógica para cambiar el fondo al entrar/salir del Dashboard (con transición)
+                // Lógica para cambiar el fondo y manejar el chequeo de sesión
                 if (targetId === 'dashboard-screen') {
                     body.classList.add('dashboard-background');
                     const storedSession = localStorage.getItem('userSession');
@@ -505,12 +543,70 @@
 
                     if (CURRENT_USER_SESSION) {
                         loadDashboardData(); 
+                        // Iniciar el chequeo periódico de sesión al entrar en el dashboard
+                        startSessionChecker(); 
                     }
                 } else {
                     body.classList.remove('dashboard-background');
+                    // Detener el chequeo de sesión al salir del dashboard
+                    stopSessionChecker(); 
                 }
             }
         }
+        
+        // ===============================================
+        // LÓGICA DE CIERRE DE SESIÓN FORZADO (Heartbeat)
+        // ===============================================
+        
+        // Intervalo de chequeo de sesión (15 segundos)
+        const SESSION_CHECK_INTERVAL_MS = 15000; 
+
+        function startSessionChecker() {
+            if (sessionCheckerInterval) {
+                clearInterval(sessionCheckerInterval);
+            }
+            // Ejecutar el chequeo inmediatamente y luego cada 15 segundos
+            checkSessionValidity(); 
+            sessionCheckerInterval = setInterval(checkSessionValidity, SESSION_CHECK_INTERVAL_MS);
+            console.log(`Chequeo de sesión iniciado cada ${SESSION_CHECK_INTERVAL_MS/1000}s.`);
+        }
+
+        function stopSessionChecker() {
+            if (sessionCheckerInterval) {
+                clearInterval(sessionCheckerInterval);
+                sessionCheckerInterval = null;
+                console.log("Chequeo de sesión detenido.");
+            }
+        }
+
+        async function checkSessionValidity() {
+            if (!CURRENT_USER_SESSION) {
+                // Si no hay sesión local (ej. usuario cerró ventana), no hay nada que verificar. 
+                // Detener el chequeo y asegurar que está en login.
+                stopSessionChecker(); 
+                // Solo si no estamos ya en login, redirigir
+                if (!document.getElementById('login-screen').classList.contains('hidden')) return;
+                navigateTo('login-screen'); 
+                return;
+            }
+
+            const userId = CURRENT_USER_SESSION._id || CURRENT_USER_SESSION.id;
+            
+            // Llama a la API para ver si nuestro deviceId es el activo
+            const verification = await apiVerifySession(userId, localDeviceId);
+
+            if (!verification.isValid) {
+                console.warn("Sesión Invalidada: Cerrada desde otro dispositivo.");
+                // Ejecutar el logout local (limpiar storage y variables)
+                await apiLogout(); 
+                
+                stopSessionChecker(); // Detener el chequeo
+                navigateTo('login-screen'); // Volver a la pantalla de login
+                showMessage('Tu sesión fue cerrada en este dispositivo, ya que iniciaste en otro.', 'error');
+            }
+        }
+
+        // ===============================================
 
         // Función para manejar la transición del splash
         function transitionToLogin() {
@@ -564,6 +660,7 @@
 
                 const data = await response.json();
 
+                // El backend usa 403 para 'datos no coinciden' o 401 para 'contraseña incorrecta'
                 if (!response.ok || !data.success) {
                     return { success: false, error: data.error || 'Error al intentar forzar el cierre de sesión.' };
                 }
@@ -643,8 +740,8 @@
                 modal.classList.add('hidden');
                 navigateTo('dashboard-screen');
             } else {
-                // Corrección: Mensaje simplificado y visible localmente
-                showForceLogoutMessage('Verificación fallida: Algún dato personal introducido es incorrecto.', 'error');
+                // Mensaje simplificado y visible localmente
+                showForceLogoutMessage('Verificación fallida: Los datos introducidos son incorrectos o la contraseña es inválida.', 'error');
             }
             
             btn.disabled = false;
@@ -658,6 +755,8 @@
             
             btn.disabled = true;
             btn.textContent = 'Cerrando...';
+            
+            stopSessionChecker(); // Detener el chequeo al cerrar sesión
 
             await apiLogout(); // La función apiLogout maneja la limpieza local y remota
             
@@ -727,7 +826,7 @@
                 document.getElementById('force-email').value = loginEmailInput.value;
             });
             
-            // CORRECCIÓN APLICADA: Botón 'Cancelar' del formulario (Cierra la modal y devuelve al login)
+            // Botón 'Cancelar' del formulario (Cierra la modal y devuelve al login)
             document.getElementById('force-logout-cancel').addEventListener('click', () => {
                 modal.classList.add('hidden');
                 showForceLogoutMessage('');
