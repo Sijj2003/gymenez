@@ -90,7 +90,7 @@
         }
         /* ======================================= */
 
-        /* Estilos para el mensaje de estado */
+        /* Estilos para el mensaje de estado (Mantiene el mensaje superior para errores/éxito genérico) */
         #message-box {
             position: fixed;
             top: 1rem;
@@ -262,6 +262,17 @@
                 </button>
             </form>
 
+        </div>
+    </div>
+    
+    <div id="temp-message-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[2000] transition-opacity duration-500 opacity-0">
+        <div class="glass-card p-6 md:p-8 w-full max-w-md mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-500/30 text-center transform scale-90 transition-transform duration-500">
+            <svg class="w-16 h-16 mx-auto mb-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 id="temp-message-text" class="text-xl md:text-2xl font-bold mb-0 text-white">
+                Proceso completado. La sesión anterior ha sido cerrada exitosamente. Por favor, inicie sesión nuevamente para acceder.
+            </h3>
         </div>
     </div>
 
@@ -486,7 +497,7 @@
         const messagebox = document.getElementById('message-box');
         const body = document.body;
 
-        // Función para mostrar mensajes de estado (éxito/error)
+        // Función para mostrar mensajes de estado (éxito/error) EN LA PARTE SUPERIOR
         function showMessage(message, type = 'success') {
             messagebox.textContent = message;
             messagebox.className = ''; 
@@ -502,6 +513,37 @@
             }, 3000);
         }
         
+        /**
+         * 🚀 NUEVA FUNCIÓN: Muestra un mensaje flotante centrado para notificaciones críticas.
+         * Lo usamos para el éxito del cierre de sesión forzado.
+         */
+        function showCenteredMessage(message, durationMs) {
+            const modal = document.getElementById('temp-message-modal');
+            const textElement = document.getElementById('temp-message-text');
+
+            textElement.textContent = message;
+            modal.classList.remove('hidden');
+            
+            // Forzar reflow para aplicar transición
+            void modal.offsetWidth; 
+            
+            // Animación de entrada
+            modal.style.opacity = '1';
+            modal.querySelector('.glass-card').style.transform = 'scale(1)';
+
+            // Animación de salida después de la duración
+            setTimeout(() => {
+                modal.style.opacity = '0';
+                modal.querySelector('.glass-card').style.transform = 'scale(0.9)';
+                
+                // Ocultar modal completamente después de la transición
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 500); 
+            }, durationMs);
+        }
+
+
         /**
          * Muestra un mensaje de error dentro del formulario de cierre forzado.
          */
@@ -726,6 +768,7 @@
         
         /**
          * Maneja el envío del formulario de verificación para cerrar forzadamente la sesión.
+         * 🚨 ACTUALIZADO: Usa la nueva ventana flotante y el nuevo mensaje profesional.
          */
         async function handleForceLogout(e) {
             e.preventDefault();
@@ -748,20 +791,20 @@
 
             if (response.success) {
                 // El servidor ya actualizó activeSessionId al nuevo deviceId.
-                const delayMs = 7000;
+                const delayMs = 7000; // Mantenemos el retraso de 7 segundos para la estabilidad
                 
                 // 1. Ocultar el modal de verificación.
                 modal.classList.add('hidden');
                 
-                // 2. Mostrar mensaje profesional con el tiempo de espera.
-                showMessage(`Proceso de cierre de sesión completado. La sesión anterior ha sido invalidada. Por favor, espere ${delayMs/1000} segundos para iniciar sesión en este dispositivo.`, 'success');
+                // 2. Mostrar mensaje profesional en el centro de la pantalla (Ventana Flotante).
+                const successMessage = `Proceso completado. La sesión anterior ha sido cerrada exitosamente. Por favor, inicie sesión nuevamente para acceder.`;
+                showCenteredMessage(successMessage, delayMs); // Mostrar mensaje por toda la duración de la espera
 
                 // 3. LIMPIEZA INMEDIATA: Deshacer el inicio de sesión automático.
-                // Esto es crucial para forzar el login manual.
                 localStorage.removeItem('userSession');
                 CURRENT_USER_SESSION = null; 
                 
-                // 4. Esperar y navegar de vuelta al login.
+                // 4. Esperar el tiempo de sincronización y navegar de vuelta al login.
                 setTimeout(() => {
                     // Navegar de vuelta a la pantalla de login (donde el usuario hará el login manual)
                     navigateTo('login-screen');
