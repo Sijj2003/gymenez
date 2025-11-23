@@ -1,108 +1,721 @@
-# ====================================================================
-# ENDPOINT: CIERRE FORZADO DE SESIÓN (Final y Corregido)
-# ====================================================================
-
-@app.route('/api/force_logout', methods=['POST'])
-def force_logout():
-    """
-    Ruta para cerrar sesión activa forzadamente si los datos de verificación coinciden 
-    con el perfil (profiles) del usuario, utilizando validación flexible.
-    """
-
-    if users_collection is None or profiles_collection is None:
-         return jsonify({'success': False, 'error': 'El servidor no pudo inicializar la base de datos (503).'}), 503
-
-    data = request.json
-    email = data.get('email')
-    password = data.get('password') # Contraseña del login
-    device_id = data.get('deviceId') # DeviceId de la nueva sesión
-    name_input_raw = data.get('name', '') # Primer Nombre del formulario
-    dob_input = data.get('dob', '') # dd/mm/yyyy del formulario
-    phone_input_raw = data.get('phone', '') # Teléfono del formulario
-    ci_input_raw = data.get('ci', '')       # Cédula del formulario
-
-    if not all([email, password, device_id, name_input_raw, dob_input, phone_input_raw, ci_input_raw]):
-        return jsonify({'success': False, 'error': 'Faltan datos de verificación esenciales.'}), 400
-
-    try:
-        # 1. Buscar Usuario y Verificar Contraseña
-        query = users_collection.where('email', '==', email).limit(1).get()
-        if not query:
-            return jsonify({'success': False, 'error': 'Credenciales o datos de verificación inválidos.'}), 401
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GYMENEZ</title>
+    <link rel="icon" type="image/png" href="mini_logo.png">
+    <link rel="shortcut icon" type="image/png" href="mini_logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         
-        user_doc = query[0]
-        user_data = user_doc.to_dict()
-        user_id_str = user_doc.id
-
-        if not (user_data and user_data.get('password_hash') == password):
-             return jsonify({'success': False, 'error': 'Contraseña incorrecta. Intente de nuevo.'}), 401
-
-        # 2. Obtener Perfil (Profiles)
-        profile_doc = profiles_collection.document(user_id_str).get()
-        if not profile_doc.exists:
-             return jsonify({'success': False, 'error': 'No se encontró un perfil asociado. Contacte soporte.'}), 404
-
-        profile_data = profile_doc.to_dict()
-
-        # 3. Mapeo y Normalización de Datos para la Coincidencia
-
-        # 3a. NOMBRE (Flexible: Case/Accent Insensitive y solo Primer Nombre)
-        # El campo en DB es 'name', ej: 'SEBASTIAN ISAAC'
-        name_db_full = profile_data.get('name', '') 
-        
-        # Normalizar y tomar solo la primera palabra de la DB
-        name_db_normalized_parts = normalize_string(name_db_full).split(' ')
-        name_db_normalized = name_db_normalized_parts[0] if name_db_normalized_parts else ''
-        
-        # Normalizar el input del usuario
-        name_input_normalized = normalize_string(name_input_raw)
-
-        name_match = (name_input_normalized == name_db_normalized)
-        
-        # 3b. TELÉFONO y CÉDULA (Solo dígitos para comparación)
-        # Los campos correctos en DB son: 'phone_number' y 'id_number'
-        phone_db_raw = profile_data.get('phone_number', '') 
-        ci_db_raw = profile_data.get('id_number', '')      
-
-        # Eliminamos cualquier no-dígito para una comparación segura
-        phone_db_digits = "".join(filter(str.isdigit, phone_db_raw))
-        phone_input_digits = "".join(filter(str.isdigit, phone_input_raw))
-        
-        ci_db_digits = "".join(filter(str.isdigit, ci_db_raw))
-        ci_input_digits = "".join(filter(str.isdigit, ci_input_raw))
-        
-        # 3c. FECHA DE NACIMIENTO (Comparación exacta, ya que el frontend la formatea)
-        dob_db = profile_data.get('dob', '') # Ej: '28/04/2003'
-        dob_match = (dob_db == dob_input)
-
-        # 4. Evaluación Final de Coincidencia
-        if (not name_match or 
-            not dob_match or 
-            phone_db_digits != phone_input_digits or 
-            ci_db_digits != ci_input_digits):
+        /* Tema de Fondo Minimalista: Base Oscura (DEFAULT/LOGIN) */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0d1a;
+            /* Fondo Inicial (LOGIN) */
+            background-image: url('FONDO.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #e5e7eb; 
+            /* Transición para un cambio de fondo suave */
+            transition: background-image 1s ease-in-out; 
             
-            # 🚨 Este error 403 es el que se enviará al frontend si no coinciden los datos
-            return jsonify({
-                'success': False, 
-                'error': 'Error de Verificación: Los datos personales (Nombre, Fecha de Nacimiento, Teléfono o Cédula) no coinciden.'
-            }), 403 
-
-        # 5. Forzar Cierre de Sesión y Abrir la Nueva
-        users_collection.document(user_id_str).update({
-            'activeSessionId': device_id
-        })
-
-        # 6. Preparar Respuesta
-        user_response = {
-            'id': user_id_str,
-            '_id': user_id_str,
-            'email': user_data['email'],
-            'name': user_data.get('name', email.split('@')[0])
+            /* === APLICADO: Borde negro para todas las letras (Text Stroke Effect) === */
+            text-shadow: 
+                -0.5px -0.5px 0 #000,  
+                 0.5px -0.5px 0 #000,
+                -0.5px  0.5px 0 #000,
+                 0.5px  0.5px 0 #000;
+        }
+        
+        /* Estilo específico para el efecto Glassmorphism en las tarjetas */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.6);
         }
 
-        return jsonify({'success': True, 'user': user_response})
+        /* Estilo para el botón con efecto NEON (AMARILLO/GRIS) */
+        .neon-button {
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px #fbbf24, 0 0 20px #fbbf24; 
+        }
+        .neon-button:hover {
+            box-shadow: 0 0 15px #fcd34d, 0 0 30px #fcd34d;
+            transform: scale(1.02);
+        }
 
-    except Exception as e:
-        import sys
-        print(f"Error en force_logout: {e}", file=sys.stderr)
-        return jsonify({'success': False, 'error': 'Error interno al intentar forzar el cierre de sesión.'}), 500
+        /* Splash Screen */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #000000;
+            z-index: 100; 
+        }
+        
+        /* === ESTILOS PARA EL LOGO Y ANIMACIÓN (Simple Pulse sin Neon) === */
+        #splash-logo {
+            width: 250px;
+            height: auto;
+            animation: simple-pulse 1.5s infinite alternate; 
+            filter: none; 
+        }
+        
+        @keyframes simple-pulse {
+            from {
+                opacity: 0.8;
+                transform: scale(1.0);
+            }
+            to {
+                opacity: 1.0;
+                transform: scale(1.05); 
+            }
+        }
+        /* ======================================= */
+
+        /* Estilos para el mensaje de estado */
+        #message-box {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            pointer-events: none;
+        }
+        .message-success { background-color: #10b981; color: white; } 
+        .message-error { background-color: #ef4444; color: white; } 
+        
+        /* Estilo específico para el logo del login (50% más grande) */
+        #login-logo-img {
+            width: 225px; 
+            height: auto;
+            margin: 0 auto;
+        }
+
+        /* === FONDO ESPECÍFICO PARA EL DASHBOARD === */
+        .dashboard-background {
+            background-image: url('PROFILE_FONDO.png') !important;
+        }
+
+        /* === ESTILO: Sombra/Borde para el texto del Header (Gris) === */
+        .text-border-gray {
+            text-shadow: 0 0 3px #4b5563; 
+        }
+        
+        /* Estilo para los enlaces de ayuda (pequeños y pulsables) */
+        .help-link {
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 500;
+            color: #9ca3af; /* gray-400 */
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+        .help-link:hover {
+            color: #38bdf8; /* sky-400 */
+            text-shadow: 0 0 5px rgba(56, 189, 248, 0.5); /* Sombra sutil neon azul */
+        }
+
+    </style>
+    </head>
+<body class="min-h-screen flex items-center justify-center bg-[#0d0d1a] text-white">
+
+    <div id="message-box"></div>
+
+    <div id="splash-screen" class="z-[1000]">
+        <div class="text-center">
+            <img id="splash-logo" 
+                src="LOADING.png" 
+                alt="Logo GYMENEZ Neon" 
+                class="mx-auto"
+            >
+            <div id="loading-text" class="mt-4 text-xl md:text-2xl font-semibold tracking-widest text-sky-400 z-10">
+                
+            </div>
+        </div>
+    </div>
+
+    <div id="login-screen" class="hidden min-h-screen w-full flex items-center justify-center p-4">
+        <div class="glass-card p-6 md:p-8 w-full max-w-sm mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-500/30">
+            <div class="text-center mb-6">
+                <div class="text-center mb-6">
+                    <img id="login-logo-img"
+                         src="LOGIN_LOGO.png" 
+                         alt="Logo GYMENEZ" 
+                         class="mx-auto"
+                    >
+                </div>
+            </div>
+
+            <form id="login-form">
+                <div class="mb-6">
+                    <label for="login-email" class="block text-sm font-medium text-white mb-2">Correo Electrónico</label>
+                    <input type="email" id="login-email" name="email" value="" placeholder="tu.correo@ejemplo.com"
+                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition duration-300 placeholder-gray-400 text-base" required>
+                </div>
+                <div class="mb-8">
+                    <label for="login-password" class="block text-sm font-medium text-white mb-2">Contraseña</label>
+                     <input type="password" id="login-password" name="password" value="" placeholder=""
+                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition duration-300 placeholder-gray-400 text-base" required>
+                </div>
+
+                <button type="submit" id="login-btn"
+                        class="neon-button w-full py-3 rounded-lg bg-gray-800 text-amber-400 font-bold text-lg hover:bg-gray-700 uppercase tracking-wider border-2 border-amber-400/50">
+                    INGRESAR
+                </button>
+            </form>
+            
+            <div class="flex justify-between items-center mt-4 pt-2 border-t border-gray-700/50">
+                <span id="register-request-link" class="help-link">
+                    Solicitar Registro
+                </span>
+                <span id="forgot-password-link" class="help-link">
+                    Recuperar Usuario
+                </span>
+            </div>
+            
+        </div>
+    </div>
+    
+    <div id="active-session-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[1000]">
+        <div class="glass-card p-6 md:p-8 w-full max-w-lg mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-500/30 text-center">
+            <svg class="w-16 h-16 mx-auto mb-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+            <h3 class="text-xl md:text-2xl font-bold mb-4 text-amber-400">Sesión Activa Detectada</h3>
+            <p class="text-white mb-6">Parece que ya hay una sesión iniciada con este usuario en otro dispositivo.</p>
+            
+            <div id="modal-options">
+                <p class="text-lg font-semibold mb-6">¿Deseas cerrarla y continuar aquí?</p>
+                <div class="flex justify-center space-x-4">
+                    <button id="modal-cancel-btn" 
+                            class="px-6 py-3 rounded-lg bg-red-600 text-white font-bold hover:bg-red-700 transition duration-300">
+                        No, Cancelar
+                    </button>
+                    <button id="modal-confirm-btn" 
+                            class="px-6 py-3 rounded-lg bg-amber-600 text-white font-bold hover:bg-amber-700 transition duration-300">
+                        Sí, Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+
+            <form id="force-logout-form" class="hidden mt-6 text-left">
+                <p class="text-sm text-gray-400 mb-4">Para confirmar el cierre, verifica tu identidad con los siguientes datos:</p>
+                
+                <div class="mb-4">
+                    <label for="force-email" class="block text-sm font-medium text-white mb-2">Email Asociado</label>
+                    <input type="email" id="force-email" name="email" placeholder="tu.correo@ejemplo.com" readonly
+                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 transition bg-gray-700/50 cursor-not-allowed" required>
+                </div>
+                <div class="mb-4">
+                    <label for="force-name" class="block text-sm font-medium text-white mb-2">Primer Nombre</label>
+                    <input type="text" id="force-name" name="name" placeholder="Tu primer nombre"
+                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 transition" required>
+                </div>
+                <div class="mb-4">
+                    <label for="force-dob" class="block text-sm font-medium text-white mb-2">Fecha de Nacimiento (dd/mm/yyyy)</label>
+                    <input type="text" id="force-dob" name="dob" placeholder="01/01/1990" maxlength="10"
+                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 transition" required>
+                </div>
+                 <div class="mb-4">
+                    <label for="force-phone" class="block text-sm font-medium text-white mb-2">Teléfono (ej: 04149283757)</label>
+                    <input type="text" id="force-phone" name="phone" placeholder="0414..."
+                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 transition" required>
+                </div>
+                 <div class="mb-6">
+                    <label for="force-ci" class="block text-sm font-medium text-white mb-2">Cédula de Identidad (ej: 10584737)</label>
+                    <input type="text" id="force-ci" name="ci" placeholder="CI sin puntos ni guiones"
+                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 transition" required>
+                </div>
+
+                <button type="submit" id="force-logout-btn"
+                        class="neon-button w-full py-3 rounded-lg bg-gray-800 text-amber-400 font-bold text-lg hover:bg-gray-700 uppercase tracking-wider border-2 border-amber-400/50">
+                    Cerrar Sesión Activa
+                </button>
+                <button type="button" id="force-logout-cancel"
+                        class="mt-3 w-full py-3 rounded-lg bg-gray-600 text-white font-bold hover:bg-gray-700 transition duration-300">
+                    Cancelar
+                </button>
+            </form>
+
+        </div>
+    </div>
+
+
+    <div id="dashboard-screen" class="hidden min-h-screen w-full p-4 md:p-8">
+        <header class="flex justify-between items-center py-4 px-2 mb-8">
+            <h1 class="text-3xl font-extrabold uppercase tracking-wider text-border-gray">
+                <span class="text-amber-400">GYM</span><span class="text-white">ENEZ</span>
+            </h1>
+            
+            <div class="flex space-x-4">
+                <a href="profile.html" 
+                   class="px-4 py-2 text-sm font-semibold rounded-full bg-amber-600 text-white hover:bg-amber-500 transition duration-300">
+                    PROFILE
+                </a>
+                <button id="logout-button"
+                        class="px-4 py-2 text-sm font-semibold rounded-full bg-red-600 hover:bg-red-500 transition duration-300">
+                    Salir
+                </button>
+            </div>
+            </header>
+
+        <div class="grid grid-cols-1 gap-6">
+            
+            <a href="routines.html" class="col-span-1 block"> 
+                <div class="glass-card p-6 md:p-8 w-full rounded-2xl flex flex-col items-center justify-center text-center h-64 cursor-pointer border-t-2 border-amber-400/50 hover:border-amber-400">
+                    <svg class="w-16 h-16 mb-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2 0l-2-1m2 1h-2m2 0h-2M4 7l2 1m-2 0l2-1m-2 1h2m-2 0h2M4 7h16M7 4h10a3 3 0 013 3v2a3 3 0 01-3 3H7a3 3 0 01-3-3V7a3 3 0 013-3z"></path>
+                    </svg>
+                    <h2 class="text-4xl font-extrabold uppercase tracking-widest">
+                        <span class="text-amber-400">WORK</span><span class="text-white">OUT</span>
+                    </h2>
+                    <p class="text-base text-white mt-4">Comienza tu entrenamiento o explora tus rutinas.</p>
+                </div>
+            </a>
+            
+            <a href="schedule.html" class="col-span-1 block"> 
+                <div class="glass-card p-6 md:p-8 w-full rounded-2xl flex flex-col items-center justify-center text-center h-64 cursor-pointer border-t-2 border-amber-400/50 hover:border-amber-400">
+                    <svg class="w-16 h-16 mb-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h.01M13 11h.01M17 11h.01M7 16h.01M11 16h.01M15 16h.01M6 18h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    <h2 class="text-4xl font-extrabold uppercase tracking-widest">
+                        <span class="text-amber-400">SCHE</span><span class="text-white">DULE</span>
+                    </h2>
+                    <p class="text-base text-white mt-4">Planifica y gestiona tus sesiones de entrenamiento grupales.</p>
+                </div>
+            </a>
+            <a href="goals.html" class="col-span-1 block"> 
+                <div class="glass-card p-6 md:p-8 w-full rounded-2xl flex flex-col items-center justify-center text-center h-64 cursor-pointer border-t-2 border-amber-400/50 hover:border-amber-400">
+                    <svg class="w-16 h-16 mb-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <h2 class="text-4xl font-extrabold uppercase tracking-widest">
+                        <span class="text-amber-400">GO</span><span class="text-white">ALS</span>
+                    </h2>
+                    <p class="text-base text-white mt-4">Hazle seguimiento a tus objetivos y ve tu progreso.</p>
+                </div>
+            </a>
+
+            <a href="eats.html" class="col-span-1 block"> 
+                <div class="glass-card p-6 md:p-8 w-full rounded-2xl flex flex-col items-center justify-center text-center h-64 cursor-pointer border-t-2 border-amber-400/50 hover:border-amber-400">
+                    <svg class="w-16 h-16 mb-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2zM7 7h.01M17 7h.01M12 7h.01"/>
+                    </svg>
+                    <h2 class="text-4xl font-extrabold uppercase tracking-widest">
+                        <span class="text-amber-400">GYMENEZ </span><span class="text-white">EATS</span>
+                    </h2>
+                    <p class="text-base text-white mt-4">Planes de nutrición personalizados y gestión alimenticia para potenciar tus resultados.</p>
+                </div>
+            </a>
+
+            <a href="pulse.html" class="col-span-1 block"> 
+                <div class="glass-card p-6 md:p-8 w-full rounded-2xl flex flex-col items-center justify-center text-center h-64 cursor-pointer border-t-2 border-amber-400/50 hover:border-amber-400">
+                    <svg class="w-16 h-16 mb-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z"></path>
+                    </svg>
+                    <h2 class="text-4xl font-extrabold uppercase tracking-widest">
+                        <span class="text-amber-400">GYMENEZ </span><span class="text-white">PULSE</span>
+                    </h2>
+                    <p class="text-base text-white mt-4">Tu centro de mensajería exclusivo.</p>
+                </div>
+            </a>
+            
+            </div>
+    </div>
+
+
+    <script>
+        // --- CONFIGURACIÓN DE SEGURIDAD Y SESIÓN ---
+        const localDeviceId = crypto.randomUUID();
+
+        // 🚀 URL BASE DE TU API. SIN LA BARRA FINAL (/)
+        const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
+
+        let CURRENT_USER_SESSION = null; 
+
+        // --- CONSTANTES PARA WHATSAPP ---
+        const WHATSAPP_NUMBER = '+584148780392';
+        const WHATSAPP_MESSAGE_REGISTER = 'Hola, estoy interesado(a) en solicitar mi registro en GYMENEZ.';
+        const WHATSAPP_MESSAGE_RECOVERY = 'Hola quisiera solicitar la recuperacion de usuario/contraseña';
+
+        /**
+         * Llama a la API REST para iniciar sesión y obtener el token/objeto de usuario.
+         */
+        async function apiLogin(email, password, deviceId) {
+            console.log(`API: Llamada a ${API_BASE_URL}/api/login para ${email}`);
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/login`, { 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password, deviceId })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    // El error 403 (FORBIDDEN) de la API indica que la sesión está activa.
+                    return { success: false, error: data.error || 'Error de conexión con la API o credenciales inválidas.' };
+                }
+
+                CURRENT_USER_SESSION = data.user;
+                // Guardar la sesión en localStorage para que el perfil pueda acceder
+                localStorage.setItem('userSession', JSON.stringify(data.user)); 
+                return { success: true, user: data.user };
+
+            } catch (e) {
+                console.error("Error en la conexión fetch:", e);
+                return { success: false, error: 'No se pudo conectar con el servidor API REST. Verifica la URL o la política CORS.' };
+            }
+        }
+
+        /**
+         * Llama a la API REST para cerrar sesión y limpiar el activeSessionId en la DB.
+         */
+        async function apiLogout() {
+            console.log(`API: Llamada a ${API_BASE_URL}/api/logout`);
+            
+            try {
+                // Si CURRENT_USER_SESSION es nulo, intenta recuperarlo del almacenamiento
+                let userId = (CURRENT_USER_SESSION && (CURRENT_USER_SESSION._id || CURRENT_USER_SESSION.id));
+                
+                if (!userId) {
+                    const storedSession = localStorage.getItem('userSession');
+                    if (storedSession) {
+                        const storedUser = JSON.parse(storedSession);
+                        userId = storedUser._id || storedUser.id;
+                    }
+                }
+
+                if (userId) {
+                    await fetch(`${API_BASE_URL}/api/logout`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ userId: userId })
+                    });
+                }
+                
+            } catch (e) {
+                console.error("Error al intentar cerrar sesión en el servidor:", e);
+            } finally {
+                CURRENT_USER_SESSION = null;
+                localStorage.removeItem('userSession'); // Limpiar sesión local siempre
+                return { success: true }; 
+            }
+        }
+        
+        // Función simplificada, ya que no se necesita la data de rutinas para el dashboard.
+        async function loadDashboardData() {
+            if (!CURRENT_USER_SESSION) return;
+            console.log("Dashboard cargado solo con los accesos directos.");
+        }
+
+
+        // --- Variables y Utilidades Globales ---
+        const SPLASH_DURATION_MS = 3000; 
+        const screens = ['splash-screen', 'login-screen', 'dashboard-screen'];
+        const messagebox = document.getElementById('message-box');
+        const body = document.body;
+
+        // Función para mostrar mensajes de estado (éxito/error)
+        function showMessage(message, type = 'success') {
+            messagebox.textContent = message;
+            messagebox.className = ''; 
+            messagebox.classList.add('transition-none');
+            messagebox.classList.add('message-' + type);
+            messagebox.style.opacity = '1';
+            messagebox.style.transform = 'translateX(-50%) translateY(0)';
+            
+            setTimeout(() => {
+                messagebox.style.style = '';
+                messagebox.style.opacity = '0';
+                messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
+            }, 3000);
+        }
+
+        // Función de navegación entre pantallas
+        function navigateTo(targetId) {
+            screens.forEach(id => {
+                const screen = document.getElementById(id);
+                if (screen) {
+                    screen.classList.add('hidden');
+                }
+            });
+            const targetScreen = document.getElementById(targetId);
+            if (targetScreen) {
+                targetScreen.classList.remove('hidden');
+                targetScreen.style.opacity = '0';
+                targetScreen.style.transition = 'opacity 0.5s ease-in';
+                requestAnimationFrame(() => {
+                    targetScreen.style.opacity = '1';
+                });
+                
+                // Lógica para cambiar el fondo al entrar/salir del Dashboard (con transición)
+                if (targetId === 'dashboard-screen') {
+                    body.classList.add('dashboard-background');
+                    const storedSession = localStorage.getItem('userSession');
+                    if (storedSession) {
+                        CURRENT_USER_SESSION = JSON.parse(storedSession);
+                    }
+
+                    if (CURRENT_USER_SESSION) {
+                        loadDashboardData(); 
+                    }
+                } else {
+                    body.classList.remove('dashboard-background');
+                }
+            }
+        }
+
+        // Función para manejar la transición del splash
+        function transitionToLogin() {
+            const splashScreen = document.getElementById('splash-screen');
+            splashScreen.style.transition = 'opacity 1s ease-out';
+            splashScreen.style.opacity = '0';
+
+            setTimeout(() => {
+                splashScreen.style.display = 'none';
+                navigateTo('login-screen'); 
+            }, 1000); 
+        }
+        
+        /**
+         * 🚨 CORRECCIÓN APLICADA: Formatea el input de Fecha de Nacimiento a dd/mm/yyyy.
+         */
+        function formatDateInput(input) {
+            let value = input.value.replace(/\D/g, ''); // Remover todos los no-dígitos
+            
+            // Limitar longitud total
+            if (value.length > 8) { // 2+2+4 = 8 dígitos
+                value = value.substring(0, 8);
+            }
+
+            // Agregar la primera barra: dd/
+            if (value.length > 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2);
+            }
+            // Agregar la segunda barra: dd/mm/
+            if (value.length > 5) { // 2 + 1 + 2 = 5
+                value = value.substring(0, 5) + '/' + value.substring(5);
+            }
+            input.value = value;
+        }
+
+        /**
+         * Llama a la API REST para forzar el cierre de sesión y loguear al usuario.
+         */
+        async function apiForceLogout(email, password, deviceId, name, dob, phone, ci) {
+            console.log(`API: Llamada a ${API_BASE_URL}/api/force_logout para forzar el cierre de sesión de ${email}`);
+            
+            try {
+                // Se envía la información completa de verificación. El backend validará de forma flexible.
+                const response = await fetch(`${API_BASE_URL}/api/force_logout`, { 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password, deviceId, name, dob, phone, ci })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    return { success: false, error: data.error || 'Error al intentar forzar el cierre de sesión.' };
+                }
+
+                // La API devuelve el objeto de usuario si la verificación fue exitosa.
+                CURRENT_USER_SESSION = data.user;
+                localStorage.setItem('userSession', JSON.stringify(data.user)); 
+                return { success: true, user: data.user };
+
+            } catch (e) {
+                console.error("Error en la conexión fetch para force_logout:", e);
+                return { success: false, error: 'No se pudo conectar con el servidor API REST para forzar el cierre.' };
+            }
+        }
+
+        /**
+         * Maneja el login, incluyendo la nueva lógica de sesión activa.
+         */
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const btn = document.getElementById('login-btn');
+            const modal = document.getElementById('active-session-modal'); 
+            
+            btn.disabled = true;
+            btn.textContent = 'VERIFICANDO SESIÓN...';
+
+            const response = await apiLogin(email, password, localDeviceId);
+
+            if (response.success) {
+                showMessage('¡Inicio de sesión exitoso!', 'success');
+                navigateTo('dashboard-screen');
+                modal.classList.add('hidden'); // Ocultar por si estaba abierto
+            } else if (response.error && response.error.includes('Ya hay una sesión activa')) {
+                // 🚨 NUEVA LÓGICA: MOSTRAR MODAL DE SESIÓN ACTIVA 🚨
+                modal.classList.remove('hidden');
+                showMessage('Sesión activa detectada.', 'error');
+                
+                // Ocultar formulario de verificación y mostrar opciones
+                document.getElementById('force-logout-form').classList.add('hidden');
+                document.getElementById('modal-options').classList.remove('hidden');
+
+            } else {
+                showMessage(response.error, 'error');
+            }
+            
+            btn.disabled = false;
+            btn.textContent = 'INGRESAR';
+        }
+        
+        /**
+         * Maneja el envío del formulario de verificación para cerrar forzadamente la sesión.
+         */
+        async function handleForceLogout(e) {
+            e.preventDefault();
+            const email = document.getElementById('force-email').value;
+            const password = document.getElementById('login-password').value; // Usar la contraseña del login
+            const name = document.getElementById('force-name').value;
+            const dob = document.getElementById('force-dob').value;
+            const phone = document.getElementById('force-phone').value;
+            const ci = document.getElementById('force-ci').value;
+
+            const btn = document.getElementById('force-logout-btn');
+            const modal = document.getElementById('active-session-modal');
+
+            btn.disabled = true;
+            btn.textContent = 'VERIFICANDO DATOS...';
+
+            // Llamar al nuevo endpoint
+            const response = await apiForceLogout(email, password, localDeviceId, name, dob, phone, ci);
+
+            if (response.success) {
+                showMessage('¡Sesión activa cerrada y nuevo inicio exitoso!', 'success');
+                modal.classList.add('hidden');
+                navigateTo('dashboard-screen');
+            } else {
+                // Mostrar el error específico de la API (incluyendo el 403 de verificación fallida)
+                showMessage(response.error, 'error');
+            }
+            
+            btn.disabled = false;
+            btn.textContent = 'Cerrar Sesión Activa';
+        }
+
+
+        async function handleLogout() {
+            const btn = document.getElementById('logout-button');
+            const originalText = btn.textContent;
+            
+            btn.disabled = true;
+            btn.textContent = 'Cerrando...';
+
+            await apiLogout(); // La función apiLogout maneja la limpieza local y remota
+            
+            showMessage('Sesión cerrada correctamente.', 'success');
+            navigateTo('login-screen');
+
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
+        
+        // FUNCIÓN PARA REDIRECCIONAR A WHATSAPP (Registro)
+        function handleRegisterRequest() {
+            const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE_REGISTER);
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\d+]/g, '')}?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // FUNCIÓN PARA RECUPERACIÓN DE USUARIO/CONTRASEÑA (Ahora va a WhatsApp)
+        function handleForgotPassword() {
+            const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE_RECOVERY);
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\d+]/g, '')}?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // --- Lógica de Inicialización ---
+        window.onload = function() {
+            // Comprobar si hay una sesión guardada para evitar login
+            const storedSession = localStorage.getItem('userSession');
+            if (storedSession) {
+                // Si hay sesión guardada, saltar el splash y navegar al dashboard
+                setTimeout(() => {
+                    document.getElementById('splash-screen').style.display = 'none';
+                    navigateTo('dashboard-screen');
+                }, 100); 
+            } else {
+                // Si no hay sesión, iniciar la transición normal
+                setTimeout(transitionToLogin, SPLASH_DURATION_MS);
+            }
+
+            // --- LISTENERS DE FORMULARIO ---
+            document.getElementById('login-form').addEventListener('submit', handleLogin);
+            document.getElementById('logout-button').addEventListener('click', handleLogout);
+            
+            // LISTENERS PARA LOS NUEVOS ENLACES
+            document.getElementById('register-request-link').addEventListener('click', handleRegisterRequest); 
+            document.getElementById('forgot-password-link').addEventListener('click', handleForgotPassword);
+            
+            // --- LISTENERS PARA EL MODAL DE SESIÓN ACTIVA (NUEVOS) ---
+            const modal = document.getElementById('active-session-modal');
+            const form = document.getElementById('force-logout-form');
+            const options = document.getElementById('modal-options');
+            const loginEmailInput = document.getElementById('login-email');
+            
+            // Botón 'No, Cancelar' (Cierra la modal y vuelve al login normal)
+            document.getElementById('modal-cancel-btn').addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+            
+            // Botón 'Sí, Cerrar Sesión' (Muestra el formulario de verificación)
+            document.getElementById('modal-confirm-btn').addEventListener('click', () => {
+                options.classList.add('hidden');
+                form.classList.remove('hidden');
+                
+                // Precargar email (solo lectura) para conveniencia
+                document.getElementById('force-email').value = loginEmailInput.value;
+            });
+            
+            // Botón 'Cancelar' del formulario (Vuelve a las opciones de la modal)
+            document.getElementById('force-logout-cancel').addEventListener('click', () => {
+                form.classList.add('hidden');
+                options.classList.remove('hidden');
+            });
+
+            // Listener para el envío del formulario de cierre forzado
+            form.addEventListener('submit', handleForceLogout);
+            
+            // 🚨 LISTENER DE CORRECCIÓN: para el formato automático de la Fecha de Nacimiento
+            document.getElementById('force-dob').addEventListener('input', (e) => formatDateInput(e.target));
+        };
+    </script>
+</body>
+</html>
