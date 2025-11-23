@@ -743,13 +743,34 @@
             btn.textContent = 'VERIFICANDO DATOS...';
             showForceLogoutMessage(''); // Limpiar el mensaje antes del intento
 
-            // Llamar al nuevo endpoint
+            // Llamar al endpoint force_logout (establece el nuevo DeviceId en el servidor)
             const response = await apiForceLogout(email, password, localDeviceId, name, dob, phone, ci);
 
             if (response.success) {
-                showMessage('¡Sesión activa cerrada y nuevo inicio exitoso!', 'success');
+                // El servidor ya actualizó activeSessionId al nuevo deviceId.
+                const delayMs = 7000;
+                
+                // 1. Ocultar el modal de verificación.
                 modal.classList.add('hidden');
-                navigateTo('dashboard-screen');
+                
+                // 2. Mostrar mensaje profesional con el tiempo de espera.
+                showMessage(`Proceso de cierre de sesión completado. La sesión anterior ha sido invalidada. Por favor, espere ${delayMs/1000} segundos para iniciar sesión en este dispositivo.`, 'success');
+
+                // 3. LIMPIEZA INMEDIATA: Deshacer el inicio de sesión automático.
+                // Esto es crucial para forzar el login manual.
+                localStorage.removeItem('userSession');
+                CURRENT_USER_SESSION = null; 
+                
+                // 4. Esperar y navegar de vuelta al login.
+                setTimeout(() => {
+                    // Navegar de vuelta a la pantalla de login (donde el usuario hará el login manual)
+                    navigateTo('login-screen');
+                    
+                    // Limpiar la contraseña ingresada previamente por seguridad.
+                    document.getElementById('login-password').value = '';
+                    
+                }, delayMs); 
+
             } else {
                 // Mensaje simplificado y visible localmente
                 showForceLogoutMessage('Verificación fallida: Los datos introducidos son incorrectos o la contraseña es inválida.', 'error');
