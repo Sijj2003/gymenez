@@ -906,7 +906,8 @@
             finishRoutineContainer.classList.add('hidden'); 
 
             // ==================================================
-            // 🚨 NUEVA LÓGICA DE BLOQUEO POR DÍA Y HORA 🚨
+            // 🚨 NUEVA LÓGICA DE BLOQUEO (SEMANAL/DÍA ESPECÍFICO) 🚨
+            // Se calcula el momento exacto del próximo desbloqueo.
             // ==================================================
             const API_LAST_SESSION_URL = `${API_BASE_URL}/api/journal/last_session/${userId}/${dayName}`;
             
@@ -915,6 +916,7 @@
                 const data = await response.json();
 
                 if (!response.ok || !data.success) {
+                    // Advertencia si la API falla, pero no bloqueamos al usuario por un fallo del servidor.
                     console.warn(`[CHECK LOCK WARNING] Fallo al obtener el último registro. Continuando con la carga: ${data.error || 'Fallo desconocido'}`);
                 }
                 
@@ -922,32 +924,46 @@
 
                 if (lastCompletedTimestampSec) {
                     const now = new Date();
-                    const lastCompletionDate = new Date(lastCompletedTimestampSec * 1000); // Convertir a milisegundos
+                    const lastCompletionDate = new Date(lastCompletedTimestampSec * 1000); 
 
-                    // --- 1. Chequeo de las 156 horas (Bloqueo Primario) ---
-                    const hoursSinceCompletion = (now.getTime() - lastCompletionDate.getTime()) / (1000 * 60 * 60);
-                    const TIME_LOCK_HOURS = 156; 
-                    const isTimeLocked = hoursSinceCompletion < TIME_LOCK_HOURS;
-
-                    // --- 2. Chequeo de Desbloqueo por Día y Hora (Override) ---
-                    // 0=Domingo, 1=Lunes, 6=Sábado
+                    // Mapeo de días de la semana (Lunes=1, Martes=2, ..., Sábado=6, Domingo=0 - según JS getDay())
                     const dayMap = { 'Lunes': 1, 'Martes': 2, 'Miércoles': 3, 'Jueves': 4, 'Viernes': 5, 'Sábado': 6, 'Domingo': 0 };
-                    const requiredDayOfWeek = dayMap[dayName]; 
-                    const currentDayOfWeek = now.getDay(); 
+                    const requiredDayOfWeek = dayMap[dayName]; // e.g., 1 for Lunes
 
-                    // La rutina se desbloquea si es el día correcto Y ya pasaron las 00:01
-                    let isDayUnlocked = false; 
-                    if (requiredDayOfWeek === currentDayOfWeek) {
-                         // Chequea si la hora actual es 00 y los minutos son 01 o más (o si la hora es 1 o más)
-                         const isAfterMidnight = now.getHours() >= 1 || (now.getHours() === 0 && now.getMinutes() >= 1);
-                         if (isAfterMidnight) {
-                            isDayUnlocked = true; 
-                         }
+                    // --- 1. Calcular la fecha y hora exacta del próximo desbloqueo (Next Unlock Date) ---
+                    
+                    let lastCompletionDay = lastCompletionDate.getDay();
+                    
+                    // Inicializar la fecha de desbloqueo a la fecha de finalización
+                    let nextUnlockDate = new Date(lastCompletionDate);
+
+                    // 1.1. Calcular cuántos días faltan para llegar al 'requiredDayOfWeek'
+                    let daysToAdd = (requiredDayOfWeek - lastCompletionDay + 7) % 7;
+
+                    // 1.2. Si daysToAdd es 0 (la finalización fue en el día de la rutina, ej: Lunes)
+                    if (daysToAdd === 0) {
+                        // Crear una fecha para las 00:01 AM del día de finalización
+                        let dayStart = new Date(lastCompletionDate);
+                        dayStart.setHours(0, 1, 0, 0);
+
+                        if (lastCompletionDate.getTime() >= dayStart.getTime()) {
+                            // Si se completó la rutina *a partir* de las 00:01 AM, el desbloqueo es la próxima semana.
+                            daysToAdd = 7;
+                        } else {
+                            // Caso raro: se completó la rutina antes de las 00:01 AM. 
+                            // Ya debería estar desbloqueada si el 'now' es posterior a 00:01 AM.
+                            daysToAdd = 0;
+                        }
                     }
 
-                    // --- 3. Decisión de Bloqueo Final ---
-                    // Bloqueado si el tiempo no ha pasado (156h) Y NO se ha cumplido el desbloqueo por día
-                    const isBlocked = isTimeLocked && !isDayUnlocked;
+                    // 1.3. Ajustar la fecha y hora al próximo día de desbloqueo a las 00:01 AM
+                    nextUnlockDate.setDate(lastCompletionDate.getDate() + daysToAdd);
+                    nextUnlockDate.setHours(0, 1, 0, 0); // Establecer la hora a 00:01 AM
+
+                    // --- 2. Decisión de Bloqueo Final ---
+                    // Si la hora actual es anterior a la hora de desbloqueo, está BLOQUEADO.
+                    // (Comparación de milisegundos)
+                    let isBlocked = now.getTime() < nextUnlockDate.getTime();
                     
                     if (isBlocked) {
                         // Muestra el mensaje de bloqueo y detiene la carga
@@ -955,15 +971,17 @@
                         noDataMessage.classList.remove('hidden');
                         
                         const completionTime = lastCompletionDate.toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
-                        const nextDayName = Object.keys(dayMap).find(key => dayMap[key] === requiredDayOfWeek) || dayName;
-                        
+                        const unlockTime = nextUnlockDate.toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+
                         // Mensaje solicitado: "rutina completada vuelve cuando te toque nuevamente"
                         noDataMessage.innerHTML = `
                             <p class="text-xl">
                                 <span class="text-red-400 font-bold">Rutina Completada</span>
                             </p>
                             <p class="mt-2 text-lg font-semibold">Vuelve cuando te toque nuevamente.</p>
-                            <p class="mt-4 text-sm text-gray-400">Próximo desbloqueo: <span class="text-amber-400 font-bold">${nextDayName}</span> a las 00:01 horas.</p>
+                            <p class="mt-4 text-sm text-gray-400">
+                                Próximo desbloqueo: <span class="text-amber-400 font-bold">${unlockTime}</span>
+                            </p>
                             <p class="mt-1 text-xs text-gray-500">Última sesión: ${completionTime}</p>
                         `;
                         
@@ -974,7 +992,7 @@
                 }
             } catch (e) {
                 console.error("Error al verificar el último registro de rutina:", e);
-                // Si la verificación falla, se asume que se puede cargar la rutina por seguridad.
+                // Si la verificación falla, se asume que se puede cargar la rutina por seguridad/usabilidad.
                 showMessage(`Advertencia: Error al chequear historial de rutina: ${e.message}. Continuando...`, 'error');
             }
             // ==================================================
