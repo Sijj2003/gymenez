@@ -643,8 +643,8 @@
                 modal.classList.add('hidden');
                 navigateTo('dashboard-screen');
             } else {
-                // Mostrar el error localmente en el formulario
-                showForceLogoutMessage(response.error, 'error');
+                // Corrección: Mensaje simplificado y visible localmente
+                showForceLogoutMessage('Verificación fallida: Algún dato personal introducido es incorrecto.', 'error');
             }
             
             btn.disabled = false;
@@ -727,8 +727,7 @@
                 document.getElementById('force-email').value = loginEmailInput.value;
             });
             
-            // 🚨 CORRECCIÓN APLICADA AQUÍ: 
-            // Botón 'Cancelar' del formulario (Cierra la modal y devuelve al login)
+            // CORRECCIÓN APLICADA: Botón 'Cancelar' del formulario (Cierra la modal y devuelve al login)
             document.getElementById('force-logout-cancel').addEventListener('click', () => {
                 modal.classList.add('hidden');
                 showForceLogoutMessage('');
@@ -741,7 +740,7 @@
             // Listener para el envío del formulario de cierre forzado
             form.addEventListener('submit', handleForceLogout);
             
-            // LISTENER DE CORRECCIÓN: para el formato automático de la Fecha de Nacimiento
+            // LISTENER para el formato automático de la Fecha de Nacimiento
             document.getElementById('force-dob').addEventListener('input', (e) => formatDateInput(e.target));
         };
     </script>
