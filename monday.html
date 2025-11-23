@@ -924,27 +924,32 @@
                     const now = new Date();
                     const lastCompletionDate = new Date(lastCompletedTimestampSec * 1000); // Convertir a milisegundos
 
-                    // Mapeo de días de la semana (Lunes=1, Martes=2, ..., Sábado=6, Domingo=0 - según JS getDay())
+                    // --- 1. Chequeo de las 156 horas (Bloqueo Primario) ---
+                    const hoursSinceCompletion = (now.getTime() - lastCompletionDate.getTime()) / (1000 * 60 * 60);
+                    const TIME_LOCK_HOURS = 156; 
+                    const isTimeLocked = hoursSinceCompletion < TIME_LOCK_HOURS;
+
+                    // --- 2. Chequeo de Desbloqueo por Día y Hora (Override) ---
+                    // 0=Domingo, 1=Lunes, 6=Sábado
                     const dayMap = { 'Lunes': 1, 'Martes': 2, 'Miércoles': 3, 'Jueves': 4, 'Viernes': 5, 'Sábado': 6, 'Domingo': 0 };
-                    
-                    const requiredDayOfWeek = dayMap[dayName]; // Día numérico requerido
+                    const requiredDayOfWeek = dayMap[dayName]; 
                     const currentDayOfWeek = now.getDay(); 
 
-                    let isLocked = true; // Por defecto, si hay un registro previo, se asume bloqueado
-
-                    // La rutina se desbloquea si:
-                    // 1. Es el día correcto (Ej: Lunes)
-                    // 2. Y son las 00:01 horas o más tarde
+                    // La rutina se desbloquea si es el día correcto Y ya pasaron las 00:01
+                    let isDayUnlocked = false; 
                     if (requiredDayOfWeek === currentDayOfWeek) {
                          // Chequea si la hora actual es 00 y los minutos son 01 o más (o si la hora es 1 o más)
                          const isAfterMidnight = now.getHours() >= 1 || (now.getHours() === 0 && now.getMinutes() >= 1);
-                         
                          if (isAfterMidnight) {
-                            isLocked = false; // Desbloqueado por el día de la semana.
+                            isDayUnlocked = true; 
                          }
                     }
+
+                    // --- 3. Decisión de Bloqueo Final ---
+                    // Bloqueado si el tiempo no ha pasado (156h) Y NO se ha cumplido el desbloqueo por día
+                    const isBlocked = isTimeLocked && !isDayUnlocked;
                     
-                    if (isLocked) {
+                    if (isBlocked) {
                         // Muestra el mensaje de bloqueo y detiene la carga
                         loadingSpinner.classList.add('hidden');
                         noDataMessage.classList.remove('hidden');
@@ -965,7 +970,7 @@
                         showMessage("Rutina completada vuelve cuando te toque nuevamente.", 'error'); 
                         return; // 🛑 Detener la carga de la rutina
                     }
-                    // Si no está bloqueado (isLocked es false), el código continúa a cargar la rutina.
+                    // Si no está bloqueado (isBlocked es false), el código continúa a cargar la rutina.
                 }
             } catch (e) {
                 console.error("Error al verificar el último registro de rutina:", e);
