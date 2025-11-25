@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GYMENEZ - Gestión de Usuarios</title>
+    <link rel="icon" type="image/png" href="mini_logo.png">
+    <link rel="shortcut icon" type="image/png" href="mini_logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        /* Estilos base del Administrador */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0d1a;
+            background-image: url('FONDO.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #e5e7eb; 
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            background-color: rgba(13, 13, 26, 0.8);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        /* Estilo para la tarjeta de contenido (glass-effect) */
+        .content-card {
+            background-color: rgba(13, 13, 26, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Estilos del Logo */
+        .logo-text {
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+        }
+        .logo-yellow { color: #facc15; }
+        .logo-white { color: #ffffff; }
+
+        /* Estilo para la tabla */
+        .data-table th, .data-table td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: left;
+        }
+        .data-table th {
+            text-transform: uppercase;
+            font-weight: 600;
+            color: #9ca3af; /* gray-400 */
+            font-size: 0.8rem;
+        }
+        .data-table tbody tr:hover {
+            background-color: rgba(14, 165, 233, 0.05); /* sky-500/5 */
+        }
+        
+        /* Estilos del Modal */
+        .modal-bg {
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background-color: #1a1a2e; /* Fondo oscuro del modal */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="dashboard-header flex justify-between items-center px-6 py-3">
+        <div class="flex items-center space-x-4">
+            <a href="administration.html">
+                <h1 class="text-3xl font-extrabold logo-text tracking-wider">
+                    <span class="logo-yellow">GYM</span><span class="logo-white">ENEZ</span>
+                </h1>
+            </a>
+            <span class="text-gray-400 text-sm font-light uppercase tracking-widest">/ Gestión de Usuarios</span>
+        </div>
+        <nav>
+            <button id="logout-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-200 shadow-lg">
+                Cerrar Sesión
+            </button>
+        </nav>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-3xl font-bold text-white">Listado de Clientes</h2>
+            <button id="add-user-btn" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 flex items-center shadow-md">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                Añadir Nuevo Usuario
+            </button>
+        </div>
+
+        <div class="content-card rounded-xl overflow-hidden shadow-lg">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-700 data-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Email</th>
+                            <th>Cédula (ID)</th>
+                            <th>Teléfono</th>
+                            <th>Activo Desde</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body" class="divide-y divide-gray-800">
+                        <tr><td colspan="7" class="text-center py-8 text-gray-400">Cargando usuarios...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p id="loading-message" class="p-4 text-center text-sm text-gray-400 hidden">Cargando...</p>
+            <p id="error-message-table" class="p-4 text-center text-sm text-red-400 hidden"></p>
+        </div>
+
+    </main>
+    
+    <div id="user-modal" class="modal-bg fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="modal-content w-full max-w-2xl mx-auto p-8 rounded-xl relative">
+            <h3 id="modal-title" class="text-2xl font-bold text-white mb-6">Añadir Nuevo Usuario</h3>
+            <form id="user-form" class="grid grid-cols-2 gap-4">
+                <input type="hidden" id="user-id" name="user_id">
+                
+                <div class="space-y-4 col-span-1">
+                    <h4 class="text-lg font-semibold text-sky-400 border-b border-sky-400/50 pb-1">Credenciales</h4>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-300">Email:</label>
+                        <input type="email" id="email" name="email" required class="w-full bg-gray-700/50 border border-gray-600 p-2 rounded-md focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-300">Contraseña (Sólo para nuevo usuario):</label>
+                        <input type="password" id="password" name="password" class="w-full bg-gray-700/50 border border-gray-600 p-2 rounded-md focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label for="id_number" class="block text-sm font-medium text-gray-300">Cédula/ID:</label>
+                        <input type="text" id="id_number" name="id_number" required class="w-full bg-gray-700/50 border border-gray-600 p-2 rounded-md focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label for="phone_number" class="block text-sm font-medium text-gray-300">Teléfono:</label>
+                        <input type="text" id="phone_number" name="phone_number" class="w-full bg-gray-700/50 border border-gray-600 p-2 rounded-md focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label for="activo_desde" class="block text-sm font-medium text-gray-300">Activo Desde (DD/MM/YYYY):</label>
+                        <input type="text" id="activo_desde" name="activo_desde" class="w-full bg-gray-700/50 border border-gray-600 p-2 rounded-md focus:border-sky-500" placeholder="01/12/2025">
+                    </div>
+                </div>
+
+                <div class="space-y-4 col-span-1">
+                    <h4 class="text-lg font-semibold text-yellow-400 border-b border-yellow-400/50 pb-1">Datos Personales</h4>
+                    <div>
+                        <label for="first_name" class="block text-sm font-medium text-gray-300">Nombre:</label>
+                        <input type="text" id="first_name" name="first_name" required class="w-full bg-gray-700/50 border border-gray-600 p-2 rounded-md focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label for="last_name" class="block text-sm font-medium text-gray-300">Apellido:</label>
+                        <input type="text" id="last_name" name="last_name" required class="w-full bg-gray-700/50 border border-gray-600 p-2 rounded-md focus:border-sky-500">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label for="dob" class="block text-sm font-medium text-gray-300">Fecha Nac. (DD/MM/YYYY):</label>
+                            <input type="text" id="dob" name="dob" class="w-full bg-gray-700/50 border border-gray-600 p-2 rounded-md focus:border-sky-500" placeholder="18/11/2004">
+                        </div>
+                        <div>
+                            <label for="sex" class="block text-sm font-medium text-gray-300">Sexo:</label>
+                            <select id="sex" name="sex" class="w-full bg-gray-700/50 border border-gray-600 p-2 rounded-md focus:border-sky-500">
+                                <option value="Masculino">Masculino</option>
+                                <option value="Femenino">Femenino</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label for="stature" class="block text-sm font-medium text-gray-300">Estatura (m):</label>
+                            <input type="number" step="0.01" id="stature" name="stature" class="w-full bg-gray-700/50 border border-gray-600 p-2 rounded-md focus:border-sky-500">
+                        </div>
+                        <div>
+                            <label for="weight" class="block text-sm font-medium text-gray-300">Peso (kg):</label>
+                            <input type="number" step="0.1" id="weight" name="weight" class="w-full bg-gray-700/50 border border-gray-600 p-2 rounded-md focus:border-sky-500">
+                        </div>
+                        <div>
+                            <label for="age" class="block text-sm font-medium text-gray-300">Edad:</label>
+                            <input type="number" id="age" name="age" class="w-full bg-gray-700/50 border border-gray-600 p-2 rounded-md focus:border-sky-500">
+                        </div>
+                    </div>
+                    <p id="modal-message" class="text-center text-sm font-semibold mt-4 hidden"></p>
+                </div>
+                
+                <div class="col-span-2 flex justify-end space-x-4 pt-4 border-t border-gray-700">
+                    <button type="button" id="close-modal-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition duration-200">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="submit-form-btn" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+                        Guardar Usuario
+                    </button>
+                </div>
+            </form>
+            <button id="modal-close-icon" class="absolute top-4 right-4 text-gray-400 hover:text-white" onclick="document.getElementById('user-modal').classList.add('hidden')">&times;</button>
+        </div>
+    </div>
+
+
+    <script>
+        // --- CONFIGURACIÓN DE LA API ---
+        const API_BASE_URL = "https://sijj2003.pythonanywhere.com"; 
+        const USERS_ENDPOINT = `${API_BASE_URL}/api/admin/users`;
+        const USER_ENDPOINT = `${API_BASE_URL}/api/admin/user`;
+        
+        // --- VARIABLES GLOBALES ---
+        let isEditMode = false;
+
+        // --- FUNCIONES DE UTILIDAD ---
+        
+        /**
+         * Muestra un mensaje de error o éxito en el modal.
+         */
+        function showModalMessage(message, isError = false) {
+            const msgEl = document.getElementById('modal-message');
+            msgEl.textContent = message;
+            msgEl.classList.remove('hidden', 'text-red-400', 'text-green-400');
+            msgEl.classList.add(isError ? 'text-red-400' : 'text-green-400');
+
+            if (!isError) {
+                setTimeout(() => {
+                    document.getElementById('user-modal').classList.add('hidden');
+                    fetchAllUsers();
+                }, 1500);
+            }
+        }
+        
+        // --- LÓGICA DE LA TABLA ---
+
+        /**
+         * Carga todos los usuarios desde la API y renderiza la tabla.
+         */
+        async function fetchAllUsers() {
+            const tableBody = document.getElementById('users-table-body');
+            const loadingMsg = document.getElementById('loading-message');
+            const errorMsg = document.getElementById('error-message-table');
+            
+            tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-400">Cargando usuarios...</td></tr>';
+            loadingMsg.classList.remove('hidden');
+            errorMsg.classList.add('hidden');
+
+            try {
+                const response = await fetch(USERS_ENDPOINT);
+                const data = await response.json();
+
+                loadingMsg.classList.add('hidden');
+
+                if (data.success) {
+                    renderUserTable(data.users);
+                } else {
+                    errorMsg.textContent = data.error || 'Error al cargar los usuarios.';
+                    errorMsg.classList.remove('hidden');
+                    tableBody.innerHTML = '';
+                }
+
+            } catch (error) {
+                loadingMsg.classList.add('hidden');
+                errorMsg.textContent = `Error de red: ${error.message}`;
+                errorMsg.classList.remove('hidden');
+                tableBody.innerHTML = '';
+            }
+        }
+
+        /**
+         * Renderiza las filas de la tabla con los datos de los usuarios.
+         */
+        function renderUserTable(users) {
+            const tableBody = document.getElementById('users-table-body');
+            tableBody.innerHTML = ''; 
+
+            if (users.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-400">No hay usuarios registrados.</td></tr>';
+                return;
+            }
+
+            users.forEach(user => {
+                const row = tableBody.insertRow();
+                row.classList.add('hover:bg-gray-800/50'); 
+                
+                // Celdas de información
+                row.insertCell().textContent = user.name || '';
+                row.insertCell().textContent = user.last_name || '';
+                row.insertCell().textContent = user.email || '';
+                row.insertCell().textContent = user.id_number || '';
+                row.insertCell().textContent = user.phone_number || '';
+                row.insertCell().textContent = user.activo_desde || 'N/A';
+                
+                // Celda de Acciones
+                const actionsCell = row.insertCell();
+                actionsCell.classList.add('space-x-2');
+                
+                // Botón Editar
+                const editBtn = document.createElement('button');
+                editBtn.textContent = 'Editar';
+                editBtn.classList.add('text-sky-400', 'hover:text-sky-300', 'font-semibold');
+                editBtn.onclick = () => openModalForEdit(user);
+                
+                // Botón Eliminar
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Eliminar';
+                deleteBtn.classList.add('text-red-500', 'hover:text-red-400', 'font-semibold');
+                deleteBtn.onclick = () => confirmDeleteUser(user.user_id, user.name);
+
+                actionsCell.appendChild(editBtn);
+                actionsCell.appendChild(deleteBtn);
+            });
+        }
+
+
+        // --- LÓGICA DEL MODAL Y FORMULARIO ---
+        
+        /**
+         * Abre el modal para crear un nuevo usuario.
+         */
+        function openModalForCreate() {
+            isEditMode = false;
+            document.getElementById('modal-title').textContent = 'Añadir Nuevo Usuario';
+            document.getElementById('user-form').reset();
+            document.getElementById('user-id').value = '';
+            document.getElementById('password').required = true; // La contraseña es obligatoria en creación
+            document.getElementById('modal-message').classList.add('hidden');
+            document.getElementById('user-modal').classList.remove('hidden');
+            // Establecer fecha de inicio por defecto
+            const today = new Date();
+            const defaultDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
+            document.getElementById('activo_desde').value = defaultDate;
+        }
+
+        /**
+         * Abre el modal para editar un usuario existente.
+         */
+        function openModalForEdit(user) {
+            isEditMode = true;
+            document.getElementById('modal-title').textContent = 'Editar Usuario';
+            document.getElementById('user-form').reset();
+            document.getElementById('password').required = false; // La contraseña es opcional en edición
+            document.getElementById('modal-message').classList.add('hidden');
+
+            // Llenar el formulario
+            document.getElementById('user-id').value = user.user_id;
+            document.getElementById('email').value = user.email || '';
+            document.getElementById('first_name').value = user.name || ''; 
+            document.getElementById('last_name').value = user.last_name || '';
+            document.getElementById('id_number').value = user.id_number || '';
+            document.getElementById('phone_number').value = user.phone_number || '';
+            document.getElementById('dob').value = user.dob || '';
+            document.getElementById('sex').value = user.sex || 'Masculino';
+            document.getElementById('stature').value = user.stature || 0;
+            document.getElementById('weight').value = user.weight || 0;
+            document.getElementById('age').value = user.age || 0;
+            document.getElementById('activo_desde').value = user.activo_desde || '';
+
+            document.getElementById('user-modal').classList.remove('hidden');
+        }
+
+        /**
+         * Maneja el envío del formulario de Creación/Edición.
+         */
+        async function handleUserFormSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const userId = document.getElementById('user-id').value;
+            const submitBtn = document.getElementById('submit-form-btn');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = isEditMode ? 'Actualizando...' : 'Creando...';
+
+            // Recoger todos los datos del formulario (simulando FormData)
+            const formData = {
+                user_id: userId,
+                email: form.email.value,
+                password: form.password.value,
+                first_name: form.first_name.value.toUpperCase(),
+                last_name: form.last_name.value.toUpperCase(),
+                id_number: form.id_number.value,
+                phone_number: form.phone_number.value,
+                dob: form.dob.value,
+                sex: form.sex.value,
+                stature: parseFloat(form.stature.value),
+                weight: parseFloat(form.weight.value),
+                age: parseInt(form.age.value),
+                activo_desde: form.activo_desde.value
+            };
+            
+            // Si está en edición, eliminamos campos vacíos o no necesarios
+            if (isEditMode) {
+                // El password solo se envía si se ha introducido un valor
+                if (!formData.password) delete formData.password; 
+                // Eliminamos user_id del body para que no se actualice
+                delete formData.user_id;
+            }
+
+            const method = isEditMode ? 'PUT' : 'POST';
+            const url = isEditMode ? `${USER_ENDPOINT}/${userId}` : USER_ENDPOINT;
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    showModalMessage(data.message || 'Operación exitosa.', false);
+                } else {
+                    showModalMessage(data.error || 'Error desconocido.', true);
+                }
+
+            } catch (error) {
+                console.error('Error de API:', error);
+                showModalMessage('Error de red al comunicarse con la API.', true);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = isEditMode ? 'Guardar Cambios' : 'Guardar Usuario';
+            }
+        }
+        
+        /**
+         * Pide confirmación antes de eliminar un usuario.
+         */
+        function confirmDeleteUser(userId, userName) {
+            if (confirm(`¿Estás seguro de que quieres ELIMINAR al usuario ${userName} (ID: ${userId})? Esta acción es irreversible.`)) {
+                deleteUser(userId);
+            }
+        }
+
+        /**
+         * Llama a la API para eliminar el usuario.
+         */
+        async function deleteUser(userId) {
+            try {
+                const response = await fetch(`${USER_ENDPOINT}/${userId}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(`¡Usuario eliminado con éxito!`);
+                    fetchAllUsers();
+                } else {
+                    alert(`Error al eliminar: ${data.error}`);
+                }
+            } catch (error) {
+                alert(`Error de red al eliminar el usuario.`);
+            }
+        }
+
+        // --- LÓGICA DE CIERRE DE SESIÓN ---
+
+        function handleAdminLogout() {
+            localStorage.removeItem('adminSession');
+            window.location.href = 'administration.html'; // Volver a la página de login
+        }
+
+
+        // --- INICIALIZACIÓN ---
+        window.onload = function() {
+            const storedSession = localStorage.getItem('adminSession');
+            
+            if (!storedSession) {
+                // Si no hay sesión, redirigir al login
+                window.location.href = 'administration.html'; 
+                return;
+            }
+
+            // Cargar datos al iniciar
+            fetchAllUsers();
+
+            // LISTENERS GLOBALES
+            document.getElementById('logout-btn').addEventListener('click', handleAdminLogout);
+            document.getElementById('add-user-btn').addEventListener('click', openModalForCreate);
+            document.getElementById('close-modal-btn').addEventListener('click', () => {
+                document.getElementById('user-modal').classList.add('hidden');
+            });
+            document.getElementById('user-form').addEventListener('submit', handleUserFormSubmit);
+        };
+    </script>
+</body>
+</html>
