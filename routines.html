@@ -244,7 +244,7 @@
             }, 3000);
         }
         
-        // --- Lógica de Inicialización de Rutinas ---
+        // --- Lógica de Inicialización ---
         window.onload = function() {
             // El contenido ahora es estático, solo mostramos un mensaje de bienvenida.
             
@@ -288,102 +288,6 @@
                     todayCard.classList.add('today');
                 }
             }
-        }
-
-        // =========================================================================
-        // === LÓGICA DE GESTIÓN DE SESIONES (COPIADO DE session manager.txt) ===
-        // =========================================================================
-
-        // Variable global para almacenar el Device ID
-        [cite_start]let localDeviceId = localStorage.getItem('localDeviceId'); [cite: 1]
-        // Si el deviceId no existe, lo genera (solo para que las funciones lo tengan)
-        if (!localDeviceId) {
-            [cite_start]localDeviceId = crypto.randomUUID(); [cite: 2]
-            [cite_start]localStorage.setItem('localDeviceId', localDeviceId); [cite: 3]
-        }
-
-        // ---------------------------------------------------------------------
-        // 1. FUNCIÓN DE LOGOUT API (Debe enviar el deviceId)
-        // ---------------------------------------------------------------------
-        async function apiLogout(userId, deviceId) {
-            const API_BASE_URL = 'https://sijj2003.pythonanywhere.com';
-            [cite_start]if (userId) { [cite: 4]
-                // 🔑 CRÍTICO: Envía el deviceId para que el backend sepa QUÉ sesión está cerrando
-                await fetch(`${API_BASE_URL}/api/logout`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                   
-                    [cite_start]body: JSON.stringify({ userId: userId, deviceId: deviceId }) [cite: 5]
-                });
-            [cite_start]} [cite: 6]
-        }
-
-        // ---------------------------------------------------------------------
-        // 2. FUNCIÓN DE VERIFICACIÓN (Heartbeat)
-        // ---------------------------------------------------------------------
-        async function checkSessionValidity() {
-            const API_BASE_URL = 'https://sijj2003.pythonanywhere.com';
-            [cite_start]const userId = localStorage.getItem('userId'); [cite: 7]
-            [cite_start]const deviceId = localStorage.getItem('localDeviceId'); [cite: 7]
-
-            if (!userId || !deviceId) {
-                // No hay sesión local o deviceId, no hay nada que verificar.
-                [cite_start]return true; [cite: 8]
-            }
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/verify_session`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ userId: userId, deviceId: deviceId })
-               
-                [cite_start]}); [cite: 9]
-
-                if (response.ok) {
-                    // Sesión válida.
-                    [cite_start]return true; [cite: 10]
-                } else if (response.status === 403) {
-                    // 🚨 SESIÓN INVALIDADA REMOTAMENTE (cierre forzado o limpieza)
-
-                    // 1. Llama al logout de la API para confirmar y limpiar la sesión local en el backend.
-                    [cite_start]//    Gracias a la lógica robusta, el backend IGNORARÁ esta llamada si otra sesión está activa. [cite: 11]
-                    [cite_start]await apiLogout(userId, deviceId); [cite: 12]
-
-                    // 2. Limpia el almacenamiento local
-                    localStorage.removeItem('userId');
-                    [cite_start]localStorage.removeItem('localDeviceId'); [cite: 13]
-                    
-                    // 3. Notifica al usuario y redirige
-                    alert('Su sesión ha sido cerrada remotamente por actividad en otro dispositivo o por inactividad.');
-                    [cite_start]window.location.href = 'index.html'; [cite: 14]
-                    return false;
-                } else {
-                    // Otros errores (500, 404, etc.)
-                    console.error(`Error en verify_session: ${response.status}`);
-                    [cite_start]return true; [cite: 15] // Asumir OK para no desloguear por error de red
-                }
-            } catch (error) {
-                console.error('Error de red durante la verificación de sesión:', error);
-                [cite_start]return true; [cite: 16] // Asumir OK para errores de red temporales
-            }
-        }
-
-        // ---------------------------------------------------------------------
-        // 3. TEMPORIZADOR HEARTBEAT (Se ejecuta automáticamente)
-        // ---------------------------------------------------------------------
-
-        // Ejecutar la verificación cada 15 segundos (15000 milisegundos)
-        // CRÍTICO: El Heartbeat debe iniciar SÓLO si hay un userId en el localStorage
-        if (localStorage.getItem('userId')) {
-            // Primera verificación al cargar la página
-            checkSessionValidity();
-            [cite_start]// Configurar el intervalo [cite: 17]
-            [cite_start]setInterval(checkSessionValidity, 15000); [cite: 17]
-            console.log("Heartbeat de sesión iniciado universalmente.");
         }
     </script>
 </body>
