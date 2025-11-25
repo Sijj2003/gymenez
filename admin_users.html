@@ -119,11 +119,11 @@
                 <span class="GYM-YELLOW">GYM</span>ENEZ | Administración de Usuarios
             </h1>
             <nav class="space-x-4">
+                <button id="back-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out">
+                    ← Regresar
+                </button>
                 <button id="add-user-btn" class="bg-GYM-YELLOW hover:bg-GYM-YELLOW-dark text-black font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out">
                     + Añadir Usuario
-                </button>
-                <button id="logout-btn" class="text-red-400 hover:text-red-300 font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out">
-                    Cerrar Sesión
                 </button>
             </nav>
         </div>
@@ -604,11 +604,11 @@
         }
 
         // =============================================================
-        // LÓGICA DE CIERRE DE SESIÓN E INICIALIZACIÓN
+        // 🚩 LÓGICA DE NAVEGACIÓN (REGRESAR) 🚩
         // =============================================================
 
-        function handleAdminLogout() {
-            localStorage.removeItem('adminSession'); 
+        function handleNavigateBack() {
+            // Simplemente redirige a la página de administración sin cerrar la sesión
             window.location.href = 'administration.html'; 
         }
 
@@ -618,6 +618,7 @@
             const storedSession = localStorage.getItem('adminSession');
             
             if (!storedSession) {
+                // Si no hay sesión, aún redirigir al login
                 window.location.href = 'administration.html'; 
                 return;
             }
@@ -661,7 +662,8 @@
             fetchAllUsers();
 
             // LISTENERS GLOBALES
-            document.getElementById('logout-btn').addEventListener('click', handleAdminLogout);
+            // 🚩 Nuevo listener para el botón de Regresar 🚩
+            document.getElementById('back-btn').addEventListener('click', handleNavigateBack);
             document.getElementById('add-user-btn').addEventListener('click', openModalForCreate);
             document.getElementById('close-modal-btn').addEventListener('click', () => {
                 document.getElementById('user-modal').classList.add('hidden');
