@@ -140,7 +140,7 @@
         <div class="modal-content rounded-xl w-full max-w-2xl mx-4 p-8 transform transition-transform duration-300 scale-95">
             <div class="flex justify-between items-center pb-4 border-b border-gray-700">
                 <h3 id="modal-title" class="text-2xl font-bold text-white">Añadir Nuevo Usuario</h3>
-                <button id="close-modal-btn" class="text-gray-400 hover:text-white transition duration-200">
+                <button type="button" id="close-modal-btn" class="text-gray-400 hover:text-white transition duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -169,7 +169,7 @@
                     </div>
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-300">Contraseña <span id="password-req" class="text-red-500">*</span></label>
-                        <input type="password" id="password" name="password" required class="w-full bg-gray-700/50 border border-gray-600 p-3 rounded-lg focus:border-sky-500 focus:ring-sky-500 text-white" placeholder="Mínimo 6 caracteres">
+                        <input type="password" id="password" name="password" required class="w-full bg-gray-700/50 border border-gray-600 p-3 rounded-lg focus:border-sky-500 focus:ring-sky-500 text-white" placeholder="Mínimo 6 caracteres (solo requerido en creación)">
                     </div>
                 </div>
 
@@ -224,8 +224,12 @@
     </div>
 
     <script>
-        // Configuración de la URL base de tu API de Flask
-        const API_BASE_URL = 'http://localhost:5000/api/admin/user'; // ASUME que la API corre en localhost:5000
+        // =============================================================
+        // 🚨 CAMBIO IMPORTANTE: URL DE LA API
+        // DEBES CAMBIAR ESTA URL por el dominio real de tu servidor Flask (por ejemplo, tu dominio en PythonAnywhere).
+        // Si sigue en localhost:5000 y el frontend no se sirve desde allí, tendrás el error "Failed to fetch".
+        // =============================================================
+        const API_BASE_URL = 'https://tudominio.pythonanywhere.com/api/admin/user'; 
 
         // =============================================================
         // LÓGICA DE LA TABLA (READ - Leer)
@@ -236,7 +240,8 @@
             tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-sky-400">Cargando datos...</td></tr>';
             
             try {
-                const response = await fetch(API_BASE_URL + 's', { // GET /api/admin/users
+                // GET /api/admin/users
+                const response = await fetch(API_BASE_URL.replace('/user', '/users'), { 
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' }
                 });
@@ -251,7 +256,7 @@
 
             } catch (error) {
                 console.error("Error de red al obtener usuarios:", error);
-                tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-red-400">Error de conexión con el servidor.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-red-400">Error de conexión con el servidor. (Verifica API_BASE_URL)</td></tr>';
             }
         }
 
@@ -322,7 +327,7 @@
             // Requerir contraseña para la creación
             document.getElementById('password').required = true;
             document.getElementById('password-req').classList.remove('hidden');
-            document.getElementById('password').placeholder = 'Mínimo 6 caracteres';
+            document.getElementById('password').placeholder = 'Mínimo 6 caracteres (solo requerido en creación)';
 
             document.getElementById('user-modal').classList.remove('hidden');
         }
@@ -399,6 +404,12 @@
             if (isEditMode && !formData.password) {
                 delete formData.password;
             }
+            
+            // Validar que en modo creación la contraseña no esté vacía
+            if (!isEditMode && !formData.password) {
+                 alert("La contraseña es obligatoria para crear un nuevo usuario.");
+                 return;
+            }
 
             const method = isEditMode ? 'PUT' : 'POST';
             const url = isEditMode ? `${API_BASE_URL}/${userId}` : API_BASE_URL;
@@ -420,11 +431,12 @@
                     alert(`Error al ${isEditMode ? 'editar' : 'crear'} usuario: ${data.error}`);
                 }
             } catch (error) {
-                alert(`Error de red al procesar el usuario.`);
+                alert(`Error de red al procesar el usuario. Verifica la conexión con el servidor de la API.`);
+                console.error(error);
             }
         }
         
-        // Función auxiliar para convertir 'YYYY-MM-DD' de HTML Input a 'DD/MM/YYYY' para el backend (como usa tu código Python)
+        // Función auxiliar para convertir 'YYYY-MM-DD' de HTML Input a 'DD/MM/YYYY' para el backend
         function formatDateForBackend(dateValue) {
             if (!dateValue) return '';
             const parts = dateValue.split('-'); // [YYYY, MM, DD]
@@ -467,7 +479,7 @@
         // =============================================================
 
         function handleAdminLogout() {
-            // Nota: Se asume que el token de sesión se limpia al redirigir al login
+            // Limpia la sesión de administrador
             localStorage.removeItem('adminSession'); 
             // Redirigir a la página de login
             window.location.href = 'administration.html'; 
@@ -480,6 +492,7 @@
             
             // Validación básica de sesión (debe complementarse con validación en el backend)
             if (!storedSession) {
+                // Si no hay sesión, redirigir al login
                 window.location.href = 'administration.html'; 
                 return;
             }
