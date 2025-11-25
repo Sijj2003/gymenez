@@ -23,39 +23,51 @@
             color: #e5e7eb; 
             /* Transición para un cambio de fondo suave */
             transition: background-image 1s ease-in-out; 
+            /* Importante: para el dashboard, quitamos la centralización inicial */
+            display: flex; /* Mantenemos flex para el login, pero lo cambiaremos a block/flex en el dashboard */
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Contenedor principal que se reemplazará (Login Card) */
+        #main-container {
+            width: 100%;
+            max-width: 448px; /* max-w-sm (384px) + padding o un valor fijo para el glass effect */
+            padding: 1rem;
         }
 
         /* Efecto de cristal esmerilado para el contenedor de login (Mejora estética) */
         .glass-effect {
-            background-color: rgba(13, 13, 26, 0.7); /* Fondo semi-transparente oscuro */
-            backdrop-filter: blur(12px); /* Efecto de desenfoque más pronunciado */
-            border: 1px solid rgba(255, 255, 255, 0.15); /* Borde más visible */
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4); /* Sombra más profunda */
-            border-radius: 20px; /* Bordes ligeramente más redondeados */
-            padding: 2.5rem; /* Aumento del padding para más espacio */
+            background-color: rgba(13, 13, 26, 0.7); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255, 255, 255, 0.15); 
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4); 
+            border-radius: 20px; 
+            padding: 2.5rem; 
         }
 
         /* Estilo para inputs más oscuros y modernos (Mejora estética) */
         .custom-input {
-            background-color: #1a1a2e; /* Fondo del input oscuro */
+            background-color: #1a1a2e; 
             border: 1px solid #3d3d5c;
-            color: #e5e7eb; /* Color del texto claro */
-            padding: 0.85rem 1rem; /* Ligeramente más alto */
+            color: #e5e7eb; 
+            padding: 0.85rem 1rem; 
             border-radius: 0.6rem; 
             transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s; 
         }
 
         .custom-input:focus {
-            border-color: #0ea5e9; /* Borde azul de Tailwind al enfocar */
+            border-color: #0ea5e9; 
             outline: none;
-            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.3); /* Sombra suave azul más grande */
-            background-color: #252540; /* Ligeramente más claro al enfocar */
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.3); 
+            background-color: #252540; 
         }
 
         /* Estilo específico para el logo GYMENEZ para asegurar el borde negro */
-        /* Ahora solo contiene el text-shadow, el color se define en los spans */
         .logo-text {
-            /* Define el borde negro para todas las letras */
             text-shadow: 
                 -1px -1px 0 #000,  
                  1px -1px 0 #000,
@@ -75,11 +87,37 @@
         .logo-white {
             color: #ffffff; /* Color blanco */
         }
+
+        /* --- ESTILOS DEL DASHBOARD --- */
+        /* Estilo del Header inspirado en el Navbar de index.html */
+        .dashboard-header {
+            background-color: rgba(13, 13, 26, 0.8); /* Oscuro semi-transparente */
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        /* Estilo del Dashboard Content */
+        .dashboard-content {
+            padding-top: 80px; /* Espacio para el header fijo */
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            padding-bottom: 1.5rem;
+            width: 100%;
+            max-width: 1280px; /* Para centrar el contenido en pantallas grandes */
+            margin: 0 auto;
+        }
+
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body>
 
-    <div class="glass-effect w-full max-w-sm space-y-7 rounded-2xl"> 
+    <div id="main-container" class="glass-effect w-full max-w-sm space-y-7 rounded-2xl"> 
 
         <div class="text-center">
             
@@ -124,26 +162,109 @@
         // --- CONFIGURACIÓN Y LÓGICA DE INICIO DE SESIÓN ---
         // ----------------------------------------------------
         
-        // Esta es la dirección de tu API Flask
         const API_BASE_URL = "https://sijj2003.pythonanywhere.com"; 
         const ADMIN_LOGIN_ENDPOINT = `${API_BASE_URL}/api/admin_login`;
-
-        // Configuración de WhatsApp para recuperación de contraseña de administrador
-        const WHATSAPP_NUMBER = "+584120000000"; // Número de ejemplo
+        const WHATSAPP_NUMBER = "+584120000000"; 
         const WHATSAPP_MESSAGE_RECOVERY = "Hola, necesito ayuda para recuperar mi acceso de administrador en GYMENEZ. Mi correo es... [Indicar Correo]"; 
 
 
         // --------------------------------
-        // --- FUNCIONES DE SOPORTE ---
+        // --- DASHBOARD RENDERER ---
         // --------------------------------
 
         /**
-         * Genera un ID de dispositivo/sesión único para el cliente si no existe.
+         * Renderiza el layout visual del dashboard del administrador, inspirado en index.html.
+         * Esto reemplaza el formulario de login.
          */
+        function renderAdminDashboard(adminData) {
+            const body = document.body;
+            const adminName = adminData.name || "Administrador";
+
+            // 1. Quitar las clases de centrado del body para que el dashboard ocupe toda la pantalla
+            body.classList.remove('flex', 'items-center', 'justify-center', 'min-h-screen', 'p-4');
+            body.style.display = 'block';
+            body.style.padding = '0';
+            body.style.margin = '0';
+
+            // 2. Definir la estructura HTML del Dashboard
+            const dashboardHTML = `
+                <header class="dashboard-header flex justify-between items-center px-6 py-3">
+                    <div class="flex items-center space-x-4">
+                        <h1 class="text-3xl font-extrabold logo-text tracking-wider">
+                            <span class="logo-yellow">GYM</span><span class="logo-white">ENEZ</span>
+                        </h1>
+                        <span class="text-gray-400 text-sm font-light uppercase tracking-widest">Admin Panel</span>
+                    </div>
+                    <nav>
+                        <ul class="flex space-x-6 text-sm font-semibold">
+                            <li><a href="#" class="text-sky-400 hover:text-sky-300 transition duration-200">Usuarios</a></li>
+                            <li><a href="#" class="text-gray-300 hover:text-sky-300 transition duration-200">Pagos</a></li>
+                            <li><a href="#" class="text-gray-300 hover:text-sky-300 transition duration-200">Reportes</a></li>
+                            <li>
+                                <button id="logout-btn" class="text-red-400 hover:text-red-300 transition duration-200">
+                                    Cerrar Sesión
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                </header>
+
+                <main class="dashboard-content">
+                    <h2 class="text-4xl font-bold text-gray-100 mb-6 mt-4">
+                        ¡Bienvenido de vuelta, ${adminName}!
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        
+                        <div class="glass-effect p-6 space-y-3 rounded-xl hover:shadow-sky-500/30 transition duration-300 transform hover:-translate-y-1">
+                            <p class="text-sm text-gray-400 uppercase tracking-widest">Usuarios Activos</p>
+                            <h3 class="text-5xl font-extrabold text-sky-400">145</h3>
+                            <p class="text-sm text-gray-300">Última actualización: Ahora</p>
+                        </div>
+                        
+                        <div class="glass-effect p-6 space-y-3 rounded-xl hover:shadow-sky-500/30 transition duration-300 transform hover:-translate-y-1">
+                            <p class="text-sm text-gray-400 uppercase tracking-widest">Ingresos (Mes)</p>
+                            <h3 class="text-5xl font-extrabold text-green-400">$8,940</h3>
+                            <p class="text-sm text-gray-300">Meta cumplida en un 80%</p>
+                        </div>
+
+                        <div class="glass-effect p-6 space-y-3 rounded-xl hover:shadow-sky-500/30 transition duration-300 transform hover:-translate-y-1">
+                            <p class="text-sm text-gray-400 uppercase tracking-widest">Rutinas Creadas</p>
+                            <h3 class="text-5xl font-extrabold text-yellow-400">42</h3>
+                            <p class="text-sm text-gray-300">Pendiente de revisión: 3</p>
+                        </div>
+
+                    </div>
+
+                    <p class="mt-12 text-gray-500 text-center">
+                        Este es un apartado puramente gráfico de demostración del Dashboard Administrativo.
+                    </p>
+                </main>
+            `;
+
+            // 3. Reemplazar todo el contenido del body por el Dashboard
+            body.innerHTML = dashboardHTML;
+
+            // 4. Adjuntar listener para el botón de Cerrar Sesión
+            document.getElementById('logout-btn').addEventListener('click', handleAdminLogout);
+        }
+
+        /**
+         * Función para cerrar la sesión (limpia localStorage y recarga la página)
+         */
+        function handleAdminLogout() {
+            localStorage.removeItem('adminSession');
+            localStorage.removeItem('deviceId'); // Opcional, pero recomendado
+            window.location.reload(); 
+        }
+
+        // --------------------------------
+        // --- FUNCIONES DE SOPORTE ---
+        // --------------------------------
+        
         function getDeviceId() {
             let deviceId = localStorage.getItem('deviceId');
             if (!deviceId) {
-                // Genera un UUID v4 simple para usar como ID de dispositivo
                 deviceId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
                     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
                     return v.toString(16);
@@ -153,16 +274,11 @@
             return deviceId;
         }
 
-        /**
-         * Muestra el mensaje de error y lo oculta automáticamente después de 5 segundos.
-         */
         function displayError(message) {
             const errorElement = document.getElementById('login-error-message');
             if (errorElement) {
                 errorElement.textContent = message;
                 errorElement.classList.remove('hidden');
-
-                // Ocultar después de 5 segundos
                 setTimeout(() => {
                     errorElement.classList.add('hidden');
                     errorElement.textContent = '';
@@ -172,21 +288,15 @@
 
 
         // --------------------------------
-        // --- FUNCIÓN PRINCIPAL DE LOGIN ---
+        // --- FUNCIÓN PRINCIPAL DE LOGIN (MODIFICADA) ---
         // --------------------------------
 
-        /**
-         * Función para manejar el inicio de sesión del administrador.
-         */
         async function handleAdminLogin(event) {
-            event.preventDefault(); // Detener el envío del formulario
-
+            event.preventDefault(); 
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
-            // Obtener el ID único del dispositivo
             const deviceId = getDeviceId(); 
             
-            // Ocultar mensaje de error anterior
             document.getElementById('login-error-message').classList.add('hidden');
 
             if (!email || !password) {
@@ -195,7 +305,6 @@
             }
 
             try {
-                // Realizar la solicitud al nuevo endpoint de administrador
                 const response = await fetch(ADMIN_LOGIN_ENDPOINT, {
                     method: 'POST',
                     headers: {
@@ -204,7 +313,6 @@
                     body: JSON.stringify({ email, password, deviceId })
                 });
 
-                // Intentar leer la respuesta como JSON
                 const responseText = await response.text();
                 let data;
                 try {
@@ -216,13 +324,10 @@
                 }
                 
                 if (response.ok && data.success) {
-                    // Autenticación exitosa
+                    // *** CAMBIO CLAVE: Llama a la función de renderizado en lugar de redirigir ***
                     localStorage.setItem('adminSession', JSON.stringify(data.admin));
-
-                    // REDIRECCIONAR AL DASHBOARD
-                    window.location.href = 'admin_dashboard.html'; 
+                    renderAdminDashboard(data.admin); 
                 } else {
-                    // Manejar errores de la API (401, 400, 500)
                     const errorMessage = data.error || 'Credenciales inválidas. Por favor, verifica el correo y la contraseña.';
                     displayError(errorMessage);
                 }
@@ -232,7 +337,7 @@
             }
         }
 
-        // FUNCIÓN PARA REDIRECCIONAR A WHATSAPP (Recuperación Administradores)
+        // FUNCIÓN PARA REDIRECCIONAR A WHATSAPP
         function handleForgotPassword() {
             const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE_RECOVERY);
             const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\\d+]/g, '')}?text=${encodedMessage}`;
@@ -241,26 +346,36 @@
         
         // FUNCIÓN PARA VOLVER AL LOGIN GENERAL
         function handleReturnToClientLogin() {
-            // Asumiendo que tu página principal de login es index.html
             window.location.href = 'index.html'; 
         }
 
 
         // --- Lógica de Inicialización ---
         window.onload = function() {
-            // Verificar si ya hay una sesión de administrador guardada para saltar el login
             const storedSession = localStorage.getItem('adminSession');
+            
+            // Si hay sesión activa, renderizar el dashboard inmediatamente
             if (storedSession) {
-                // *** REDIRECCIONAR AL DASHBOARD DEL ADMINISTRADOR ***
-                window.location.href = 'admin_dashboard.html'; 
-                return; 
+                try {
+                    const adminData = JSON.parse(storedSession);
+                    renderAdminDashboard(adminData);
+                } catch (e) {
+                    // Si el JSON es inválido, limpiar y mostrar login
+                    localStorage.removeItem('adminSession');
+                    attachLoginListeners();
+                }
+            } else {
+                // Si no hay sesión, adjuntar listeners al formulario de login
+                attachLoginListeners();
             }
+        };
 
-            // LISTENERS
+        // Función auxiliar para adjuntar listeners al formulario (solo se usa en el login)
+        function attachLoginListeners() {
             document.getElementById('admin-login-form').addEventListener('submit', handleAdminLogin);
             document.getElementById('forgot-password-link').addEventListener('click', handleForgotPassword);
             document.getElementById('return-to-client-login').addEventListener('click', handleReturnToClientLogin);
-        };
+        }
     </script>
 </body>
 </html>
