@@ -374,6 +374,7 @@
             document.getElementById('submit-btn').textContent = 'Crear Usuario';
             
             // Configurar campos por defecto o requeridos
+            document.getElementById('email').removeAttribute('disabled');
             document.getElementById('password').required = true;
             document.getElementById('password-req').classList.remove('hidden');
             document.getElementById('password').placeholder = 'Mínimo 6 caracteres (solo requerido en creación)';
@@ -396,6 +397,10 @@
             document.getElementById('is-edit-mode').value = 'true';
             document.getElementById('submit-btn').textContent = 'Guardar Cambios';
 
+            // El email se deshabilita para evitar conflictos de autenticación de terceros
+            document.getElementById('email').value = user.email || '';
+            document.getElementById('email').setAttribute('disabled', 'true'); // Deshabilitar edición de email
+
             document.getElementById('password').required = false;
             document.getElementById('password-req').classList.add('hidden');
             document.getElementById('password').placeholder = 'Dejar vacío para no cambiar';
@@ -403,7 +408,6 @@
             // Llenar campos con datos del usuario
             document.getElementById('name').value = user.name || '';
             document.getElementById('last_name').value = user.last_name || '';
-            document.getElementById('email').value = user.email || '';
             document.getElementById('sex').value = user.sex || 'Otro';
             document.getElementById('subscription_level').value = user.subscription_level || 'Básico';
 
@@ -443,6 +447,10 @@
             document.getElementById('dob').value = formatStringDateToInput(user.dob);
             document.getElementById('activo_desde').value = formatStringDateToInput(user.activo_desde);
 
+            // Forzar formateo de cédula en modo edición al abrir el modal (por si el valor guardado no tiene puntos)
+            const idNumberInput = document.getElementById('id_number');
+            idNumberInput.value = formatIdNumber(idNumberInput.value);
+
             document.getElementById('user-modal').classList.remove('hidden');
         }
 
@@ -468,7 +476,6 @@
             const phoneNumberBody = form.phone_number_body.value.replace(/\D/g, ''); // Solo dígitos para el cuerpo
             const fullPhoneNumber = phonePrefix + '-' + phoneNumberBody;
 
-
             // Recoger datos del formulario
             const formData = {
                 id: userId,
@@ -489,6 +496,13 @@
                 activo_desde: formatDateForBackend(form.activo_desde.value)
             };
             
+            // Si estamos editando, el email viene deshabilitado, lo tomamos del valor en el input
+            if (isEditMode) {
+                 // Si el email está deshabilitado en el modal, usamos el valor que está ahí, pero el backend lo ignora si no se actualiza
+                 // Además, eliminamos el email de los datos a enviar si estamos en modo edición para no confundir el backend con un email deshabilitado
+                 delete formData.email; 
+            }
+
             // Si estamos editando y el password está vacío, no lo enviamos
             if (isEditMode && !formData.password) {
                 delete formData.password;
@@ -584,32 +598,41 @@
                 return;
             }
 
-            // Agregar listener para el formateo de cédula en tiempo real
+            // =============================================================
+            // ⭐️ CORRECCIÓN DEL CURSOR EN TIEMPO REAL (Cédula) ⭐️
+            // =============================================================
             const idNumberInput = document.getElementById('id_number');
             if (idNumberInput) {
                 idNumberInput.addEventListener('input', function() {
-                    // Guarda el valor de la selección para restaurar el cursor
-                    const start = this.selectionStart; 
-                    const end = this.selectionEnd;
-
-                    // Guarda el valor anterior sin formatear para calcular la posición del cursor
-                    const oldRawValue = this.value.replace(/\D/g, ''); 
-
-                    // Aplica el formato y actualiza el valor
-                    this.value = formatIdNumber(this.value);
-
-                    // Intenta restaurar la posición del cursor
-                    const newRawValue = this.value.replace(/\D/g, '');
-                    const addedChars = newRawValue.length - oldRawValue.length;
+                    const oldFormattedValue = this.value;
+                    const oldCursorPos = this.selectionStart;
                     
-                    // Ajuste de la posición del cursor: Si se agregó un punto, mueve el cursor hacia adelante.
-                    this.setSelectionRange(start + addedChars, end + addedChars);
-
+                    // 1. Limpiar el valor a solo dígitos y formatearlo
+                    const rawValue = oldFormattedValue.replace(/\D/g, '');
+                    const newFormattedValue = formatIdNumber(rawValue);
+                    
+                    // 2. Contar los caracteres no dígitos (puntos) antes de la actualización
+                    const oldNonDigitCount = (oldFormattedValue.match(/\./g) || []).length;
+                    // 3. Contar los caracteres no dígitos (puntos) después de la actualización
+                    const newNonDigitCount = (newFormattedValue.match(/\./g) || []).length;
+                    
+                    // 4. Calcular la diferencia neta (puntos añadidos o eliminados)
+                    const netDotChange = newNonDigitCount - oldNonDigitCount;
+                    
+                    // 5. Actualizar el valor del input
+                    this.value = newFormattedValue;
+                    
+                    // 6. Ajustar la posición del cursor: moverlo por el cambio neto de puntos
+                    const newCursorPos = oldCursorPos + netDotChange;
+                    
+                    // 7. Aplicar la nueva posición del cursor
+                    this.setSelectionRange(newCursorPos, newCursorPos);
                 });
                 
-                // Forzar formato inicial si ya tiene valor (ej: en modo edición)
+                // Forzar formato inicial si ya tiene valor (ej: en modo edición, aunque se hace también en openModalForEdit)
                 idNumberInput.value = formatIdNumber(idNumberInput.value);
             }
+            // =============================================================
 
             fetchAllUsers();
 
