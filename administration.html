@@ -23,14 +23,11 @@
             color: #e5e7eb; 
             /* Transición para un cambio de fondo suave */
             transition: background-image 1s ease-in-out; 
-            
-            /* === APLICADO: Borde negro para todas las letras (Text Stroke Effect) === */
-            /* Este estilo se aplica a todo el body, lo ajustaremos más abajo para el logo */
         }
 
-        /* Efecto de cristal esmerilado para el contenedor de login */
+        /* Efecto de cristal esmerilado para el contenedor de login (Mejora estética) */
         .glass-effect {
-            background-color: rgba(13, 13, 26, 0.7); /* Fondo semi-transparente oscuro, un poco menos opaco */
+            background-color: rgba(13, 13, 26, 0.7); /* Fondo semi-transparente oscuro */
             backdrop-filter: blur(12px); /* Efecto de desenfoque más pronunciado */
             border: 1px solid rgba(255, 255, 255, 0.15); /* Borde más visible */
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4); /* Sombra más profunda */
@@ -38,14 +35,14 @@
             padding: 2.5rem; /* Aumento del padding para más espacio */
         }
 
-        /* Estilo para inputs más oscuros y modernos */
+        /* Estilo para inputs más oscuros y modernos (Mejora estética) */
         .custom-input {
             background-color: #1a1a2e; /* Fondo del input oscuro */
             border: 1px solid #3d3d5c;
             color: #e5e7eb; /* Color del texto claro */
             padding: 0.85rem 1rem; /* Ligeramente más alto */
-            border-radius: 0.6rem; /* Bordes un poco más redondeados */
-            transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s; /* Animación adicional */
+            border-radius: 0.6rem; 
+            transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s; 
         }
 
         .custom-input:focus {
@@ -55,14 +52,14 @@
             background-color: #252540; /* Ligeramente más claro al enfocar */
         }
 
-        /* Estilo específico para el logo GYMENEZ para asegurar el borde negro */
+        /* Estilo específico para el logo GYMENEZ para asegurar el borde negro (Mejora estética) */
         .logo-text {
             text-shadow: 
                 -1px -1px 0 #000,  
                  1px -1px 0 #000,
                 -1px  1px 0 #000,
                  1px  1px 0 #000,
-                -1.5px -1.5px 0 #000, /* Bordes un poco más gruesos para el logo */
+                -1.5px -1.5px 0 #000, 
                  1.5px -1.5px 0 #000,
                 -1.5px  1.5px 0 #000,
                  1.5px  1.5px 0 #000;
@@ -72,21 +69,31 @@
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
 
-    <div class="glass-effect w-full max-w-sm space-y-7 rounded-2xl"> <div class="text-center">
-            <h1 class="text-4xl font-extrabold logo-text tracking-wider">GYMENEZ</h1> 
-            <p class="mt-3 text-xl font-semibold text-gray-200">Acceso Administrativo</p> </div>
+    <div class="glass-effect w-full max-w-sm space-y-7 rounded-2xl"> 
 
-        <form id="admin-login-form" class="space-y-5"> <div>
-                <label for="login-email" class="text-sm font-medium text-gray-300 block mb-2">Correo Electrónico:</label> <input type="email" id="login-email" name="email" required class="custom-input w-full" placeholder="admin@tudominio.com">
+        <div class="text-center">
+            
+            <h1 class="text-4xl font-extrabold logo-text tracking-wider">GYMENEZ</h1> 
+            <p class="mt-3 text-xl font-semibold text-gray-200">Acceso Administrativo</p> 
+
+        </div>
+
+        <form id="admin-login-form" class="space-y-5"> 
+
+            <div>
+                <label for="login-email" class="text-sm font-medium text-gray-300 block mb-2">Correo Electrónico:</label> 
+                <input type="email" id="login-email" name="email" required class="custom-input w-full" placeholder="admin@tudominio.com">
             </div>
 
             <div>
-                <label for="login-password" class="text-sm font-medium text-gray-300 block mb-2">Contraseña:</label> <input type="password" id="login-password" name="password" required class="custom-input w-full" placeholder="••••••••">
+                <label for="login-password" class="text-sm font-medium text-gray-300 block mb-2">Contraseña:</label> 
+                <input type="password" id="login-password" name="password" required class="custom-input w-full" placeholder="••••••••">
             </div>
 
             <p id="login-error-message" class="text-red-400 text-center font-semibold mt-4 mb-4 hidden"></p>
 
-            <button type="submit" id="login-button" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3.5 rounded-xl transition duration-300 transform hover:scale-105 tracking-wider uppercase shadow-lg"> Iniciar Sesión
+            <button type="submit" id="login-button" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3.5 rounded-xl transition duration-300 transform hover:scale-105 tracking-wider uppercase shadow-lg"> 
+                Iniciar Sesión
             </button>
         </form>
 
@@ -105,8 +112,8 @@
         // --- CONFIGURACIÓN Y LÓGICA DE INICIO DE SESIÓN ---
         // ----------------------------------------------------
         
-        // ** IMPORTANTE: REEMPLAZA ESTA URL CON LA DIRECCIÓN REAL DE TU API FLASK **
-        const API_BASE_URL = "TU_URL_DEL_BACKEND"; 
+        // ** ¡CORRECCIÓN! Esta es la dirección real de tu API Flask **
+        const API_BASE_URL = "https://sijj2003.pythonanywhere.com"; 
         const ADMIN_LOGIN_ENDPOINT = `${API_BASE_URL}/api/admin_login`;
 
         // Configuración de WhatsApp para recuperación de contraseña de administrador
@@ -176,6 +183,7 @@
             }
 
             try {
+                // Realizar la solicitud al nuevo endpoint de administrador
                 const response = await fetch(ADMIN_LOGIN_ENDPOINT, {
                     method: 'POST',
                     headers: {
@@ -184,10 +192,20 @@
                     body: JSON.stringify({ email, password, deviceId })
                 });
 
-                const data = await response.json();
-
+                // Intentar leer la respuesta como JSON
+                const responseText = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (e) {
+                    console.error('La respuesta no es JSON, es HTML o texto plano:', responseText);
+                    // Esto maneja el error de sintaxis que tenías
+                    displayError('Error de servidor: La API no devolvió una respuesta válida. (404/500)');
+                    return;
+                }
+                
                 if (response.ok && data.success) {
-                    // Guardar la sesión del administrador en localStorage
+                    // Autenticación exitosa
                     localStorage.setItem('adminSession', JSON.stringify(data.admin));
 
                     // REDIRECCIONAR AL DASHBOARD
@@ -199,7 +217,7 @@
                 }
             } catch (error) {
                 console.error('Error al intentar iniciar sesión:', error);
-                displayError('Error de red. No se pudo conectar con el servidor API. (Verifica la URL)');
+                displayError('Error de red. No se pudo conectar con el servidor API.');
             }
         }
 
@@ -212,7 +230,8 @@
         
         // FUNCIÓN PARA VOLVER AL LOGIN GENERAL
         function handleReturnToClientLogin() {
-            window.location.href = 'index.html';
+            // Asumiendo que tu página principal de login es index.html
+            window.location.href = 'index.html'; 
         }
 
 
@@ -222,9 +241,8 @@
             const storedSession = localStorage.getItem('adminSession');
             if (storedSession) {
                 // *** REDIRECCIONAR AL DASHBOARD DEL ADMINISTRADOR ***
-                // Asumiendo que existe una página "admin_dashboard.html"
                 window.location.href = 'admin_dashboard.html'; 
-                return; // Detener la ejecución para no adjuntar listeners
+                return; 
             }
 
             // LISTENERS
