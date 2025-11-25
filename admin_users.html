@@ -225,11 +225,10 @@
 
     <script>
         // =============================================================
-        // 🚨 CAMBIO IMPORTANTE: URL DE LA API
-        // DEBES CAMBIAR ESTA URL por el dominio real de tu servidor Flask (por ejemplo, tu dominio en PythonAnywhere).
-        // Si sigue en localhost:5000 y el frontend no se sirve desde allí, tendrás el error "Failed to fetch".
+        // 🚨 CORRECCIÓN FINAL DE LA URL DE LA API
+        // Se ha actualizado con tu dominio: https://sijj2003.pythonanywhere.com
         // =============================================================
-        const API_BASE_URL = 'https://tudominio.pythonanywhere.com/api/admin/user'; 
+        const API_BASE_URL = 'https://sijj2003.pythonanywhere.com/api/admin/user'; 
 
         // =============================================================
         // LÓGICA DE LA TABLA (READ - Leer)
@@ -240,11 +239,17 @@
             tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-sky-400">Cargando datos...</td></tr>';
             
             try {
-                // GET /api/admin/users
+                // Se utiliza replace para cambiar /user a /users para la ruta GET all
                 const response = await fetch(API_BASE_URL.replace('/user', '/users'), { 
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' }
                 });
+                
+                // Si la respuesta no es un 200 OK, lanzamos un error para la captura
+                if (!response.ok) {
+                     const errorText = await response.text();
+                     throw new Error(`Error HTTP: ${response.status} - ${errorText.substring(0, 100)}...`);
+                }
 
                 const data = await response.json();
                 
@@ -256,7 +261,7 @@
 
             } catch (error) {
                 console.error("Error de red al obtener usuarios:", error);
-                tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-red-400">Error de conexión con el servidor. (Verifica API_BASE_URL)</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-red-400">Error de conexión. 🔑 **Solución: Revisa la configuración CORS en tu api_server.py y recarga tu Web App en PythonAnywhere**.</td></tr>';
             }
         }
 
@@ -273,15 +278,12 @@
                 const row = tableBody.insertRow();
                 row.classList.add('hover:bg-gray-800/50'); 
                 
-                // Función para formatear fechas de Firestore (puede ser un objeto Timestamp o un string)
                 function formatDate(dateValue) {
                     if (!dateValue || dateValue === 'N/A') return 'N/A';
-                    // Intenta interpretar como objeto Firestore Timestamp
                     if (dateValue.seconds && dateValue.nanoseconds) {
                         return new Date(dateValue.seconds * 1000).toLocaleDateString('es-ES');
                     }
-                    // Asume que es un string con formato conocido (ej: YYYY-MM-DD o DD/MM/YYYY)
-                    return String(dateValue).split('T')[0]; // Elimina el tiempo si es ISO
+                    return String(dateValue).split('T')[0];
                 }
                 
                 // Celdas de información
@@ -360,12 +362,10 @@
             // Formatear fechas (dob, activo_desde) a 'YYYY-MM-DD' para input[type=date]
             function formatStringDateToInput(dateStr) {
                 if (!dateStr || dateStr === 'N/A') return '';
-                // Asume formato DD/MM/YYYY y lo convierte a YYYY-MM-DD
                 const parts = dateStr.split('/');
                 if (parts.length === 3) {
                     return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
                 }
-                // Si ya está en YYYY-MM-DD (ISO) o un formato compatible con el input
                 return dateStr.split('T')[0]; 
             }
             
@@ -420,6 +420,11 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
                 });
+                
+                if (!response.ok) {
+                     const errorText = await response.text();
+                     throw new Error(`Error HTTP: ${response.status} - ${errorText.substring(0, 100)}...`);
+                }
 
                 const data = await response.json();
                 
@@ -431,7 +436,7 @@
                     alert(`Error al ${isEditMode ? 'editar' : 'crear'} usuario: ${data.error}`);
                 }
             } catch (error) {
-                alert(`Error de red al procesar el usuario. Verifica la conexión con el servidor de la API.`);
+                alert(`Error de red al procesar el usuario. Verifica la conexión con el servidor de la API y el CORS.`);
                 console.error(error);
             }
         }
@@ -461,6 +466,11 @@
                     headers: { 'Content-Type': 'application/json' }
                 });
 
+                if (!response.ok) {
+                     const errorText = await response.text();
+                     throw new Error(`Error HTTP: ${response.status} - ${errorText.substring(0, 100)}...`);
+                }
+                
                 const data = await response.json();
                 
                 if (data.success) {
