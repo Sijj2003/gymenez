@@ -24,7 +24,7 @@
             /* Transición para un cambio de fondo suave */
             transition: background-image 1s ease-in-out; 
             /* Importante: para el dashboard, quitamos la centralización inicial */
-            display: flex; /* Mantenemos flex para el login, pero lo cambiaremos a block/flex en el dashboard */
+            display: flex; 
             justify-content: center;
             align-items: center;
             min-height: 100vh;
@@ -35,11 +35,11 @@
         /* Contenedor principal que se reemplazará (Login Card) */
         #main-container {
             width: 100%;
-            max-width: 448px; /* max-w-sm (384px) + padding o un valor fijo para el glass effect */
+            max-width: 448px; 
             padding: 1rem;
         }
 
-        /* Efecto de cristal esmerilado para el contenedor de login (Mejora estética) */
+        /* Efecto de cristal esmerilado para el contenedor de login */
         .glass-effect {
             background-color: rgba(13, 13, 26, 0.7); 
             backdrop-filter: blur(12px); 
@@ -49,7 +49,7 @@
             padding: 2.5rem; 
         }
 
-        /* Estilo para inputs más oscuros y modernos (Mejora estética) */
+        /* Estilo para inputs más oscuros y modernos */
         .custom-input {
             background-color: #1a1a2e; 
             border: 1px solid #3d3d5c;
@@ -89,9 +89,9 @@
         }
 
         /* --- ESTILOS DEL DASHBOARD --- */
-        /* Estilo del Header inspirado en el Navbar de index.html */
+        
         .dashboard-header {
-            background-color: rgba(13, 13, 26, 0.8); /* Oscuro semi-transparente */
+            background-color: rgba(13, 13, 26, 0.8); 
             backdrop-filter: blur(5px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             position: fixed;
@@ -102,15 +102,24 @@
             padding: 1rem;
         }
 
-        /* Estilo del Dashboard Content */
         .dashboard-content {
-            padding-top: 80px; /* Espacio para el header fijo */
+            padding-top: 80px; 
             padding-left: 1.5rem;
             padding-right: 1.5rem;
             padding-bottom: 1.5rem;
             width: 100%;
-            max-width: 1280px; /* Para centrar el contenido en pantallas grandes */
+            max-width: 1280px; 
             margin: 0 auto;
+        }
+
+        /* Estilo del Botón de Panel */
+        .panel-button {
+            transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .panel-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
 
     </style>
@@ -129,31 +138,17 @@
         </div>
 
         <form id="admin-login-form" class="space-y-5"> 
-
-            <div>
-                <label for="login-email" class="text-sm font-medium text-gray-300 block mb-2">Correo Electrónico:</label> 
-                <input type="email" id="login-email" name="email" required class="custom-input w-full" placeholder="admin@tudominio.com">
-            </div>
-
-            <div>
-                <label for="login-password" class="text-sm font-medium text-gray-300 block mb-2">Contraseña:</label> 
-                <input type="password" id="login-password" name="password" required class="custom-input w-full" placeholder="••••••••">
-            </div>
-
+            <div><label for="login-email" class="text-sm font-medium text-gray-300 block mb-2">Correo Electrónico:</label> <input type="email" id="login-email" name="email" required class="custom-input w-full" placeholder="admin@tudominio.com"></div>
+            <div><label for="login-password" class="text-sm font-medium text-gray-300 block mb-2">Contraseña:</label> <input type="password" id="login-password" name="password" required class="custom-input w-full" placeholder="••••••••"></div>
             <p id="login-error-message" class="text-red-400 text-center font-semibold mt-4 mb-4 hidden"></p>
-
             <button type="submit" id="login-button" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3.5 rounded-xl transition duration-300 transform hover:scale-105 tracking-wider uppercase shadow-lg"> 
                 Iniciar Sesión
             </button>
         </form>
 
         <div class="text-center text-sm space-y-3">
-            <a href="#" id="forgot-password-link" class="text-sky-400 hover:text-sky-300 transition duration-200 block">
-                ¿Olvidaste tu contraseña?
-            </a>
-            <a href="#" id="return-to-client-login" class="text-gray-400 hover:text-gray-300 transition duration-200 block">
-                Volver a acceso de clientes
-            </a>
+            <a href="#" id="forgot-password-link" class="text-sky-400 hover:text-sky-300 transition duration-200 block">¿Olvidaste tu contraseña?</a>
+            <a href="#" id="return-to-client-login" class="text-gray-400 hover:text-gray-300 transition duration-200 block">Volver a acceso de clientes</a>
         </div>
     </div>
 
@@ -169,80 +164,94 @@
 
 
         // --------------------------------
-        // --- DASHBOARD RENDERER ---
+        // --- DASHBOARD RENDERER Y LOGOUT ---
         // --------------------------------
 
         /**
-         * Renderiza el layout visual del dashboard del administrador, inspirado en index.html.
-         * Esto reemplaza el formulario de login.
+         * Renderiza el layout visual del dashboard con los paneles de control.
          */
         function renderAdminDashboard(adminData) {
             const body = document.body;
             const adminName = adminData.name || "Administrador";
 
-            // 1. Quitar las clases de centrado del body para que el dashboard ocupe toda la pantalla
-            body.classList.remove('flex', 'items-center', 'justify-center', 'min-h-screen', 'p-4');
+            // 1. Quitar las clases de centrado del body
+            body.classList.remove('flex', 'items-center', 'justify-center', 'min-h-screen');
             body.style.display = 'block';
             body.style.padding = '0';
             body.style.margin = '0';
 
-            // 2. Definir la estructura HTML del Dashboard
+            // 2. Definir la estructura HTML del Dashboard con los nuevos botones
             const dashboardHTML = `
                 <header class="dashboard-header flex justify-between items-center px-6 py-3">
                     <div class="flex items-center space-x-4">
                         <h1 class="text-3xl font-extrabold logo-text tracking-wider">
                             <span class="logo-yellow">GYM</span><span class="logo-white">ENEZ</span>
                         </h1>
-                        <span class="text-gray-400 text-sm font-light uppercase tracking-widest">Admin Panel</span>
+                        <span class="text-gray-400 text-sm font-light uppercase tracking-widest">Panel Administrativo</span>
                     </div>
                     <nav>
-                        <ul class="flex space-x-6 text-sm font-semibold">
-                            <li><a href="#" class="text-sky-400 hover:text-sky-300 transition duration-200">Usuarios</a></li>
-                            <li><a href="#" class="text-gray-300 hover:text-sky-300 transition duration-200">Pagos</a></li>
-                            <li><a href="#" class="text-gray-300 hover:text-sky-300 transition duration-200">Reportes</a></li>
-                            <li>
-                                <button id="logout-btn" class="text-red-400 hover:text-red-300 transition duration-200">
-                                    Cerrar Sesión
-                                </button>
-                            </li>
-                        </ul>
+                        <button id="logout-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-200 shadow-lg">
+                            Cerrar Sesión
+                        </button>
                     </nav>
                 </header>
 
                 <main class="dashboard-content">
-                    <h2 class="text-4xl font-bold text-gray-100 mb-6 mt-4">
-                        ¡Bienvenido de vuelta, ${adminName}!
+                    <h2 class="text-4xl font-bold text-gray-100 mb-8 mt-4">
+                        Bienvenido, ${adminName}
                     </h2>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         
-                        <div class="glass-effect p-6 space-y-3 rounded-xl hover:shadow-sky-500/30 transition duration-300 transform hover:-translate-y-1">
-                            <p class="text-sm text-gray-400 uppercase tracking-widest">Usuarios Activos</p>
-                            <h3 class="text-5xl font-extrabold text-sky-400">145</h3>
-                            <p class="text-sm text-gray-300">Última actualización: Ahora</p>
-                        </div>
+                        <a href="admin_users.html" class="panel-button glass-effect p-8 space-y-4 rounded-xl flex flex-col items-center justify-center bg-sky-600/20 hover:bg-sky-600/40 text-sky-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20v-2h2m-6-8a5 5 0 11-10 0 5 5 0 0110 0zM4 16v4h4m-4-4l-1-1m8-1a5 5 0 100-10 5 5 0 000 10z"/>
+                            </svg>
+                            <h3 class="text-2xl font-bold text-white">Gestión de Usuarios</h3>
+                            <p class="text-sm text-gray-300 text-center">Gestiona perfiles, accesos y sesiones de todos los clientes.</p>
+                        </a>
                         
-                        <div class="glass-effect p-6 space-y-3 rounded-xl hover:shadow-sky-500/30 transition duration-300 transform hover:-translate-y-1">
-                            <p class="text-sm text-gray-400 uppercase tracking-widest">Ingresos (Mes)</p>
-                            <h3 class="text-5xl font-extrabold text-green-400">$8,940</h3>
-                            <p class="text-sm text-gray-300">Meta cumplida en un 80%</p>
-                        </div>
+                        <a href="admin_routines.html" class="panel-button glass-effect p-8 space-y-4 rounded-xl flex flex-col items-center justify-center bg-yellow-600/20 hover:bg-yellow-600/40 text-yellow-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                            </svg>
+                            <h3 class="text-2xl font-bold text-white">Gestión de Rutinas</h3>
+                            <p class="text-sm text-gray-300 text-center">Crea, edita y asigna planes de entrenamiento personalizados.</p>
+                        </a>
+                        
+                        <a href="admin_pulse.html" class="panel-button glass-effect p-8 space-y-4 rounded-xl flex flex-col items-center justify-center bg-gray-600/20 hover:bg-gray-600/40 text-gray-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18m-9-4v4m0 0l-3 3m3-3l3 3"/>
+                            </svg>
+                            <h3 class="text-2xl font-bold text-white">GYMENEZ PULSE</h3>
+                            <p class="text-sm text-gray-300 text-center">Administra la conexión con hardware y registros de rendimiento.</p>
+                        </a>
 
-                        <div class="glass-effect p-6 space-y-3 rounded-xl hover:shadow-sky-500/30 transition duration-300 transform hover:-translate-y-1">
-                            <p class="text-sm text-gray-400 uppercase tracking-widest">Rutinas Creadas</p>
-                            <h3 class="text-5xl font-extrabold text-yellow-400">42</h3>
-                            <p class="text-sm text-gray-300">Pendiente de revisión: 3</p>
-                        </div>
-
+                        <a href="admin_billing.html" class="panel-button glass-effect p-8 space-y-4 rounded-xl flex flex-col items-center justify-center bg-green-600/20 hover:bg-green-600/40 text-green-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c1.657 0 3 .895 3 2s-1.343 2-3 2v5m5-5H7m5 5a2 2 0 100-4 2 2 0 000 4zM19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2z"/>
+                            </svg>
+                            <h3 class="text-2xl font-bold text-white">Gestión de Suscripciones</h3>
+                            <p class="text-sm text-gray-300 text-center">Revisa pagos, vencimientos y planes activos de los clientes.</p>
+                        </a>
+                        
+                        <a href="admin_trainers.html" class="panel-button glass-effect p-8 space-y-4 rounded-xl flex flex-col items-center justify-center bg-purple-600/20 hover:bg-purple-600/40 text-purple-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H9a2 2 0 01-2-2v-1a4 4 0 014-4h2a4 4 0 014 4v1a2 2 0 01-2 2z"/>
+                            </svg>
+                            <h3 class="text-2xl font-bold text-white">Gestión de Entrenadores</h3>
+                            <p class="text-sm text-gray-300 text-center">Administra el personal, sus asignaciones y credenciales.</p>
+                        </a>
+                        
                     </div>
 
                     <p class="mt-12 text-gray-500 text-center">
-                        Este es un apartado puramente gráfico de demostración del Dashboard Administrativo.
+                        Haz clic en un panel para gestionar ese módulo.
                     </p>
                 </main>
             `;
 
-            // 3. Reemplazar todo el contenido del body por el Dashboard
+            // 3. Reemplazar todo el contenido del body
             body.innerHTML = dashboardHTML;
 
             // 4. Adjuntar listener para el botón de Cerrar Sesión
@@ -254,12 +263,12 @@
          */
         function handleAdminLogout() {
             localStorage.removeItem('adminSession');
-            localStorage.removeItem('deviceId'); // Opcional, pero recomendado
+            localStorage.removeItem('deviceId'); 
             window.location.reload(); 
         }
 
         // --------------------------------
-        // --- FUNCIONES DE SOPORTE ---
+        // --- FUNCIONES DE SOPORTE Y LOGIN (SIN CAMBIOS) ---
         // --------------------------------
         
         function getDeviceId() {
@@ -285,11 +294,6 @@
                 }, 5000);
             }
         }
-
-
-        // --------------------------------
-        // --- FUNCIÓN PRINCIPAL DE LOGIN (MODIFICADA) ---
-        // --------------------------------
 
         async function handleAdminLogin(event) {
             event.preventDefault(); 
@@ -324,7 +328,6 @@
                 }
                 
                 if (response.ok && data.success) {
-                    // *** CAMBIO CLAVE: Llama a la función de renderizado en lugar de redirigir ***
                     localStorage.setItem('adminSession', JSON.stringify(data.admin));
                     renderAdminDashboard(data.admin); 
                 } else {
@@ -337,40 +340,33 @@
             }
         }
 
-        // FUNCIÓN PARA REDIRECCIONAR A WHATSAPP
         function handleForgotPassword() {
             const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE_RECOVERY);
             const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\\d+]/g, '')}?text=${encodedMessage}`;
             window.open(whatsappUrl, '_blank');
         }
         
-        // FUNCIÓN PARA VOLVER AL LOGIN GENERAL
         function handleReturnToClientLogin() {
             window.location.href = 'index.html'; 
         }
-
 
         // --- Lógica de Inicialización ---
         window.onload = function() {
             const storedSession = localStorage.getItem('adminSession');
             
-            // Si hay sesión activa, renderizar el dashboard inmediatamente
             if (storedSession) {
                 try {
                     const adminData = JSON.parse(storedSession);
                     renderAdminDashboard(adminData);
                 } catch (e) {
-                    // Si el JSON es inválido, limpiar y mostrar login
                     localStorage.removeItem('adminSession');
                     attachLoginListeners();
                 }
             } else {
-                // Si no hay sesión, adjuntar listeners al formulario de login
                 attachLoginListeners();
             }
         };
 
-        // Función auxiliar para adjuntar listeners al formulario (solo se usa en el login)
         function attachLoginListeners() {
             document.getElementById('admin-login-form').addEventListener('submit', handleAdminLogin);
             document.getElementById('forgot-password-link').addEventListener('click', handleForgotPassword);
