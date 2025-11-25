@@ -207,9 +207,9 @@
                     <div>
                         <label for="subscription_level" class="block text-sm font-medium text-gray-300">Suscripción</label>
                         <select id="subscription_level" name="subscription_level" class="mt-1 w-full p-3 border rounded-lg">
-                            <option value="Básico">Básico</option>
-                            <option value="Intermedio">Intermedio</option>
-                            <option value="Premium">Premium</option>
+                            <option value="STANDARD">STANDARD</option>
+                            <option value="PLUS">PLUS</option>
+                            <option value="ULTRA">ULTRA</option>
                         </select>
                     </div>
                 </div>
@@ -340,7 +340,8 @@
                 row.insertCell().textContent = user.id_number || 'N/A'; 
                 // Teléfono: Se muestra el valor completo guardado (ej: 0414-1234567)
                 row.insertCell().textContent = user.phone_number || 'N/A';
-                row.insertCell().textContent = user.subscription_level || 'Básico';
+                // 🚩 CAMBIO DE FALLBACK AQUÍ
+                row.insertCell().textContent = user.subscription_level || 'STANDARD';
                 row.insertCell().textContent = displayDate(user.activo_desde);
 
                 // Celda de Acciones
@@ -383,6 +384,7 @@
             // Valores por defecto para select
             document.getElementById('id_number_prefix').value = 'V';
             document.getElementById('phone_prefix').value = '0414';
+            // La suscripción por defecto será STANDARD (primer elemento en HTML)
 
 
             document.getElementById('user-modal').classList.remove('hidden');
@@ -409,7 +411,8 @@
             document.getElementById('name').value = user.name || '';
             document.getElementById('last_name').value = user.last_name || '';
             document.getElementById('sex').value = user.sex || 'Otro';
-            document.getElementById('subscription_level').value = user.subscription_level || 'Básico';
+            // 🚩 CAMBIO DE FALLBACK AQUÍ
+            document.getElementById('subscription_level').value = user.subscription_level || 'STANDARD';
 
             // --- Manejo de Cédula (V-12.345.678) ---
             if (user.id_number && user.id_number.includes('-')) {
@@ -629,7 +632,7 @@
                     this.setSelectionRange(newCursorPos, newCursorPos);
                 });
                 
-                // Forzar formato inicial si ya tiene valor (ej: en modo edición, aunque se hace también en openModalForEdit)
+                // Forzar formato inicial si ya tiene valor 
                 idNumberInput.value = formatIdNumber(idNumberInput.value);
             }
             // =============================================================
