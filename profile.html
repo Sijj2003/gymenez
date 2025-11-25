@@ -116,37 +116,24 @@
         </header>
 
         <div id="loading-spinner" class="text-center py-12 text-lg text-gray-300">
-            
+            Cargando datos del perfil...
         </div>
 
-        <div id="profile-content" class="grid grid-cols-1 gap-6 lg:grid-cols-3 hidden">
+        <!-- SOLO SE MANTIENE LA COLUMNA DE PERFIL -->
+        <div id="profile-content" class="grid grid-cols-1 gap-6 lg:grid-cols-1 xl:grid-cols-3 hidden">
             
+            <!-- TARJETA DE PERFIL BÁSICO -->
             <div class="glass-card p-6 rounded-2xl lg:col-span-1">
                 <h3 class="text-xl font-bold mb-4 title-amber-stroke flex items-center">
                     <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                     PERFIL
                 </h3>
                 <table id="profile-table" class="profile-table">
-                    </table>
+                    <!-- El contenido de la tabla se inyectará aquí -->
+                </table>
             </div>
 
-            <div class="glass-card p-6 rounded-2xl lg:col-span-1">
-                <h3 class="text-xl font-bold mb-4 title-amber-stroke flex items-center">
-                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                    MEDICIONES GENERALES
-                </h3>
-                <table id="general-measurements-table" class="profile-table">
-                    </table>
-            </div>
-
-            <div class="glass-card p-6 rounded-2xl lg:col-span-3">
-                <h3 class="text-xl font-bold mb-4 title-amber-stroke flex items-center">
-                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                    MEDICIONES CORPORALES (cm)
-                </h3>
-                <table id="body-measurements-table" class="profile-table">
-                    </table>
-            </div>
+            <!-- SE ELIMINARON LAS CARDS DE MEDICIONES GENERALES Y CORPORALES -->
             
         </div>
     </div>
@@ -178,7 +165,7 @@
         }
         
         /**
-         * Llama a la API para obtener el perfil y las mediciones del usuario.
+         * Llama a la API para obtener el perfil del usuario (solo datos básicos).
          */
         async function apiFetchProfileData(userId) {
             console.log(`API: Intentando conectar a: ${API_BASE_URL}/api/profile/${userId}`);
@@ -222,58 +209,25 @@
 
 
         /**
-         * Renderiza la información del perfil en las tablas usando la data de la DB.
+         * Renderiza la información del perfil en la única tabla.
+         * Solo incluye: Email, Nombre, Apellido, Fecha de Nacimiento, Sexo.
          */
         function renderProfile(data) {
             // --- 1. TABLA PERFIL ---
             const profileTable = document.getElementById('profile-table');
+            
+            // Renderizamos solo los datos básicos solicitados
             profileTable.innerHTML = `
                 <tr><th>Email</th><td>${data.email || 'N/A'}</td></tr>
                 <tr><th>Nombre</th><td>${data.name || 'N/A'}</td></tr>
                 <tr><th>Apellido</th><td>${data.last_name || 'N/A'}</td></tr>
                 <tr><th>Fecha de Nacimiento</th><td>${data.dob || 'N/A'}</td></tr>
-                <tr><th>Activo Desde</th><td>${data.activo_desde || 'N/A'}</td></tr>
                 <tr><th>Sexo</th><td>${data.sex || 'N/A'}</td></tr>
+                <!-- "Activo Desde" se mantiene oculto/omitido según la solicitud de mostrar solo los 4 campos clave, pero si se quiere, se puede añadir: -->
+                <!-- <tr><th>Activo Desde</th><td>${data.activo_desde || 'N/A'}</td></tr> -->
             `;
 
-            // --- 2. TABLA MEDICIONES GENERALES ---
-            const generalTable = document.getElementById('general-measurements-table');
-            generalTable.innerHTML = `
-                <tr><th>Estatura</th><td><span class="measurement-value">${data.estatura ? data.estatura.toFixed(2) : 'N/A'}</span> m</td></tr>
-                <tr><th>Peso</th><td><span class="measurement-value">${data.peso ? data.peso.toFixed(1) : 'N/A'}</span> kg</td></tr>
-                <tr><th>Índice de Grasa</th><td><span class="measurement-value">${data.indice_grasa ? data.indice_grasa.toFixed(1) : 'N/A'}</span> %</td></tr>
-            `;
-            
-            // --- 3. TABLA MEDICIONES CORPORALES ---
-            const bodyTable = document.getElementById('body-measurements-table');
-            
-            // Mapeo de claves de la DB (se asume snake_case) a etiquetas amigables
-            const labels = {
-                brazo_izquierdo: "Brazo Izquierdo",
-                brazo_derecho: "Brazo Derecho",
-                antebrazo_izquierdo: "Antebrazo Izquierdo",
-                antebrazo_derecho: "Antebrazo Derecho",
-                torax: "Tórax",
-                cintura: "Cintura",
-                cuadriceps_izquierdo: "Cuádriceps Izquierdo",
-                cuadriceps_derecho: "Cuádriceps Derecho",
-                gemelo_izquierdo: "Gemelo Izquierdo",
-                gemelo_derecho: "Gemelo Derecho",
-            };
-
-            let bodyHtml = '';
-            for (const key in labels) {
-                 // Aseguramos que el valor sea un número y lo formateamos a 1 decimal, si no, 'N/A'
-                const value = data[key] !== undefined && data[key] !== null ? parseFloat(data[key]).toFixed(1) : 'N/A';
-                
-                bodyHtml += `
-                    <tr>
-                        <th>${labels[key]}</th>
-                        <td><span class="measurement-value">${value}</span> cm</td>
-                    </tr>
-                `;
-            }
-            bodyTable.innerHTML = bodyHtml;
+            // SE ELIMINA LA LÓGICA DE renderProfile para tablas no existentes
         }
 
         /**
@@ -286,7 +240,7 @@
             if (!storedSession) {
                 loadingSpinner.textContent = '❌ Error: No hay sesión activa. Redirigiendo a Login...';
                 showMessage('No hay sesión activa.', 'error');
-                // Redirigir al index si no hay sesión (CORRECCIÓN HECHA AQUÍ)
+                // Redirigir al index si no hay sesión
                 setTimeout(() => window.location.href = 'index.html', 3000); 
                 return;
             }
@@ -329,6 +283,3 @@
     </script>
 </body>
 </html>
-
-
-
