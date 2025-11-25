@@ -10,21 +10,42 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         
+        /* 💡 Define el color de acento amarillo de tu marca */
+        .GYM-YELLOW {
+            color: #FFC300; /* Amarillo */
+        }
+        .bg-GYM-YELLOW {
+            background-color: #FFC300;
+        }
+        .hover\:bg-GYM-YELLOW-dark:hover {
+            background-color: #FFB300; /* Amarillo ligeramente más oscuro para el hover */
+        }
+        .border-GYM-YELLOW {
+            border-color: #FFC300;
+        }
+        .focus\:ring-GYM-YELLOW:focus {
+            --tw-ring-color: #FFC300;
+        }
+        .focus\:border-GYM-YELLOW:focus {
+            border-color: #FFC300;
+        }
+
+
         /* Estilos base del Administrador */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0d0d1a;
+            background-color: #0d0d1a; /* Negro muy oscuro */
             background-image: url('FONDO.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            color: #e5e7eb; 
+            color: #e5e7eb; /* Blanco suave para el texto */
             min-height: 100vh;
         }
 
         .dashboard-header {
-            background-color: rgba(13, 13, 26, 0.8);
+            background-color: rgba(13, 13, 26, 0.9); /* Fondo oscuro semitransparente */
             backdrop-filter: blur(5px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             position: sticky;
@@ -33,10 +54,10 @@
         }
 
         .content-container {
-            background-color: rgba(25, 25, 33, 0.9);
+            background-color: rgba(18, 18, 30, 0.95); /* Contenedor ligeramente más claro que el fondo */
             backdrop-filter: blur(3px);
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             padding: 24px;
             margin-top: 24px;
         }
@@ -55,23 +76,23 @@
         }
 
         .admin-table th {
-            background-color: #1a1a2e; /* Fondo de encabezado más oscuro */
+            background-color: #1a1a2e; /* Fondo de encabezado gris oscuro */
             font-weight: 600;
-            color: #94a3b8;
+            color: #94a3b8; /* Gris claro para las cabeceras */
             text-transform: uppercase;
             font-size: 0.75rem;
         }
 
         /* Modal backdrop */
         .modal-backdrop {
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0, 0.85); /* Fondo modal más oscuro */
         }
 
         /* Modal content */
         .modal-content {
             background-color: #1a1a2e;
             border: 1px solid #334155;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
         }
 
         /* Inputs y Selects */
@@ -81,10 +102,11 @@
              border: 1px solid #334155;
              color: #e5e7eb;
         }
+        /* Aplica el color amarillo al focus */
         .modal-content input:focus, .modal-content select:focus {
-            border-color: #0ea5e9;
+            border-color: #FFC300; /* Amarillo */
             ring: 1px;
-            ring-color: #0ea5e9;
+            ring-color: #FFC300; /* Amarillo */
         }
 
     </style>
@@ -94,10 +116,10 @@
     <header class="dashboard-header">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
             <h1 class="text-2xl font-bold text-white">
-                <span class="text-sky-400">GYMENEZ</span> | Administración de Usuarios
+                <span class="GYM-YELLOW">GYM</span>ENEZ | Administración de Usuarios
             </h1>
             <nav class="space-x-4">
-                <button id="add-user-btn" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out">
+                <button id="add-user-btn" class="bg-GYM-YELLOW hover:bg-GYM-YELLOW-dark text-black font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out">
                     + Añadir Usuario
                 </button>
                 <button id="logout-btn" class="text-red-400 hover:text-red-300 font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out">
@@ -168,17 +190,17 @@
                     <div>
                         <label for="id_number_prefix" class="block text-sm font-medium text-gray-300">Cédula <span class="text-red-500">*</span></label>
                         <div class="flex mt-1">
-                            <select id="id_number_prefix" name="id_number_prefix" required class="bg-gray-700/50 border border-gray-600 p-3 rounded-l-lg focus:border-sky-500 focus:ring-sky-500 text-white w-20">
+                            <select id="id_number_prefix" name="id_number_prefix" required class="bg-gray-700/50 border border-gray-600 p-3 rounded-l-lg focus:border-GYM-YELLOW focus:ring-GYM-YELLOW text-white w-20">
                                 <option value="V">V</option>
                                 <option value="E">E</option>
                             </select>
-                            <input type="text" id="id_number" name="id_number" required class="w-full bg-gray-700/50 border border-gray-600 border-l-0 p-3 rounded-r-lg focus:border-sky-500 focus:ring-sky-500 text-white" placeholder="Ej: 12.345.678">
+                            <input type="text" id="id_number" name="id_number" required class="w-full bg-gray-700/50 border border-gray-600 border-l-0 p-3 rounded-r-lg focus:border-GYM-YELLOW focus:ring-GYM-YELLOW text-white" placeholder="Ej: 12.345.678">
                         </div>
                     </div>
                     <div>
                         <label for="phone_prefix" class="block text-sm font-medium text-gray-300">Teléfono <span class="text-red-500">*</span></label>
                         <div class="flex mt-1">
-                            <select id="phone_prefix" name="phone_prefix" required class="bg-gray-700/50 border border-gray-600 p-3 rounded-l-lg focus:border-sky-500 focus:ring-sky-500 text-white w-32">
+                            <select id="phone_prefix" name="phone_prefix" required class="bg-gray-700/50 border border-gray-600 p-3 rounded-l-lg focus:border-GYM-YELLOW focus:ring-GYM-YELLOW text-white w-32">
                                 <option value="0414">0414</option>
                                 <option value="0424">0424</option>
                                 <option value="0412">0412</option>
@@ -186,7 +208,7 @@
                                 <option value="0416">0416</option>
                                 <option value="0426">0426</option>
                             </select>
-                            <input type="tel" id="phone_number_body" name="phone_number_body" required class="w-full bg-gray-700/50 border border-gray-600 border-l-0 p-3 rounded-r-lg focus:border-sky-500 focus:ring-sky-500 text-white" placeholder="Ej: 1234567">
+                            <input type="tel" id="phone_number_body" name="phone_number_body" required class="w-full bg-gray-700/50 border border-gray-600 border-l-0 p-3 rounded-r-lg focus:border-GYM-YELLOW focus:ring-GYM-YELLOW text-white" placeholder="Ej: 1234567">
                         </div>
                     </div>
                 </div>
@@ -224,7 +246,7 @@
                     <button type="button" id="cancel-modal-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out" onclick="document.getElementById('user-modal').classList.add('hidden')">
                         Cancelar
                     </button>
-                    <button type="submit" id="submit-btn" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out">
+                    <button type="submit" id="submit-btn" class="bg-GYM-YELLOW hover:bg-GYM-YELLOW-dark text-black font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out">
                         Crear Usuario
                     </button>
                 </div>
@@ -286,7 +308,7 @@
 
         async function fetchAllUsers() {
             const tableBody = document.getElementById('users-table-body');
-            tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-sky-400">Cargando datos...</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 GYM-YELLOW">Cargando datos...</td></tr>';
             
             try {
                 // Se usa la ruta /api/admin/users
@@ -340,7 +362,7 @@
                 row.insertCell().textContent = user.id_number || 'N/A'; 
                 // Teléfono: Se muestra el valor completo guardado (ej: 0414-1234567)
                 row.insertCell().textContent = user.phone_number || 'N/A';
-                // 🚩 CAMBIO DE FALLBACK AQUÍ
+                // Suscripción: Usa STANDARD como fallback
                 row.insertCell().textContent = user.subscription_level || 'STANDARD';
                 row.insertCell().textContent = displayDate(user.activo_desde);
 
@@ -350,7 +372,8 @@
                 
                 const editBtn = document.createElement('button');
                 editBtn.textContent = 'Editar';
-                editBtn.classList.add('text-sky-400', 'hover:text-sky-300', 'font-semibold');
+                // Botón de acción con color de acento AMARILLO
+                editBtn.classList.add('GYM-YELLOW', 'hover:text-yellow-400', 'font-semibold');
                 editBtn.onclick = () => openModalForEdit(user);
                 actionsCell.appendChild(editBtn);
 
@@ -411,7 +434,7 @@
             document.getElementById('name').value = user.name || '';
             document.getElementById('last_name').value = user.last_name || '';
             document.getElementById('sex').value = user.sex || 'Otro';
-            // 🚩 CAMBIO DE FALLBACK AQUÍ
+            // Suscripción: Usa STANDARD como fallback
             document.getElementById('subscription_level').value = user.subscription_level || 'STANDARD';
 
             // --- Manejo de Cédula (V-12.345.678) ---
@@ -499,10 +522,8 @@
                 activo_desde: formatDateForBackend(form.activo_desde.value)
             };
             
-            // Si estamos editando, el email viene deshabilitado, lo tomamos del valor en el input
+            // Si estamos editando, eliminamos el email de los datos a enviar
             if (isEditMode) {
-                 // Si el email está deshabilitado en el modal, usamos el valor que está ahí, pero el backend lo ignora si no se actualiza
-                 // Además, eliminamos el email de los datos a enviar si estamos en modo edición para no confundir el backend con un email deshabilitado
                  delete formData.email; 
             }
 
