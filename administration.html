@@ -52,8 +52,10 @@
             background-color: #252540; /* Ligeramente más claro al enfocar */
         }
 
-        /* Estilo específico para el logo GYMENEZ para asegurar el borde negro (Mejora estética) */
+        /* Estilo específico para el logo GYMENEZ para asegurar el borde negro */
+        /* Ahora solo contiene el text-shadow, el color se define en los spans */
         .logo-text {
+            /* Define el borde negro para todas las letras */
             text-shadow: 
                 -1px -1px 0 #000,  
                  1px -1px 0 #000,
@@ -63,7 +65,15 @@
                  1.5px -1.5px 0 #000,
                 -1.5px  1.5px 0 #000,
                  1.5px  1.5px 0 #000;
-            color: #0ea5e9; /* Color celeste brillante para el logo */
+        }
+
+        /* Clases de color específicas para el logo */
+        .logo-yellow {
+            color: #facc15; /* Color amarillo */
+        }
+
+        .logo-white {
+            color: #ffffff; /* Color blanco */
         }
     </style>
 </head>
@@ -73,7 +83,9 @@
 
         <div class="text-center">
             
-            <h1 class="text-4xl font-extrabold logo-text tracking-wider">GYMENEZ</h1> 
+            <h1 class="text-4xl font-extrabold logo-text tracking-wider"> 
+                <span class="logo-yellow">GYM</span><span class="logo-white">ENEZ</span>
+            </h1> 
             <p class="mt-3 text-xl font-semibold text-gray-200">Acceso Administrativo</p> 
 
         </div>
@@ -112,7 +124,7 @@
         // --- CONFIGURACIÓN Y LÓGICA DE INICIO DE SESIÓN ---
         // ----------------------------------------------------
         
-        // ** ¡CORRECCIÓN! Esta es la dirección real de tu API Flask **
+        // Esta es la dirección de tu API Flask
         const API_BASE_URL = "https://sijj2003.pythonanywhere.com"; 
         const ADMIN_LOGIN_ENDPOINT = `${API_BASE_URL}/api/admin_login`;
 
@@ -199,7 +211,6 @@
                     data = JSON.parse(responseText);
                 } catch (e) {
                     console.error('La respuesta no es JSON, es HTML o texto plano:', responseText);
-                    // Esto maneja el error de sintaxis que tenías
                     displayError('Error de servidor: La API no devolvió una respuesta válida. (404/500)');
                     return;
                 }
