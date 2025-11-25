@@ -31,167 +31,147 @@
                 -0.5px  0.5px 0 #000,
                  0.5px  0.5px 0 #000;
         }
-        
-        /* Estilo específico para el efecto Glassmorphism en las tarjetas */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .glass-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.6);
+
+        /* Efecto de cristal esmerilado para el contenedor de login */
+        .glass-effect {
+            background-color: rgba(13, 13, 26, 0.9); /* Fondo semi-transparente oscuro */
+            backdrop-filter: blur(8px); /* Efecto de desenfoque */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Borde suave */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
 
-        /* Estilo para el botón con efecto NEON (AMARILLO/GRIS) */
-        .neon-button {
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px #fbbf24, 0 0 20px #fbbf24; 
-        }
-        .neon-button:hover {
-            box-shadow: 0 0 15px #fcd34d, 0 0 30px #fcd34d;
-            transform: scale(1.02);
-        }
-
-        /* Estilo específico para el logo del login (50% más grande) */
-        #login-logo-img {
-            width: 225px; 
-            height: auto;
-            margin: 0 auto;
+        /* Estilo para inputs más oscuros y modernos */
+        .custom-input {
+            background-color: #1a1a2e; /* Fondo del input oscuro */
+            border: 1px solid #3d3d5c;
+            color: #e5e7eb; /* Color del texto claro */
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
 
-        /* Estilos para el mensaje de estado */
-        #message-box {
-            position: fixed;
-            top: 1rem;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 1rem 1.5rem;
-            border-radius: 0.75rem;
-            font-weight: 600;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-            pointer-events: none;
+        .custom-input:focus {
+            border-color: #0ea5e9; /* Borde azul de Tailwind al enfocar */
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.5); /* Sombra suave azul */
         }
-        .message-success { background-color: #10b981; color: white; } 
-        .message-error { background-color: #ef4444; color: white; } 
-
-        /* Estilo para los enlaces de ayuda (pequeños y pulsables) */
-        .help-link {
-            font-size: 0.875rem; /* text-sm */
-            font-weight: 500;
-            color: #9ca3af; /* gray-400 */
-            transition: color 0.3s ease;
-            cursor: pointer;
-        }
-        .help-link:hover {
-            color: #38bdf8; /* sky-400 */
-            text-shadow: 0 0 5px rgba(56, 189, 248, 0.5); /* Sombra sutil neon azul */
-        }
-
     </style>
-    </head>
-<body class="min-h-screen flex items-center justify-center bg-[#0d0d1a] text-white" style="background-image: url('FONDO.png');">
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
 
-    <div id="message-box"></div>
+    <div class="glass-effect w-full max-w-sm p-8 space-y-6 rounded-2xl">
+        <div class="text-center">
+            <h1 class="text-3xl font-extrabold text-sky-400 tracking-wider">GYMENEZ</h1>
+            <p class="mt-2 text-xl font-semibold text-gray-200">Acceso Administrativo</p>
+        </div>
 
-    <div id="login-screen" class="min-h-screen w-full flex items-center justify-center p-4">
-        <div class="glass-card p-6 md:p-8 w-full max-w-sm mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-500/30">
+        <form id="admin-login-form" class="space-y-4">
             
-            <h2 class="text-3xl font-extrabold text-center mb-6 tracking-wider text-sky-400 uppercase">
-                Acceso Administrador
-            </h2>
-            
-            <div class="text-center mb-6">
-                <img id="login-logo-img"
-                     src="LOGIN_LOGO.png" 
-                     alt="Logo GYMENEZ" 
-                     class="mx-auto"
-                >
+            <div>
+                <label for="login-email" class="text-sm font-medium text-gray-400 block mb-2">Correo Electrónico:</label>
+                <input type="email" id="login-email" name="email" required class="custom-input w-full" placeholder="admin@tudominio.com">
             </div>
 
-            <form id="admin-login-form">
-                <div class="mb-6">
-                    <label for="login-email" class="block text-sm font-medium text-white mb-2">Correo Electrónico</label>
-                    <input type="email" id="login-email" name="email" value="" placeholder="admin.correo@gymen.com"
-                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition duration-300 placeholder-gray-400 text-base" required>
-                </div>
-                <div class="mb-8">
-                    <label for="login-password" class="block text-sm font-medium text-white mb-2">Contraseña</label>
-                     <input type="password" id="login-password" name="password" value="" placeholder=""
-                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition duration-300 placeholder-gray-400 text-base" required>
-                </div>
-
-                <button type="submit" id="admin-login-btn"
-                        class="neon-button w-full py-3 rounded-lg bg-gray-800 text-sky-400 font-bold text-lg hover:bg-gray-700 uppercase tracking-wider border-2 border-sky-400/50">
-                    INGRESAR
-                </button>
-            </form>
-            
-            <div class="flex justify-between items-center mt-4 pt-2 border-t border-gray-700/50">
-                <span id="return-to-client-login" class="help-link">
-                    &larr; Volver al Acceso General
-                </span>
-                <span id="forgot-password-link" class="help-link">
-                    Recuperar Contraseña
-                </span>
+            <div>
+                <label for="login-password" class="text-sm font-medium text-gray-400 block mb-2">Contraseña:</label>
+                <input type="password" id="login-password" name="password" required class="custom-input w-full" placeholder="••••••••">
             </div>
-            
+
+            <p id="login-error-message" class="text-red-400 text-center font-semibold mt-4 mb-4 hidden">
+                </p>
+
+            <button type="submit" id="login-button" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-xl transition duration-300 transform hover:scale-105 tracking-wider uppercase shadow-lg">
+                Iniciar Sesión
+            </button>
+        </form>
+
+        <div class="text-center text-sm space-y-3">
+            <a href="#" id="forgot-password-link" class="text-sky-400 hover:text-sky-300 transition duration-200 block">
+                ¿Olvidaste tu contraseña?
+            </a>
+            <a href="#" id="return-to-client-login" class="text-gray-400 hover:text-gray-300 transition duration-200 block">
+                Volver a acceso de clientes
+            </a>
         </div>
     </div>
-    
+
     <script>
-        // --- CONFIGURACIÓN DE SEGURIDAD Y SESIÓN ---
-        const DEVICE_ID_KEY = 'gymen_admin_device_id'; // Clave específica para Administradores
-        let localDeviceId = localStorage.getItem(DEVICE_ID_KEY);
-
-        if (!localDeviceId) {
-            localDeviceId = crypto.randomUUID();
-            localStorage.setItem(DEVICE_ID_KEY, localDeviceId);
-        }
+        // ----------------------------------------------------
+        // --- CONFIGURACIÓN Y LÓGICA DE INICIO DE SESIÓN ---
+        // ----------------------------------------------------
         
-        // 🚀 URL BASE DE TU API. SIN LA BARRA FINAL (/)
-        const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
-        
-        // --- CONSTANTES PARA WHATSAPP ---
-        const WHATSAPP_NUMBER = '+584148780392';
-        const WHATSAPP_MESSAGE_RECOVERY = 'Hola quisiera solicitar la recuperación de usuario/contraseña para *Administradores*.';
+        // ** IMPORTANTE: REEMPLAZA ESTA URL CON LA DIRECCIÓN REAL DE TU API FLASK **
+        const API_BASE_URL = "TU_URL_DEL_BACKEND"; 
+        const ADMIN_LOGIN_ENDPOINT = `${API_BASE_URL}/api/admin_login`;
+
+        // Configuración de WhatsApp para recuperación de contraseña de administrador
+        const WHATSAPP_NUMBER = "+584120000000"; // Número de ejemplo
+        const WHATSAPP_MESSAGE_RECOVERY = "Hola, necesito ayuda para recuperar mi acceso de administrador en GYMENEZ. Mi correo es... [Indicar Correo]"; 
 
 
-        // --- Variables y Utilidades Globales ---
-        const messagebox = document.getElementById('message-box');
-
-        // Función para mostrar mensajes de estado (éxito/error) EN LA PARTE SUPERIOR
-        function showMessage(message, type = 'success') {
-            messagebox.textContent = message;
-            messagebox.className = ''; 
-            messagebox.classList.add('transition-none');
-            messagebox.classList.add('message-' + type);
-            messagebox.style.opacity = '1';
-            messagebox.style.transform = 'translateX(-50%) translateY(0)';
-            
-            setTimeout(() => {
-                messagebox.style.style = '';
-                messagebox.style.opacity = '0';
-                messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
-            }, 3000);
-        }
-
+        // --------------------------------
+        // --- FUNCIONES DE SOPORTE ---
+        // --------------------------------
 
         /**
-         * Llama a la API REST para iniciar sesión del administrador.
-         * *NOTA*: Se asume que habrá un endpoint /api/admin_login en el backend.
+         * Genera un ID de dispositivo/sesión único para el cliente si no existe.
          */
-        async function apiAdminLogin(email, password, deviceId) {
-            console.log(`API: Llamada a ${API_BASE_URL}/api/admin_login para ${email}. Device ID: ${deviceId}`);
+        function getDeviceId() {
+            let deviceId = localStorage.getItem('deviceId');
+            if (!deviceId) {
+                // Genera un UUID v4 simple para usar como ID de dispositivo
+                deviceId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+                localStorage.setItem('deviceId', deviceId);
+            }
+            return deviceId;
+        }
+
+        /**
+         * Muestra el mensaje de error y lo oculta automáticamente después de 5 segundos.
+         */
+        function displayError(message) {
+            const errorElement = document.getElementById('login-error-message');
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.classList.remove('hidden');
+
+                // Ocultar después de 5 segundos
+                setTimeout(() => {
+                    errorElement.classList.add('hidden');
+                    errorElement.textContent = '';
+                }, 5000);
+            }
+        }
+
+
+        // --------------------------------
+        // --- FUNCIÓN PRINCIPAL DE LOGIN ---
+        // --------------------------------
+
+        /**
+         * Función para manejar el inicio de sesión del administrador.
+         */
+        async function handleAdminLogin(event) {
+            event.preventDefault(); // Detener el envío del formulario
+
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            // Obtener el ID único del dispositivo
+            const deviceId = getDeviceId(); 
             
+            // Ocultar mensaje de error anterior
+            document.getElementById('login-error-message').classList.add('hidden');
+
+            if (!email || !password) {
+                displayError('Por favor, ingresa tu correo electrónico y contraseña.');
+                return;
+            }
+
             try {
-                // *** CAMBIAR EL ENDPOINT A 'api/admin_login' ***
-                const response = await fetch(`${API_BASE_URL}/api/admin_login`, { 
+                const response = await fetch(ADMIN_LOGIN_ENDPOINT, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -201,55 +181,27 @@
 
                 const data = await response.json();
 
-                if (!response.ok || !data.success) {
-                    return { success: false, error: data.error || 'Error de conexión con la API, credenciales inválidas o no eres administrador.' };
+                if (response.ok && data.success) {
+                    // Guardar la sesión del administrador en localStorage
+                    localStorage.setItem('adminSession', JSON.stringify(data.admin));
+
+                    // REDIRECCIONAR AL DASHBOARD
+                    window.location.href = 'admin_dashboard.html'; 
+                } else {
+                    // Manejar errores de la API (401, 400, 500)
+                    const errorMessage = data.error || 'Credenciales inválidas. Por favor, verifica el correo y la contraseña.';
+                    displayError(errorMessage);
                 }
-
-                // Guardar la sesión del administrador en localStorage (con una clave distinta)
-                localStorage.setItem('adminSession', JSON.stringify(data.admin)); 
-                return { success: true, admin: data.admin };
-
-            } catch (e) {
-                console.error("Error en la conexión fetch:", e);
-                return { success: false, error: 'No se pudo conectar con el servidor API REST. Verifica la URL o la política CORS.' };
+            } catch (error) {
+                console.error('Error al intentar iniciar sesión:', error);
+                displayError('Error de red. No se pudo conectar con el servidor API. (Verifica la URL)');
             }
         }
-
-        /**
-         * Maneja el login del administrador.
-         */
-        async function handleAdminLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            const btn = document.getElementById('admin-login-btn');
-            
-            btn.disabled = true;
-            btn.textContent = 'INGRESANDO...';
-
-            // Llama a la API de login del administrador (se asume un endpoint dedicado)
-            const response = await apiAdminLogin(email, password, localDeviceId);
-
-            if (response.success) {
-                showMessage('¡Acceso de Administrador exitoso!', 'success');
-                
-                // *** REDIRECCIONAR AL DASHBOARD DEL ADMINISTRADOR ***
-                // Se asume que tendrás una página "admin_dashboard.html"
-                window.location.href = 'admin_dashboard.html'; 
-
-            } else {
-                showMessage(response.error, 'error');
-            }
-            
-            btn.disabled = false;
-            btn.textContent = 'INGRESAR';
-        }
-
 
         // FUNCIÓN PARA REDIRECCIONAR A WHATSAPP (Recuperación Administradores)
         function handleForgotPassword() {
             const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE_RECOVERY);
-            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\d+]/g, '')}?text=${encodedMessage}`;
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\\d+]/g, '')}?text=${encodedMessage}`;
             window.open(whatsappUrl, '_blank');
         }
         
