@@ -32,485 +32,456 @@
             z-index: 1000;
         }
 
-        .user-table-container {
-            background-color: rgba(13, 13, 26, 0.9);
-            border: 1px solid #3b82f6;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        /* Estilo para la tarjeta de contenido (glass-effect) */
+        .content-card {
+            background-color: rgba(13, 13, 26, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
-        /* Estilo para filas de tabla */
-        .user-row:nth-child(even) {
-            background-color: rgba(30, 41, 59, 0.5); 
+        /* Estilos del Logo */
+        .logo-text {
+            text-shadow: 
+                -1px -1px 0 #000, 1px -1px 0 #000, 
+                -1px 1px 0 #000, 1px 1px 0 #000;
         }
+        .logo-yellow { color: #facc15; }
+        .logo-white { color: #ffffff; }
 
-        .user-row:hover {
-            background-color: rgba(59, 130, 246, 0.3); 
+        /* Estilo para la tabla */
+        .data-table th, .data-table td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: left;
         }
-
-        /* Estilo para el modal */
-        .modal-overlay {
-            background-color: rgba(0, 0, 0, 0.7);
+        .data-table th {
+            text-transform: uppercase;
+            font-weight: 600;
+            color: #9ca3af; /* gray-400 */
+            font-size: 0.8rem;
         }
-
+        .data-table tbody tr:hover {
+            background-color: rgba(14, 165, 233, 0.05); /* sky-500/5 */
+        }
+        
+        /* Estilos del Modal */
+        .modal-bg {
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+        }
         .modal-content {
-            background-color: #1e293b;
-            border: 2px solid #3b82f6;
-            box-shadow: 0 0 25px rgba(59, 130, 246, 0.5);
+            background-color: #1a1a2e; /* Fondo oscuro del modal */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
         }
 
-        .input-field {
-            background-color: #0d0d1a;
-            border: 1px solid #475569;
-            color: #e5e7eb;
-            transition: border-color 0.3s;
-        }
-
-        .input-field:focus {
-            border-color: #3b82f6;
-            outline: none;
-        }
     </style>
 </head>
 <body>
-    <!-- Barra de Estado Global (para reemplazar alerts) -->
-    <div id="global-status-message" class="hidden fixed top-20 right-5 p-4 rounded-lg text-white font-bold shadow-xl z-[1001] transition-opacity duration-300">
-        <!-- Mensajes de éxito o error se mostrarán aquí -->
-    </div>
-    
-    <!-- Header/Nav Bar -->
-    <header class="dashboard-header">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <h1 class="text-3xl font-extrabold text-blue-400">GYMENEZ Admin - Usuarios</h1>
-            <div class="flex space-x-4">
-                <button id="add-user-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 shadow-md">
-                    + Añadir Usuario
-                </button>
-                <button id="logout-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 shadow-md">
-                    Cerrar Sesión
-                </button>
-            </div>
+
+    <header class="dashboard-header flex justify-between items-center px-6 py-3">
+        <div class="flex items-center space-x-4">
+            <a href="administration.html">
+                <h1 class="text-3xl font-extrabold logo-text tracking-wider">
+                    <span class="logo-yellow">GYM</span><span class="logo-white">ENEZ</span>
+                </h1>
+            </a>
+            <span class="text-gray-400 text-sm font-light uppercase tracking-widest">/ Gestión de Usuarios</span>
         </div>
+        
+        <nav class="flex items-center space-x-4">
+            <a href="administration.html" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded transition duration-200 shadow-md flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                Dashboard
+            </a>
+            <button id="logout-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-200 shadow-lg">
+                Cerrar Sesión
+            </button>
+        </nav>
     </header>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        <!-- Controles y Búsqueda -->
-        <div class="flex flex-col md:flex-row justify-between items-center mb-6 space-y-4 md:space-y-0">
-            <h2 class="text-2xl font-semibold text-white">Lista de Usuarios</h2>
-            
-            <!-- Barra de Búsqueda Flexible - NUEVO -->
-            <div class="relative w-full md:w-80">
-                <input type="text" id="search-input" placeholder="Buscar por Nombre o Apellido..." class="input-field w-full px-4 py-2 pl-10 rounded-lg focus:ring-2 focus:ring-blue-500">
-                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            </div>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-3xl font-bold text-white">Listado de Clientes</h2>
+            <button id="add-user-btn" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 flex items-center shadow-md">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                Añadir Nuevo Usuario
+            </button>
         </div>
 
-        <!-- Tabla de Usuarios -->
-        <div class="user-table-container rounded-xl overflow-hidden shadow-lg">
+        <div class="content-card rounded-xl overflow-hidden shadow-lg">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-700">
-                    <thead class="bg-blue-900/40">
+                <table class="min-w-full divide-y divide-gray-700 data-table">
+                    <thead>
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-blue-300 uppercase tracking-wider">ID</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-blue-300 uppercase tracking-wider">Nombre Completo</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-blue-300 uppercase tracking-wider">Email</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-blue-300 uppercase tracking-wider">Nivel</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-blue-300 uppercase tracking-wider">Activo Desde</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-blue-300 uppercase tracking-wider">Acciones</th>
+                            <th>Nombre Completo</th>
+                            <th>Email</th>
+                            <th>Cédula</th>
+                            <th>Teléfono</th>
+                            <th>Suscripción</th>
+                            <th>Activo Desde</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="users-table-body" class="divide-y divide-gray-800 text-sm">
-                        <!-- Las filas de usuarios se insertarán aquí -->
-                        <tr><td colspan="6" class="p-4 text-center text-gray-400">Cargando usuarios...</td></tr>
+                    <tbody id="users-table-body" class="divide-y divide-gray-800">
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-gray-400">Cargando usuarios...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-        
+
     </main>
 
-    <!-- Modal de Creación/Edición de Usuario -->
-    <div id="user-modal" class="modal-overlay hidden fixed inset-0 flex items-center justify-center p-4 z-[2000]">
-        <div class="modal-content w-full max-w-2xl p-6 rounded-xl transform transition-all duration-300 scale-95 opacity-0" id="modal-content-inner">
-            <div class="flex justify-between items-center border-b pb-3 border-gray-600">
-                <h3 id="modal-title" class="text-2xl font-bold text-white">Crear Nuevo Usuario</h3>
+    <div id="user-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-bg transition-opacity duration-300">
+        <div class="modal-content rounded-xl w-full max-w-2xl mx-4 p-8 transform transition-transform duration-300 scale-95">
+            <div class="flex justify-between items-center pb-4 border-b border-gray-700">
+                <h3 id="modal-title" class="text-2xl font-bold text-white">Añadir Nuevo Usuario</h3>
                 <button id="close-modal-btn" class="text-gray-400 hover:text-white transition duration-200">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                 </button>
             </div>
+            
+            <form id="user-form" class="py-6 space-y-4">
+                <input type="hidden" id="user-id-field" name="id">
+                <input type="hidden" id="is-edit-mode" value="false">
 
-            <!-- Formulario de Creación de Usuario - Campos Solicitados -->
-            <form id="user-form" class="mt-4 space-y-4">
-                <input type="hidden" id="user-id"> <!-- Para futuras ediciones -->
-
-                <!-- Nombres y Apellidos -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="name" class="block text-sm font-medium text-blue-300">Nombres <span class="text-red-400">*</span></label>
-                        <input type="text" id="name" required class="input-field mt-1 block w-full rounded-lg px-3 py-2">
+                        <label for="name" class="block text-sm font-medium text-gray-300">Nombres <span class="text-red-500">*</span></label>
+                        <input type="text" id="name" name="name" required class="w-full bg-gray-700/50 border border-gray-600 p-3 rounded-lg focus:border-sky-500 focus:ring-sky-500 text-white">
                     </div>
                     <div>
-                        <label for="last_name" class="block text-sm font-medium text-blue-300">Apellidos <span class="text-red-400">*</span></label>
-                        <input type="text" id="last_name" required class="input-field mt-1 block w-full rounded-lg px-3 py-2">
+                        <label for="last_name" class="block text-sm font-medium text-gray-300">Apellidos <span class="text-red-500">*</span></label>
+                        <input type="text" id="last_name" name="last_name" required class="w-full bg-gray-700/50 border border-gray-600 p-3 rounded-lg focus:border-sky-500 focus:ring-sky-500 text-white">
                     </div>
                 </div>
 
-                <!-- Email y Contraseña -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="email" class="block text-sm font-medium text-blue-300">Email <span class="text-red-400">*</span></label>
-                        <input type="email" id="email" required class="input-field mt-1 block w-full rounded-lg px-3 py-2">
+                        <label for="email" class="block text-sm font-medium text-gray-300">Email <span class="text-red-500">*</span></label>
+                        <input type="email" id="email" name="email" required class="w-full bg-gray-700/50 border border-gray-600 p-3 rounded-lg focus:border-sky-500 focus:ring-sky-500 text-white">
                     </div>
                     <div>
-                        <label for="password" class="block text-sm font-medium text-blue-300">Contraseña <span class="text-red-400">*</span></label>
-                        <!-- Usamos type="text" temporalmente para facilitar la entrada del admin -->
-                        <input type="text" id="password" required class="input-field mt-1 block w-full rounded-lg px-3 py-2"> 
+                        <label for="password" class="block text-sm font-medium text-gray-300">Contraseña <span id="password-req" class="text-red-500">*</span></label>
+                        <input type="password" id="password" name="password" required class="w-full bg-gray-700/50 border border-gray-600 p-3 rounded-lg focus:border-sky-500 focus:ring-sky-500 text-white" placeholder="Mínimo 6 caracteres">
                     </div>
                 </div>
-                
-                <!-- Fecha Nacimiento y Sexo -->
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="dob" class="block text-sm font-medium text-blue-300">Fecha de Nacimiento <span class="text-red-400">*</span></label>
-                        <input type="date" id="dob" required class="input-field mt-1 block w-full rounded-lg px-3 py-2 text-gray-300">
+                        <label for="id_number" class="block text-sm font-medium text-gray-300">Cédula</label>
+                        <input type="text" id="id_number" name="id_number" class="w-full bg-gray-700/50 border border-gray-600 p-3 rounded-lg focus:border-sky-500 focus:ring-sky-500 text-white">
                     </div>
                     <div>
-                        <label for="sex" class="block text-sm font-medium text-blue-300">Sexo <span class="text-red-400">*</span></label>
-                        <select id="sex" required class="input-field mt-1 block w-full rounded-lg px-3 py-2">
-                            <option value="">Seleccione</option>
+                        <label for="phone_number" class="block text-sm font-medium text-gray-300">Teléfono</label>
+                        <input type="tel" id="phone_number" name="phone_number" class="w-full bg-gray-700/50 border border-gray-600 p-3 rounded-lg focus:border-sky-500 focus:ring-sky-500 text-white">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="sex" class="block text-sm font-medium text-gray-300">Sexo</label>
+                        <select id="sex" name="sex" class="w-full bg-gray-700/50 border border-gray-600 p-3 rounded-lg focus:border-sky-500 focus:ring-sky-500 text-white">
                             <option value="Masculino">Masculino</option>
                             <option value="Femenino">Femenino</option>
+                            <option value="Otro">Otro</option>
                         </select>
                     </div>
-                </div>
-                
-                <!-- Activo Desde y Nivel de Usuario -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="activo_desde" class="block text-sm font-medium text-blue-300">Activo Desde <span class="text-red-400">*</span></label>
-                        <input type="date" id="activo_desde" required class="input-field mt-1 block w-full rounded-lg px-3 py-2 text-gray-300">
-                    </div>
-                    <div>
-                        <label for="user_level" class="block text-sm font-medium text-blue-300">Nivel de Usuario <span class="text-red-400">*</span></label>
-                        <select id="user_level" required class="input-field mt-1 block w-full rounded-lg px-3 py-2">
-                            <option value="">Seleccione Nivel</option>
-                            <option value="GYMENEZ STANDARD">GYMENEZ STANDARD</option>
-                            <option value="GYMENEZ PLUS">GYMENEZ PLUS</option>
-                            <option value="GYMENEZ ULTRA">GYMENEZ ULTRA</option>
-                        </select>
+                        <label for="dob" class="block text-sm font-medium text-gray-300">Fecha de Nacimiento</label>
+                        <input type="date" id="dob" name="dob" class="w-full bg-gray-700/50 border border-gray-600 p-3 rounded-lg focus:border-sky-500 focus:ring-sky-500 text-white">
                     </div>
                 </div>
 
-                <!-- Número de Teléfono -->
-                <div>
-                    <label for="phone_number" class="block text-sm font-medium text-blue-300">Número de Teléfono (04xx-xxxxxxx) <span class="text-red-400">*</span></label>
-                    <!-- Añadimos pattern para validación de formato básico en el lado del cliente -->
-                    <input type="tel" id="phone_number" required 
-                           placeholder="Ej: 04141234567 (sin guiones)" 
-                           pattern="(0414|0424|0416|0426|0412|0422)[0-9]{7}"
-                           title="Debe ser un número móvil de Venezuela (0414, 0424, 0416, 0426, 0412, 0422) seguido de 7 dígitos."
-                           class="input-field mt-1 block w-full rounded-lg px-3 py-2">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="subscription_level" class="block text-sm font-medium text-gray-300">Nivel de Suscripción</label>
+                        <select id="subscription_level" name="subscription_level" class="w-full bg-gray-700/50 border border-gray-600 p-3 rounded-lg focus:border-sky-500 focus:ring-sky-500 text-white">
+                            <option value="Básico">Básico</option>
+                            <option value="Premium">Premium</option>
+                            <option value="VIP">VIP</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="activo_desde" class="block text-sm font-medium text-gray-300">Activo Desde</label>
+                        <input type="date" id="activo_desde" name="activo_desde" class="w-full bg-gray-700/50 border border-gray-600 p-3 rounded-lg focus:border-sky-500 focus:ring-sky-500 text-white">
+                    </div>
                 </div>
                 
                 <div class="pt-4 flex justify-end">
-                    <button type="submit" id="submit-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 shadow-lg">
-                        Crear Usuario
+                    <button type="submit" id="submit-btn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 shadow-md">
+                        Guardar Usuario
                     </button>
                 </div>
             </form>
         </div>
     </div>
-    
+
     <script>
-        // URL base de tu API (Asegúrate de cambiar esto por la URL real de tu PythonAnywhere si es necesario)
-        const API_BASE_URL = window.location.origin.includes('127.0.0.1') || window.location.origin.includes('localhost')
-            ? 'http://127.0.0.1:5000/api'
-            : '/api'; // Usar ruta relativa si está en el mismo dominio/servidor
+        // Configuración de la URL base de tu API de Flask
+        const API_BASE_URL = 'http://localhost:5000/api/admin/user'; // ASUME que la API corre en localhost:5000
 
-        const usersTableBody = document.getElementById('users-table-body');
-        const userModal = document.getElementById('user-modal');
-        const modalContentInner = document.getElementById('modal-content-inner');
-        const userForm = document.getElementById('user-form');
-        const searchInput = document.getElementById('search-input');
-        
-        // --- FUNCIÓN DE MENSAJE DE ESTADO (Reemplaza alert()) ---
-        /**
-         * Muestra un mensaje de estado flotante.
-         * @param {string} message - El mensaje a mostrar.
-         * @param {boolean} isSuccess - Si es un mensaje de éxito (verde) o error (rojo).
-         */
-        function showStatusMessage(message, isSuccess = true) {
-            const statusDiv = document.getElementById('global-status-message');
-            statusDiv.textContent = message;
+        // =============================================================
+        // LÓGICA DE LA TABLA (READ - Leer)
+        // =============================================================
+
+        async function fetchAllUsers() {
+            const tableBody = document.getElementById('users-table-body');
+            tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-sky-400">Cargando datos...</td></tr>';
             
-            statusDiv.classList.remove('hidden', 'bg-red-600', 'bg-green-600', 'opacity-0');
-            statusDiv.classList.add('opacity-100');
+            try {
+                const response = await fetch(API_BASE_URL + 's', { // GET /api/admin/users
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
 
-            if (isSuccess) {
-                statusDiv.classList.add('bg-green-600');
-            } else {
-                statusDiv.classList.add('bg-red-600');
+                const data = await response.json();
+                
+                if (data.success && data.users) {
+                    renderUsersTable(data.users);
+                } else {
+                    tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-red-400">Error al cargar: ${data.error || 'Desconocido'}</td></tr>`;
+                }
+
+            } catch (error) {
+                console.error("Error de red al obtener usuarios:", error);
+                tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-red-400">Error de conexión con el servidor.</td></tr>';
             }
-
-            // Ocultar después de 5 segundos con transición
-            setTimeout(() => {
-                statusDiv.classList.remove('opacity-100');
-                statusDiv.classList.add('opacity-0');
-                // Ocultar completamente después de la transición
-                setTimeout(() => {
-                    statusDiv.classList.add('hidden');
-                }, 300);
-            }, 5000);
         }
 
-        /**
-         * Abre el modal para crear un nuevo usuario.
-         */
-        function openModalForCreate() {
-            document.getElementById('modal-title').textContent = 'Crear Nuevo Usuario';
-            document.getElementById('submit-btn').textContent = 'Crear Usuario';
-            userForm.reset(); // Limpiar el formulario
+        function renderUsersTable(users) {
+            const tableBody = document.getElementById('users-table-body');
+            tableBody.innerHTML = ''; // Limpiar filas anteriores
 
-            // Establecer la fecha actual por defecto para 'activo_desde'
-            document.getElementById('activo_desde').valueAsDate = new Date(); 
-            
-            // Mostrar el modal con animación
-            userModal.classList.remove('hidden');
-            setTimeout(() => {
-                modalContentInner.classList.remove('scale-95', 'opacity-0');
-            }, 50);
-        }
-
-        /**
-         * Cierra el modal de creación/edición.
-         */
-        function closeModal() {
-            modalContentInner.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => {
-                userModal.classList.add('hidden');
-            }, 300);
-        }
-
-        /**
-         * Rellena la tabla con los datos de los usuarios.
-         * @param {Array<Object>} users - Lista de objetos de usuario.
-         */
-        function renderUsers(users) {
-            usersTableBody.innerHTML = '';
             if (users.length === 0) {
-                usersTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-400">No se encontraron usuarios.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-400">No hay usuarios registrados.</td></tr>';
                 return;
             }
 
             users.forEach(user => {
-                const row = document.createElement('tr');
-                row.className = 'user-row';
+                const row = tableBody.insertRow();
+                row.classList.add('hover:bg-gray-800/50'); 
                 
-                // Formatear la fecha de creación
-                let createdAtText = 'N/A';
-                if (user.createdAt && user.createdAt._seconds) {
-                    const date = new Date(user.createdAt._seconds * 1000);
-                    createdAtText = date.toLocaleDateString('es-ES');
-                } else if (user.activo_desde) {
-                     // Usar activo_desde como fallback si createdAt no está presente
-                    createdAtText = new Date(user.activo_desde).toLocaleDateString('es-ES');
+                // Función para formatear fechas de Firestore (puede ser un objeto Timestamp o un string)
+                function formatDate(dateValue) {
+                    if (!dateValue || dateValue === 'N/A') return 'N/A';
+                    // Intenta interpretar como objeto Firestore Timestamp
+                    if (dateValue.seconds && dateValue.nanoseconds) {
+                        return new Date(dateValue.seconds * 1000).toLocaleDateString('es-ES');
+                    }
+                    // Asume que es un string con formato conocido (ej: YYYY-MM-DD o DD/MM/YYYY)
+                    return String(dateValue).split('T')[0]; // Elimina el tiempo si es ISO
                 }
+                
+                // Celdas de información
+                row.insertCell().textContent = user.full_name || 'N/A';
+                row.insertCell().textContent = user.email || 'N/A';
+                row.insertCell().textContent = user.id_number || 'N/A';
+                row.insertCell().textContent = user.phone_number || 'N/A';
+                row.insertCell().textContent = user.subscription_level || 'Básico';
+                row.insertCell().textContent = formatDate(user.activo_desde);
 
+                // Celda de Acciones (Editar y Eliminar)
+                const actionsCell = row.insertCell();
+                actionsCell.classList.add('space-x-2');
+                
+                // Botón Editar
+                const editBtn = document.createElement('button');
+                editBtn.textContent = 'Editar';
+                editBtn.classList.add('text-sky-400', 'hover:text-sky-300', 'font-semibold');
+                editBtn.onclick = () => openModalForEdit(user);
+                actionsCell.appendChild(editBtn);
 
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-gray-300 truncate max-w-xs">${user.id}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">${user.name || 'N/A'} ${user.last_name || ''}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">${user.email}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-blue-400 font-semibold">${user.user_level || 'N/A'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">${createdAtText}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                        <button onclick="editUser('${user.id}')" class="text-yellow-400 hover:text-yellow-300 mx-1">Editar</button>
-                        <button onclick="confirmDelete('${user.id}', '${user.email}')" class="text-red-400 hover:text-red-300 mx-1">Eliminar</button>
-                    </td>
-                `;
-                usersTableBody.appendChild(row);
+                // Botón Eliminar
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Eliminar';
+                deleteBtn.classList.add('text-red-500', 'hover:text-red-400', 'font-semibold', 'ml-2');
+                deleteBtn.onclick = () => deleteUser(user.id, user.full_name);
+                actionsCell.appendChild(deleteBtn);
             });
         }
-        
-        // --- FUNCIÓN DE BÚSQUEDA ---
-        /**
-         * Ejecuta la búsqueda de usuarios o lista todos si el campo de búsqueda está vacío.
-         */
-        async function searchUsers() {
-            const searchTerm = searchInput.value.trim();
-            if (searchTerm === '') {
-                fetchAllUsers(); // Si el campo está vacío, listar todos
-                return;
-            }
 
-            usersTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-blue-300">Buscando usuarios...</td></tr>';
+        // =============================================================
+        // LÓGICA DEL MODAL (CREATE/UPDATE - Crear/Actualizar)
+        // =============================================================
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/admin/users/search?q=${encodeURIComponent(searchTerm)}`);
-                const data = await response.json();
+        function openModalForCreate() {
+            const form = document.getElementById('user-form');
+            form.reset(); 
+            document.getElementById('modal-title').textContent = 'Añadir Nuevo Usuario';
+            document.getElementById('user-id-field').value = '';
+            document.getElementById('is-edit-mode').value = 'false';
+            document.getElementById('submit-btn').textContent = 'Crear Usuario';
+            
+            // Requerir contraseña para la creación
+            document.getElementById('password').required = true;
+            document.getElementById('password-req').classList.remove('hidden');
+            document.getElementById('password').placeholder = 'Mínimo 6 caracteres';
 
-                if (data.success) {
-                    renderUsers(data.users);
-                } else {
-                    renderUsers([]); // Mostrar tabla vacía en caso de error de búsqueda
-                    showStatusMessage(`Error en la búsqueda: ${data.error}`, false);
-                }
-            } catch (error) {
-                renderUsers([]);
-                showStatusMessage('Error de red al intentar buscar usuarios.', false);
-            }
+            document.getElementById('user-modal').classList.remove('hidden');
         }
 
-        // --- FUNCIÓN DE LISTADO GENERAL ---
-        /**
-         * Obtiene la lista completa de usuarios.
-         */
-        async function fetchAllUsers() {
-            usersTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-blue-300">Cargando usuarios...</td></tr>';
-            try {
-                const response = await fetch(`${API_BASE_URL}/admin/users`);
-                const data = await response.json();
+        function openModalForEdit(user) {
+            const form = document.getElementById('user-form');
+            form.reset(); 
+            
+            document.getElementById('modal-title').textContent = `Editar Usuario: ${user.full_name}`;
+            document.getElementById('user-id-field').value = user.id;
+            document.getElementById('is-edit-mode').value = 'true';
+            document.getElementById('submit-btn').textContent = 'Guardar Cambios';
 
-                if (data.success) {
-                    // Mapear los datos de 'users' y obtener los perfiles (no es eficiente, pero necesario
-                    // para obtener los campos de profile como name, last_name, level, etc.).
-                    // Dado que la ruta admin/users solo devuelve ID y email, haremos un fetch adicional
-                    // para obtener el perfil completo, o confiamos en que admin/users/search devuelve
-                    // los datos combinados (en la implementación de search, sí se combinan, pero en list_users no).
-                    // Para simplificar, asumiremos que los datos principales (name, last_name, level)
-                    // están disponibles para el listado o se obtendrán al editar/buscar.
-                    // Para la demostración, usaremos la data que devuelve admin/users/search si se hiciera sin término de búsqueda.
-                    
-                    // Nota: Ya que la ruta /admin/users es simple, la reemplazaremos con /admin/users/search sin query.
-                    // Para mantener la consistencia con la implementación del backend, usaremos la simple:
-                    renderUsers(data.users);
+            // Ocultar requerimiento de contraseña, ya que es opcional en edición
+            document.getElementById('password').required = false;
+            document.getElementById('password-req').classList.add('hidden');
+            document.getElementById('password').placeholder = 'Dejar vacío para no cambiar';
 
-                } else {
-                    usersTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-400">Error al cargar datos: ' + data.error + '</td></tr>';
+            // Llenar campos con datos del usuario
+            document.getElementById('name').value = user.name || '';
+            document.getElementById('last_name').value = user.last_name || '';
+            document.getElementById('email').value = user.email || '';
+            document.getElementById('id_number').value = user.id_number || '';
+            document.getElementById('phone_number').value = user.phone_number || '';
+            
+            // Asignar el valor de selección
+            document.getElementById('sex').value = user.sex || 'Otro';
+            document.getElementById('subscription_level').value = user.subscription_level || 'Básico';
+            
+            // Formatear fechas (dob, activo_desde) a 'YYYY-MM-DD' para input[type=date]
+            function formatStringDateToInput(dateStr) {
+                if (!dateStr || dateStr === 'N/A') return '';
+                // Asume formato DD/MM/YYYY y lo convierte a YYYY-MM-DD
+                const parts = dateStr.split('/');
+                if (parts.length === 3) {
+                    return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
                 }
-            } catch (error) {
-                usersTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-400">Error de red. Asegúrate de que el servidor esté activo.</td></tr>';
-                showStatusMessage('Error de red al cargar la lista de usuarios.', false);
+                // Si ya está en YYYY-MM-DD (ISO) o un formato compatible con el input
+                return dateStr.split('T')[0]; 
             }
+            
+            document.getElementById('dob').value = formatStringDateToInput(user.dob);
+            document.getElementById('activo_desde').value = formatStringDateToInput(user.activo_desde);
+
+            document.getElementById('user-modal').classList.remove('hidden');
         }
-        
-        /**
-         * Maneja el envío del formulario de creación de usuario.
-         */
+
+        // Manejador del Formulario (Crear y Editar)
         async function handleUserFormSubmit(event) {
             event.preventDefault();
-            
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Procesando...';
 
-            const name = document.getElementById('name').value;
-            const last_name = document.getElementById('last_name').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const dob = document.getElementById('dob').value; // YYYY-MM-DD
-            const sex = document.getElementById('sex').value;
-            const activo_desde = document.getElementById('activo_desde').value; // YYYY-MM-DD
-            const user_level = document.getElementById('user_level').value;
-            const phone_number = document.getElementById('phone_number').value;
+            const form = event.target;
+            const isEditMode = document.getElementById('is-edit-mode').value === 'true';
+            const userId = document.getElementById('user-id-field').value;
+
+            // Recoger datos del formulario
+            const formData = {
+                id: userId,
+                name: form.name.value,
+                last_name: form.last_name.value,
+                email: form.email.value,
+                password: form.password.value,
+                id_number: form.id_number.value,
+                phone_number: form.phone_number.value,
+                sex: form.sex.value,
+                subscription_level: form.subscription_level.value,
+                
+                // Formatear fechas a DD/MM/YYYY para el backend de Flask
+                dob: formatDateForBackend(form.dob.value), 
+                activo_desde: formatDateForBackend(form.activo_desde.value)
+            };
             
-            // Validación de Teléfono en el Cliente
-            const phoneRegex = /^(0414|0424|0416|0426|0412|0422)\d{7}$/;
-            if (!phoneRegex.test(phone_number)) {
-                showStatusMessage('Error: El formato de teléfono es inválido. Debe ser 04xx + 7 dígitos.', false);
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Crear Usuario';
+            // Si estamos editando y el password está vacío, no lo enviamos
+            if (isEditMode && !formData.password) {
+                delete formData.password;
+            }
+
+            const method = isEditMode ? 'PUT' : 'POST';
+            const url = isEditMode ? `${API_BASE_URL}/${userId}` : API_BASE_URL;
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`${isEditMode ? 'Edición' : 'Creación'} de usuario exitosa: ${data.message}`);
+                    document.getElementById('user-modal').classList.add('hidden');
+                    fetchAllUsers(); // Recargar la tabla
+                } else {
+                    alert(`Error al ${isEditMode ? 'editar' : 'crear'} usuario: ${data.error}`);
+                }
+            } catch (error) {
+                alert(`Error de red al procesar el usuario.`);
+            }
+        }
+        
+        // Función auxiliar para convertir 'YYYY-MM-DD' de HTML Input a 'DD/MM/YYYY' para el backend (como usa tu código Python)
+        function formatDateForBackend(dateValue) {
+            if (!dateValue) return '';
+            const parts = dateValue.split('-'); // [YYYY, MM, DD]
+            if (parts.length === 3) {
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+            return dateValue;
+        }
+
+        // =============================================================
+        // LÓGICA DE ELIMINACIÓN (DELETE)
+        // =============================================================
+
+        async function deleteUser(userId, fullName) {
+            if (!confirm(`¿Está seguro de que desea ELIMINAR permanentemente a ${fullName}? Esta acción es irreversible.`)) {
                 return;
             }
 
-            const userData = {
-                name, last_name, email, password, dob, sex, activo_desde, user_level, phone_number
-            };
-
             try {
-                const response = await fetch(`${API_BASE_URL}/admin/users/create`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(userData)
+                const response = await fetch(`${API_BASE_URL}/${userId}`, { // DELETE /api/admin/user/<user_id>
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
                 });
-                const data = await response.json();
 
+                const data = await response.json();
+                
                 if (data.success) {
-                    closeModal();
-                    showStatusMessage(`Usuario ${email} creado con éxito!`);
-                    fetchAllUsers(); // Recargar la lista
+                    alert(`Usuario ${fullName} eliminado con éxito!`);
+                    fetchAllUsers();
                 } else {
-                    showStatusMessage(`Error al crear usuario: ${data.error}`, false);
+                    alert(`Error al eliminar: ${data.error}`);
                 }
             } catch (error) {
-                showStatusMessage('Error de red al intentar crear el usuario.', false);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Crear Usuario';
+                alert(`Error de red al eliminar el usuario.`);
             }
         }
 
-        /**
-         * Simula la edición de un usuario (solo para demostración, la lógica de edición no se implementó).
-         */
-        function editUser(userId) {
-            showStatusMessage(`Funcionalidad de Edición para ${userId} aún no implementada.`, false);
-        }
-
-        /**
-         * Simula la confirmación y eliminación de un usuario.
-         */
-        function confirmDelete(userId, email) {
-            // Nota: Reemplazamos window.confirm con una lógica de mensaje simple para seguir la directiva.
-            if (window.confirm(`¿Estás seguro de que quieres eliminar al usuario ${email} (${userId})? Esta acción es irreversible.`)) {
-                deleteUser(userId);
-            }
-        }
-
-        /**
-         * Simula la llamada a la API para eliminar un usuario.
-         */
-        async function deleteUser(userId) {
-            showStatusMessage(`Eliminando usuario ${userId}...`, true);
-            
-            // Simulación de endpoint de eliminación:
-            // En un entorno real, usaríamos: DELETE ${API_BASE_URL}/admin/users/${userId}
-            try {
-                 // ** ESTO ES UN PLACEHOLDER. El endpoint de DELETE no existe actualmente en api_server.py **
-                 // Simulación de éxito después de un retraso:
-                 await new Promise(resolve => setTimeout(resolve, 1000));
-                 
-                 // Para probar el error: descomenta la siguiente línea
-                 // throw new Error("Simulación de fallo de eliminación");
-                 
-                 showStatusMessage(`Usuario ${userId} eliminado con éxito!`);
-                 fetchAllUsers(); // Recargar la lista
-                 
-            } catch (error) {
-                showStatusMessage(`Error de red/simulación al eliminar el usuario.`, false);
-            }
-        }
-
-        // --- LÓGICA DE CIERRE DE SESIÓN ---
+        // =============================================================
+        // LÓGICA DE CIERRE DE SESIÓN E INICIALIZACIÓN
+        // =============================================================
 
         function handleAdminLogout() {
-            localStorage.removeItem('adminSession');
-            showStatusMessage('Sesión cerrada. Redirigiendo...', true);
+            // Nota: Se asume que el token de sesión se limpia al redirigir al login
+            localStorage.removeItem('adminSession'); 
             // Redirigir a la página de login
-            // window.location.href = 'administration.html'; 
+            window.location.href = 'administration.html'; 
         }
 
 
         // --- INICIALIZACIÓN ---
         window.onload = function() {
-            // Comprobación de Sesión (simulada)
             const storedSession = localStorage.getItem('adminSession');
             
+            // Validación básica de sesión (debe complementarse con validación en el backend)
             if (!storedSession) {
-                // Si no hay sesión, redirigir al login (Comentado para que el Canvas funcione)
-                // window.location.href = 'administration.html'; 
-                // return;
+                window.location.href = 'administration.html'; 
+                return;
             }
 
             // Cargar datos al iniciar
@@ -519,18 +490,11 @@
             // LISTENERS GLOBALES
             document.getElementById('logout-btn').addEventListener('click', handleAdminLogout);
             document.getElementById('add-user-btn').addEventListener('click', openModalForCreate);
-            document.getElementById('close-modal-btn').addEventListener('click', closeModal);
-            userForm.addEventListener('submit', handleUserFormSubmit);
-            
-            // Listener de búsqueda
-            searchInput.addEventListener('input', searchUsers);
-            
-            // Animación para cerrar modal al hacer click fuera
-            userModal.addEventListener('click', (e) => {
-                if (e.target === userModal) {
-                    closeModal();
-                }
+            document.getElementById('close-modal-btn').addEventListener('click', () => {
+                document.getElementById('user-modal').classList.add('hidden');
             });
+            // El listener se añade al formulario
+            document.getElementById('user-form').addEventListener('submit', handleUserFormSubmit);
         };
     </script>
 </body>
