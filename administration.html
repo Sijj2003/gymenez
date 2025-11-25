@@ -25,19 +25,17 @@
             transition: background-image 1s ease-in-out; 
             
             /* === APLICADO: Borde negro para todas las letras (Text Stroke Effect) === */
-            text-shadow: 
-                -0.5px -0.5px 0 #000,  
-                 0.5px -0.5px 0 #000,
-                -0.5px  0.5px 0 #000,
-                 0.5px  0.5px 0 #000;
+            /* Este estilo se aplica a todo el body, lo ajustaremos más abajo para el logo */
         }
 
         /* Efecto de cristal esmerilado para el contenedor de login */
         .glass-effect {
-            background-color: rgba(13, 13, 26, 0.9); /* Fondo semi-transparente oscuro */
-            backdrop-filter: blur(8px); /* Efecto de desenfoque */
-            border: 1px solid rgba(255, 255, 255, 0.1); /* Borde suave */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            background-color: rgba(13, 13, 26, 0.7); /* Fondo semi-transparente oscuro, un poco menos opaco */
+            backdrop-filter: blur(12px); /* Efecto de desenfoque más pronunciado */
+            border: 1px solid rgba(255, 255, 255, 0.15); /* Borde más visible */
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4); /* Sombra más profunda */
+            border-radius: 20px; /* Bordes ligeramente más redondeados */
+            padding: 2.5rem; /* Aumento del padding para más espacio */
         }
 
         /* Estilo para inputs más oscuros y modernos */
@@ -45,43 +43,50 @@
             background-color: #1a1a2e; /* Fondo del input oscuro */
             border: 1px solid #3d3d5c;
             color: #e5e7eb; /* Color del texto claro */
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            padding: 0.85rem 1rem; /* Ligeramente más alto */
+            border-radius: 0.6rem; /* Bordes un poco más redondeados */
+            transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s; /* Animación adicional */
         }
 
         .custom-input:focus {
             border-color: #0ea5e9; /* Borde azul de Tailwind al enfocar */
             outline: none;
-            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.5); /* Sombra suave azul */
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.3); /* Sombra suave azul más grande */
+            background-color: #252540; /* Ligeramente más claro al enfocar */
+        }
+
+        /* Estilo específico para el logo GYMENEZ para asegurar el borde negro */
+        .logo-text {
+            text-shadow: 
+                -1px -1px 0 #000,  
+                 1px -1px 0 #000,
+                -1px  1px 0 #000,
+                 1px  1px 0 #000,
+                -1.5px -1.5px 0 #000, /* Bordes un poco más gruesos para el logo */
+                 1.5px -1.5px 0 #000,
+                -1.5px  1.5px 0 #000,
+                 1.5px  1.5px 0 #000;
+            color: #0ea5e9; /* Color celeste brillante para el logo */
         }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
 
-    <div class="glass-effect w-full max-w-sm p-8 space-y-6 rounded-2xl">
-        <div class="text-center">
-            <h1 class="text-3xl font-extrabold text-sky-400 tracking-wider">GYMENEZ</h1>
-            <p class="mt-2 text-xl font-semibold text-gray-200">Acceso Administrativo</p>
-        </div>
+    <div class="glass-effect w-full max-w-sm space-y-7 rounded-2xl"> <div class="text-center">
+            <h1 class="text-4xl font-extrabold logo-text tracking-wider">GYMENEZ</h1> 
+            <p class="mt-3 text-xl font-semibold text-gray-200">Acceso Administrativo</p> </div>
 
-        <form id="admin-login-form" class="space-y-4">
-            
-            <div>
-                <label for="login-email" class="text-sm font-medium text-gray-400 block mb-2">Correo Electrónico:</label>
-                <input type="email" id="login-email" name="email" required class="custom-input w-full" placeholder="admin@tudominio.com">
+        <form id="admin-login-form" class="space-y-5"> <div>
+                <label for="login-email" class="text-sm font-medium text-gray-300 block mb-2">Correo Electrónico:</label> <input type="email" id="login-email" name="email" required class="custom-input w-full" placeholder="admin@tudominio.com">
             </div>
 
             <div>
-                <label for="login-password" class="text-sm font-medium text-gray-400 block mb-2">Contraseña:</label>
-                <input type="password" id="login-password" name="password" required class="custom-input w-full" placeholder="••••••••">
+                <label for="login-password" class="text-sm font-medium text-gray-300 block mb-2">Contraseña:</label> <input type="password" id="login-password" name="password" required class="custom-input w-full" placeholder="••••••••">
             </div>
 
-            <p id="login-error-message" class="text-red-400 text-center font-semibold mt-4 mb-4 hidden">
-                </p>
+            <p id="login-error-message" class="text-red-400 text-center font-semibold mt-4 mb-4 hidden"></p>
 
-            <button type="submit" id="login-button" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-xl transition duration-300 transform hover:scale-105 tracking-wider uppercase shadow-lg">
-                Iniciar Sesión
+            <button type="submit" id="login-button" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3.5 rounded-xl transition duration-300 transform hover:scale-105 tracking-wider uppercase shadow-lg"> Iniciar Sesión
             </button>
         </form>
 
