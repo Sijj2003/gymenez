@@ -466,14 +466,17 @@
                 }
 
                 if (userId) {
-                    await fetch(`${API_BASE_URL}/api/logout`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ userId: userId })
-                    });
-                }
+            await fetch(`${API_BASE_URL}/api/logout`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    userId: userId,
+                    deviceId: localDeviceId // 👈 ¡ESTO ES LO CLAVE!
+                })
+            });
+        }
                 
             } catch (e) {
                 console.error("Error al intentar cerrar sesión en el servidor:", e);
@@ -918,4 +921,5 @@
     </script>
 </body>
 </html>
+
 
