@@ -331,7 +331,7 @@
         }
 
         // =============================================================
-        // LÓGICA DE LA TABLA (READ - Leer) 
+        // LÓGICA DE LA TABLA (READ - Leer)
         // =============================================================
 
         async function fetchAllUsers() {
@@ -353,19 +353,20 @@
                 const data = await response.json();
                 
                 if (data.success && data.users) {
+                    // 🚨 Almacenar la lista completa de usuarios
                     allUsersData = data.users; 
-                    // Llama a filterUsersTable para manejar la búsqueda activa
+                    // Llama a filterUsersTable para manejar la búsqueda activa, aunque el campo de búsqueda esté vacío
                     const userSearchInput = document.getElementById('user-search-input');
                     filterUsersTable(userSearchInput ? userSearchInput.value : '');
                 } else {
                     tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-red-400">Error al cargar: ${data.error || 'Desconocido'}</td></tr>`;
-                    allUsersData = [];
+                    allUsersData = []; // Limpiar si falla
                 }
 
             } catch (error) {
                 console.error("Error de red al obtener usuarios:", error);
                 tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-red-400">Error de conexión. 🔑 **Revisa la configuración CORS en api_server.py**.</td></tr>';
-                allUsersData = [];
+                allUsersData = []; // Limpiar si falla
             }
         }
 
@@ -387,15 +388,15 @@
 
             usersToRender.forEach(user => {
                 const row = tableBody.insertRow();
-                row.classList.add('hover:bg-gray-800/50', 'transition', 'duration-150'); 
+                row.classList.add('hover:bg-gray-800/50'); 
                 
                 // Formato de fecha para la tabla (ya viene en DD/MM/YYYY desde el backend)
                 function displayDate(dateValue) {
                     if (!dateValue || dateValue === 'N/A') return 'N/A';
-                    return String(dateValue).split('T')[0]; 
+                    return String(dateValue).split('T')[0]; // Simple string display
                 }
                 
-                // Celdas de información (Insertamos las celdas directamente)
+                // Celdas de información
                 row.insertCell().textContent = user.full_name || 'N/A';
                 row.insertCell().textContent = user.email || 'N/A';
                 row.insertCell().textContent = user.id_number || 'N/A'; 
@@ -404,22 +405,23 @@
                 // Celda de Suscripción con estilo
                 const subCell = row.insertCell();
                 subCell.textContent = user.subscription_level || 'STANDARD';
-                subCell.classList.add('px-6', 'py-4', 'whitespace-nowrap', 'text-sm', 'font-semibold');
+                subCell.classList.add('font-semibold');
                 subCell.style.color = (user.subscription_level === 'PLUS' || user.subscription_level === 'ULTRA') ? '#FFC300' : '#E5E7EB';
 
                 row.insertCell().textContent = displayDate(user.activo_desde);
 
                 // Celda de Acciones
                 const actionsCell = row.insertCell();
-                actionsCell.classList.add('px-6', 'py-4', 'whitespace-nowrap', 'text-sm', 'text-gray-500');
+                actionsCell.classList.add('whitespace-nowrap', 'text-sm', 'text-gray-500');
                 
                 // Usamos un contenedor flex para alinear los botones
                 const divContainer = document.createElement('div');
                 divContainer.classList.add('flex', 'space-x-2', 'items-center');
 
-                // --- Bloquear/Desbloquear Button ---
+                // --- Bloquear/Desbloquear Button (NUEVA LÓGICA) ---
                 const blockBtn = document.createElement('button');
                 // 🟢 CRÍTICO: Leer el estado is_blocked desde el backend 🟢
+                // Usamos user.is_blocked === true para asegurar que es un booleano (si es undefined/null, será false)
                 const isBlocked = user.is_blocked === true; 
                 
                 // Texto y color dinámico
@@ -434,10 +436,13 @@
                     blockBtn.classList.add('text-white', 'bg-red-600', 'hover:bg-red-500');
                 }
                 
-                // 🚩 Asignar el listener: Envía el estado OPUESTO del botón 🚩
+                // 🚩 Asignar el listener: Envía el estado ACTUAL del botón 🚩
+                // Llama a handleBlockUser con el ID del usuario y su estado ACTUAL
                 blockBtn.addEventListener('click', () => handleBlockUser(user.id, isBlocked));
 
                 divContainer.appendChild(blockBtn);
+                // --- FIN Bloquear/Desbloquear Button ---
+
 
                 // --- Botón Editar ---
                 const editBtn = document.createElement('button');
@@ -458,13 +463,14 @@
         }
 
         // =============================================================
-        // 🔍 LÓGICA DE BÚSQUEDA 🔍
+        // 🔍 LÓGICA DE BÚSQUEDA AÑADIDA 🔍
         // =============================================================
 
         function filterUsersTable(searchTerm) {
             const normalizedSearch = searchTerm.toLowerCase().trim();
 
             if (normalizedSearch === '') {
+                // Si la búsqueda está vacía, mostrar todos los usuarios
                 renderUsersTable(allUsersData);
                 return;
             }
@@ -701,7 +707,7 @@
                 alert(`Error de red al eliminar el usuario.`);
             }
         }
-        
+
         // =============================================================
         // 🚫 LÓGICA DE BLOQUEO / DESBLOQUEO (TOGGLE BLOCK) 🚫
         // =============================================================
@@ -711,6 +717,9 @@
             const newBlockedState = !currentState;
             const action = newBlockedState ? 'bloquear' : 'desbloquear';
             
+            // Console log para debuggear el click (si fuera necesario)
+            console.log(`[BLOCK ACTION] Usuario: ${userId}, Estado Actual: ${currentState}, Nuevo Estado a enviar: ${newBlockedState}`);
+
             // Confirmación al usuario
             if (!confirm(`¿Está seguro que desea ${action} al usuario ID: ${userId}?`)) {
                 return;
@@ -737,7 +746,7 @@
 
                 if (data.success) {
                     alert(`Usuario ${action} con éxito. El nuevo estado es: ${data.is_blocked ? 'BLOQUEADO' : 'DESBLOQUEADO'}`);
-                    // Recargar la tabla para mostrar el botón con el nuevo estado y color
+                    // 🟢 Recargar la tabla para mostrar el botón con el nuevo estado y color
                     fetchAllUsers(); 
                 } else {
                     alert(`Error al ${action}: ${data.error}`);
@@ -748,12 +757,13 @@
             }
         }
 
+
         // =============================================================
         // 🚩 LÓGICA DE NAVEGACIÓN (REGRESAR) 🚩
         // =============================================================
 
         function handleNavigateBack() {
-            // Simplemente redirige a la página de administración
+            // Simplemente redirige a la página de administración sin cerrar la sesión
             window.location.href = 'administration.html'; 
         }
 
