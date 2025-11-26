@@ -87,13 +87,32 @@
         .modal-backdrop {
             background-color: rgba(0, 0, 0, 0.85); /* Fondo modal más oscuro */
         }
-
-        /* Modal content */
+        
+        /* 🎨 NUEVOS ESTILOS PARA EL MODAL (Incluye scrollbar y max-height) 🎨 */
         .modal-content {
             background-color: #1a1a2e;
             border: 1px solid #334155;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
+            max-height: calc(100vh - 40px); /* Limita la altura visible en el viewport */
+            overflow-y: auto; /* Permite scroll solo en el contenido si es necesario */
         }
+        
+        /* Estilo para Scrollbar en Webkit */
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #334155; /* Color del thumb (barra) */
+            border-radius: 10px;
+        }
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        .modal-content::-webkit-scrollbar-track {
+            background: #1a1a2e; /* Color del track (fondo) */
+        }
+        /* 🎨 FIN NUEVOS ESTILOS MODAL 🎨 */
 
         /* Inputs y Selects */
         .modal-content input, .modal-content select {
@@ -102,7 +121,7 @@
              border: 1px solid #334155;
              color: #e5e7eb;
         }
-        /* Aplica el color amarillo al focus */
+        /* Aplica el color amarillo al focus (Se sobreescribe con clases de Tailwind en el HTML) */
         .modal-content input:focus, .modal-content select:focus {
             border-color: #FFC300; /* Amarillo */
             ring: 1px;
@@ -158,54 +177,56 @@
         </div>
     </main>
 
-    <div id="user-modal" class="fixed inset-0 bg-black bg-opacity-70 modal-backdrop hidden z-[1010] flex justify-center p-4 overflow-y-auto">
+    <div id="user-modal" class="fixed inset-0 bg-black bg-opacity-80 modal-backdrop hidden z-[1010] flex justify-center p-4 overflow-y-auto">
+        
         <div class="modal-content w-full max-w-2xl p-6 rounded-xl transform transition-all duration-300 scale-100">
-            <div class="flex justify-between items-center border-b border-gray-700 pb-3 mb-4">
-                <h3 id="modal-title" class="text-xl font-semibold text-white">Añadir Nuevo Usuario</h3>
-                <button id="close-modal-btn" class="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
+            
+            <div class="flex justify-between items-center border-b border-gray-700 pb-4 mb-6">
+                <h3 id="modal-title" class="text-2xl font-semibold text-white">Añadir Nuevo Usuario</h3>
+                <button id="close-modal-btn" class="text-gray-400 hover:text-GYM-YELLOW text-3xl leading-none transition-colors duration-200">&times;</button>
             </div>
 
-            <form id="user-form" class="space-y-4">
+            <form id="user-form" class="space-y-6">
                 <input type="hidden" id="user-id-field" name="id">
                 <input type="hidden" id="is-edit-mode" value="false">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-300">Nombre(s) <span class="text-red-500">*</span></label>
-                        <input type="text" id="name" name="name" required class="mt-1 w-full p-3 border rounded-lg" placeholder="Se convertirá a MAYÚSCULAS">
+                        <input type="text" id="name" name="name" required class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW" placeholder="Se convertirá a MAYÚSCULAS">
                     </div>
                     <div>
                         <label for="last_name" class="block text-sm font-medium text-gray-300">Apellido(s) <span class="text-red-500">*</span></label>
-                        <input type="text" id="last_name" name="last_name" required class="mt-1 w-full p-3 border rounded-lg" placeholder="Se convertirá a MAYÚSCULAS">
+                        <input type="text" id="last_name" name="last_name" required class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW" placeholder="Se convertirá a MAYÚSCULAS">
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-300">Email <span class="text-red-500">*</span></label>
-                        <input type="email" id="email" name="email" required class="mt-1 w-full p-3 border rounded-lg" placeholder="ejemplo@correo.com">
+                        <input type="email" id="email" name="email" required class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW" placeholder="ejemplo@correo.com">
                     </div>
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-300">Contraseña <span id="password-req" class="text-red-500">*</span></label>
-                        <input type="password" id="password" name="password" class="mt-1 w-full p-3 border rounded-lg" required placeholder="Mínimo 6 caracteres (solo requerido en creación)">
+                        <input type="password" id="password" name="password" class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW" required placeholder="Mínimo 6 caracteres (solo requerido en creación)">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                         <label for="id_number_prefix" class="block text-sm font-medium text-gray-300">Cédula <span class="text-red-500">*</span></label>
-                        <div class="flex mt-1">
-                            <select id="id_number_prefix" name="id_number_prefix" required class="bg-gray-700/50 border border-gray-600 p-3 rounded-l-lg focus:border-GYM-YELLOW focus:ring-GYM-YELLOW text-white w-20">
+                        <div class="flex mt-1 rounded-lg overflow-hidden border border-gray-600 focus-within:border-GYM-YELLOW focus-within:ring-1 focus-within:ring-GYM-YELLOW">
+                            <select id="id_number_prefix" name="id_number_prefix" required class="bg-gray-700/50 p-3 text-white w-20 border-none focus:outline-none focus:ring-0">
                                 <option value="V">V</option>
                                 <option value="E">E</option>
                             </select>
-                            <input type="text" id="id_number" name="id_number" required class="w-full bg-gray-700/50 border border-gray-600 border-l-0 p-3 rounded-r-lg focus:border-GYM-YELLOW focus:ring-GYM-YELLOW text-white" placeholder="Ej: 12.345.678">
+                            <input type="text" id="id_number" name="id_number" required class="w-full bg-[#1a1a2e] p-3 text-white border-none focus:outline-none focus:ring-0" placeholder="Ej: 12.345.678">
                         </div>
                     </div>
                     <div>
                         <label for="phone_prefix" class="block text-sm font-medium text-gray-300">Teléfono <span class="text-red-500">*</span></label>
-                        <div class="flex mt-1">
-                            <select id="phone_prefix" name="phone_prefix" required class="bg-gray-700/50 border border-gray-600 p-3 rounded-l-lg focus:border-GYM-YELLOW focus:ring-GYM-YELLOW text-white w-24 sm:w-28">
+                        <div class="flex mt-1 rounded-lg overflow-hidden border border-gray-600 focus-within:border-GYM-YELLOW focus-within:ring-1 focus-within:ring-GYM-YELLOW">
+                            <select id="phone_prefix" name="phone_prefix" required class="bg-gray-700/50 p-3 text-white w-24 sm:w-28 border-none focus:outline-none focus:ring-0">
                                 <option value="0414">0414</option>
                                 <option value="0424">0424</option>
                                 <option value="0412">0412</option>
@@ -213,19 +234,19 @@
                                 <option value="0416">0416</option>
                                 <option value="0426">0426</option>
                             </select>
-                            <input type="tel" id="phone_number_body" name="phone_number_body" required class="w-full bg-gray-700/50 border border-gray-600 border-l-0 p-3 rounded-r-lg focus:border-GYM-YELLOW focus:ring-GYM-YELLOW text-white" placeholder="Ej: 1234567">
+                            <input type="tel" id="phone_number_body" name="phone_number_body" required class="w-full bg-[#1a1a2e] p-3 text-white border-none focus:outline-none focus:ring-0" placeholder="Ej: 1234567">
                         </div>
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <div>
                         <label for="dob" class="block text-sm font-medium text-gray-300">Fecha Nacimiento</label>
-                        <input type="date" id="dob" name="dob" class="mt-1 w-full p-3 border rounded-lg">
+                        <input type="date" id="dob" name="dob" class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW">
                     </div>
                     <div>
                         <label for="sex" class="block text-sm font-medium text-gray-300">Sexo</label>
-                        <select id="sex" name="sex" class="mt-1 w-full p-3 border rounded-lg">
+                        <select id="sex" name="sex" class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW">
                             <option value="Hombre">Hombre</option>
                             <option value="Mujer">Mujer</option>
                             <option value="Otro">Otro</option>
@@ -233,7 +254,7 @@
                     </div>
                     <div>
                         <label for="subscription_level" class="block text-sm font-medium text-gray-300">Suscripción</label>
-                        <select id="subscription_level" name="subscription_level" class="mt-1 w-full p-3 border rounded-lg">
+                        <select id="subscription_level" name="subscription_level" class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW">
                             <option value="STANDARD">STANDARD</option>
                             <option value="PLUS">PLUS</option>
                             <option value="ULTRA">ULTRA</option>
@@ -243,15 +264,15 @@
 
                 <div>
                     <label for="activo_desde" class="block text-sm font-medium text-gray-300">Activo Desde</label>
-                    <input type="date" id="activo_desde" name="activo_desde" class="mt-1 w-full p-3 border rounded-lg">
+                    <input type="date" id="activo_desde" name="activo_desde" class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW">
                     <p class="text-xs text-gray-500 mt-1">Dejar vacío para usar la fecha de hoy.</p>
                 </div>
 
-                <div class="pt-4 flex justify-end space-x-3 border-t border-gray-700">
-                    <button type="button" id="cancel-modal-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out" onclick="document.getElementById('user-modal').classList.add('hidden')">
+                <div class="pt-6 flex justify-end space-x-3 border-t border-gray-700">
+                    <button type="button" id="cancel-modal-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-5 rounded-lg transition duration-200 ease-in-out" onclick="document.getElementById('user-modal').classList.add('hidden')">
                         Cancelar
                     </button>
-                    <button type="submit" id="submit-btn" class="bg-GYM-YELLOW hover:bg-GYM-YELLOW-dark text-black font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out">
+                    <button type="submit" id="submit-btn" class="bg-GYM-YELLOW hover:bg-GYM-YELLOW-dark text-black font-bold py-2 px-5 rounded-lg transition duration-200 ease-in-out">
                         Crear Usuario
                     </button>
                 </div>
