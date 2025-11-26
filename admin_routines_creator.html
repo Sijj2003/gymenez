@@ -10,7 +10,6 @@
     <style>
         /*
          * ESTILOS BASE COPIADOS DE admin_users.html
-         * Asegura la consistencia visual (colores, fuente, fondo).
          */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         
@@ -51,7 +50,6 @@
             margin-top: 24px;
         }
 
-        /* Estilo para la tabla */
         .admin-table {
             width: 100%;
             border-collapse: separate;
@@ -72,7 +70,6 @@
             font-size: 0.75rem;
         }
         
-        /* Modal backdrop y contenido */
         .modal-backdrop { background-color: rgba(0, 0, 0, 0.85); }
         .modal-content {
             background-color: #1a1a2e;
@@ -81,12 +78,28 @@
             max-height: calc(100vh - 40px);
             overflow-y: auto;
         }
-        .modal-content input, .modal-content textarea {
-             /* Estilos personalizados para inputs y textareas */
+        .modal-content input[type="text"], .modal-content textarea {
              background-color: #1a1a2e;
              border: 1px solid #334155;
              color: #e5e7eb;
         }
+        /* Estilo para las casillas de verificación */
+        .day-checkbox {
+            appearance: none;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid #334155;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            vertical-align: middle;
+        }
+        .day-checkbox:checked {
+            background-color: #FFC300;
+            border-color: #FFC300;
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='black' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+        }
+
     </style>
 </head>
 <body>
@@ -123,6 +136,7 @@
                     <thead>
                         <tr>
                             <th class="rounded-tl-lg">Nombre de la Rutina</th>
+                            <th>Días Asignados</th>
                             <th>Descripción</th>
                             <th class="rounded-tr-lg">Acciones</th>
                         </tr>
@@ -146,6 +160,8 @@
             <form id="routine-form" class="space-y-6">
                 <input type="hidden" id="routine-id-field" name="id">
                 <input type="hidden" id="is-edit-mode" value="false">
+                <input type="hidden" id="exercises-field" name="exercises" value="[]"> 
+                <input type="hidden" id="assigned-users-field" name="assigned_users" value="[]"> 
 
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-300">Nombre de la Rutina <span class="text-red-500">*</span></label>
@@ -155,11 +171,42 @@
                 </div>
 
                 <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Días de Entrenamiento</label>
+                    <div class="grid grid-cols-3 gap-2 text-sm">
+                        <label class="inline-flex items-center text-gray-300">
+                            <input type="checkbox" name="assigned_days" value="Lunes" class="day-checkbox mr-2"> Lunes
+                        </label>
+                        <label class="inline-flex items-center text-gray-300">
+                            <input type="checkbox" name="assigned_days" value="Martes" class="day-checkbox mr-2"> Martes
+                        </label>
+                        <label class="inline-flex items-center text-gray-300">
+                            <input type="checkbox" name="assigned_days" value="Miércoles" class="day-checkbox mr-2"> Miércoles
+                        </label>
+                        <label class="inline-flex items-center text-gray-300">
+                            <input type="checkbox" name="assigned_days" value="Jueves" class="day-checkbox mr-2"> Jueves
+                        </label>
+                        <label class="inline-flex items-center text-gray-300">
+                            <input type="checkbox" name="assigned_days" value="Viernes" class="day-checkbox mr-2"> Viernes
+                        </label>
+                        <label class="inline-flex items-center text-gray-300">
+                            <input type="checkbox" name="assigned_days" value="Sábado" class="day-checkbox mr-2"> Sábado
+                        </label>
+                    </div>
+                </div>
+
+
+                <div>
                     <label for="description" class="block text-sm font-medium text-gray-300">Descripción de la Rutina <span class="text-red-500">*</span></label>
                     <textarea id="description" name="description" rows="4" required
                               class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW" 
-                              placeholder="Describe el objetivo y nivel de esta rutina."></textarea>
+                              placeholder="Describe el objetivo y nivel de esta rutina. (Se guardará como 'notes')"></textarea>
                 </div>
+
+                <div class="text-sm text-gray-500 p-3 border border-gray-700 rounded-lg">
+                    <p class="font-semibold text-gray-300">Nota:</p>
+                    <p>La gestión de **Ejercicios** y **Usuarios Asignados** se mantiene en segundo plano. Para construir una rutina detallada, se requerirá una página de "Constructor de Rutinas" separada.</p>
+                </div>
+
 
                 <div class="pt-6 flex justify-end space-x-3 border-t border-gray-700">
                     <button type="button" id="cancel-modal-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-5 rounded-lg transition duration-200 ease-in-out" onclick="document.getElementById('routine-modal').classList.add('hidden')">
@@ -175,20 +222,22 @@
     
     <script>
         // =============================================================
-        // 🚨 URL BASE DE LA API (Deberá existir una ruta /api/admin/routine)
+        // 🚨 URL BASE DE LA API 
         // =============================================================
         const API_BASE_URL = 'https://sijj2003.pythonanywhere.com/api/admin/routine'; 
 
         // Variable para almacenar la lista completa de rutinas
         let allRoutinesData = [];
+        const dayNames = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
         // =============================================================
         // LÓGICA DE LA TABLA (READ - Leer y Mostrar)
         // =============================================================
 
         async function fetchAllRoutines() {
+            // ... (Función fetchAllRoutines sin cambios significativos)
             const tableBody = document.getElementById('routines-table-body');
-            tableBody.innerHTML = '<tr><td colspan="3" class="text-center py-4 GYM-YELLOW">Cargando rutinas...</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 GYM-YELLOW">Cargando rutinas...</td></tr>';
             
             try {
                 // Se usa la ruta plural /api/admin/routines
@@ -208,13 +257,13 @@
                     allRoutinesData = data.routines; 
                     renderRoutinesTable(allRoutinesData);
                 } else {
-                    tableBody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-red-400">Error al cargar: ${data.error || 'Desconocido'}</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-400">Error al cargar: ${data.error || 'Desconocido'}</td></tr>`;
                     allRoutinesData = [];
                 }
 
             } catch (error) {
                 console.error("Error de red al obtener rutinas:", error);
-                tableBody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-red-400">Error de conexión.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-400">Error de conexión.</td></tr>';
                 allRoutinesData = [];
             }
         }
@@ -230,7 +279,7 @@
                     ? `No se encontraron rutinas para "${searchTerm}".` 
                     : 'No hay rutinas registradas.';
 
-                tableBody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-gray-400">${message}</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-400">${message}</td></tr>`;
                 return;
             }
 
@@ -241,9 +290,16 @@
                 // Celdas de información
                 row.insertCell().textContent = routine.name || 'N/A';
                 
+                // Días Asignados
+                const assignedDays = routine.assigned_days && routine.assigned_days.length > 0
+                    ? routine.assigned_days.join(', ')
+                    : 'Ninguno';
+                row.insertCell().textContent = assignedDays;
+
+
                 // Descripción (limitada)
-                const descriptionText = routine.description || 'N/A';
-                row.insertCell().textContent = descriptionText.length > 80 ? descriptionText.substring(0, 80) + '...' : descriptionText;
+                const descriptionText = routine.description || routine.notes || 'N/A'; // Usa 'description' o 'notes'
+                row.insertCell().textContent = descriptionText.length > 50 ? descriptionText.substring(0, 50) + '...' : descriptionText;
 
 
                 // Celda de Acciones
@@ -265,32 +321,19 @@
         }
 
         // =============================================================
-        // 🔍 LÓGICA DE BÚSQUEDA 🔍
-        // =============================================================
-
-        function filterRoutinesTable(searchTerm) {
-            const normalizedSearch = searchTerm.toLowerCase().trim();
-
-            if (normalizedSearch === '') {
-                renderRoutinesTable(allRoutinesData);
-                return;
-            }
-
-            const filteredRoutines = allRoutinesData.filter(routine => {
-                // Criterios de búsqueda
-                const name = (routine.name || '').toLowerCase();
-                const description = (routine.description || '').toLowerCase();
-                
-                return name.includes(normalizedSearch) || 
-                       description.includes(normalizedSearch);
-            });
-
-            renderRoutinesTable(filteredRoutines);
-        }
-
-        // =============================================================
         // LÓGICA DEL MODAL (CREATE/UPDATE - Crear/Actualizar)
         // =============================================================
+        
+        // Helper para resetear las casillas de los días
+        function resetDaysCheckboxes() {
+            document.querySelectorAll('input[name="assigned_days"]').forEach(cb => {
+                cb.checked = false;
+            });
+        }
+        // Helper para obtener la rutina completa (del array local)
+        function findRoutineById(id) {
+            return allRoutinesData.find(r => r.id === id);
+        }
 
         function openModalForCreate() {
             const form = document.getElementById('routine-form');
@@ -299,22 +342,47 @@
             document.getElementById('routine-id-field').value = '';
             document.getElementById('is-edit-mode').value = 'false';
             document.getElementById('submit-btn').textContent = 'Crear Rutina';
+            
+            // Inicializar arrays complejos vacíos para nueva creación
+            document.getElementById('exercises-field').value = '[]';
+            document.getElementById('assigned-users-field').value = '[]';
+            resetDaysCheckboxes();
 
             document.getElementById('routine-modal').classList.remove('hidden');
         }
 
-        function openModalForEdit(routine) {
+        function openModalForEdit(simplifiedRoutine) {
+            const fullRoutine = findRoutineById(simplifiedRoutine.id);
+            if (!fullRoutine) {
+                alert("Error: No se encontró la información completa de la rutina.");
+                return;
+            }
+
             const form = document.getElementById('routine-form');
             form.reset(); 
             
-            document.getElementById('modal-title').textContent = `Editar Rutina: ${routine.name}`;
-            document.getElementById('routine-id-field').value = routine.id;
+            document.getElementById('modal-title').textContent = `Editar Rutina: ${fullRoutine.name}`;
+            document.getElementById('routine-id-field').value = fullRoutine.id;
             document.getElementById('is-edit-mode').value = 'true';
             document.getElementById('submit-btn').textContent = 'Guardar Cambios';
 
-            // Llenar campos con datos de la rutina
-            document.getElementById('name').value = routine.name || '';
-            document.getElementById('description').value = routine.description || '';
+            // Llenar campos simples
+            document.getElementById('name').value = fullRoutine.name || '';
+            document.getElementById('description').value = fullRoutine.description || fullRoutine.notes || ''; // Usar 'description' o 'notes'
+
+            // 1. Días Asignados (assigned_days)
+            resetDaysCheckboxes();
+            const days = fullRoutine.assigned_days || [];
+            document.querySelectorAll('input[name="assigned_days"]').forEach(cb => {
+                if (days.includes(cb.value)) {
+                    cb.checked = true;
+                }
+            });
+
+            // 2. Preservar Ejercicios y Usuarios (Datos complejos)
+            document.getElementById('exercises-field').value = JSON.stringify(fullRoutine.exercises || []);
+            document.getElementById('assigned-users-field').value = JSON.stringify(fullRoutine.assigned_users || []);
+
 
             document.getElementById('routine-modal').classList.remove('hidden');
         }
@@ -327,19 +395,33 @@
             const isEditMode = document.getElementById('is-edit-mode').value === 'true';
             const routineId = document.getElementById('routine-id-field').value;
 
-            // Recoger datos del formulario
-            const formData = {
-                id: routineId,
+            // 1. Recoger Días Asignados
+            const selectedDays = Array.from(document.querySelectorAll('input[name="assigned_days"]:checked')).map(cb => cb.value);
+
+            // 2. Recoger datos simples
+            const baseData = {
                 name: form.name.value.trim(),
-                description: form.description.value.trim()
+                description: form.description.value.trim(), // Mapeado a 'notes' en el backend
+                assigned_days: selectedDays
             };
             
             // Validaciones básicas
-            if (!formData.name || !formData.description) {
+            if (!baseData.name || !baseData.description) {
                 alert("El Nombre y la Descripción de la rutina son obligatorios.");
                 return;
             }
 
+            // 3. Obtener/Preservar datos complejos para el payload
+            const complexData = {
+                exercises: JSON.parse(document.getElementById('exercises-field').value || '[]'),
+                assigned_users: JSON.parse(document.getElementById('assigned-users-field').value || '[]')
+            };
+
+            const payload = {
+                ...baseData,
+                ...complexData
+            };
+            
             const method = isEditMode ? 'PUT' : 'POST';
             const url = isEditMode ? `${API_BASE_URL}/${routineId}` : API_BASE_URL;
             const actionText = isEditMode ? 'Edición' : 'Creación';
@@ -348,7 +430,7 @@
                 const response = await fetch(url, {
                     method: method,
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
+                    body: JSON.stringify(payload) // Envía el objeto completo
                 });
                 
                 if (!response.ok) {
@@ -373,19 +455,16 @@
         }
         
         // =============================================================
-        // LÓGICA DE ELIMINACIÓN (DELETE)
+        // LÓGICA DE ELIMINACIÓN (DELETE) y BÚSQUEDA
         // =============================================================
-
+        // Las funciones deleteRoutine y filterRoutinesTable no necesitan cambios.
         async function deleteRoutine(routineId, routineName) {
             if (!confirm(`¿Está seguro de que desea ELIMINAR permanentemente la rutina: "${routineName}"? Esta acción es irreversible.`)) {
                 return;
             }
 
             try {
-                const response = await fetch(`${API_BASE_URL}/${routineId}`, { 
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' }
-                });
+                const response = await fetch(`${API_BASE_URL}/${routineId}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } });
 
                 if (!response.ok) {
                     const errorText = await response.text();
@@ -405,22 +484,29 @@
             }
         }
 
+        function filterRoutinesTable(searchTerm) {
+            const normalizedSearch = searchTerm.toLowerCase().trim();
+            const filteredRoutines = allRoutinesData.filter(routine => {
+                const name = (routine.name || '').toLowerCase();
+                const description = (routine.description || routine.notes || '').toLowerCase();
+                return name.includes(normalizedSearch) || description.includes(normalizedSearch);
+            });
+            renderRoutinesTable(filteredRoutines);
+        }
+        
         // =============================================================
-        // 🚩 LÓGICA DE NAVEGACIÓN (REGRESAR) 🚩
+        // 🚩 LÓGICA DE NAVEGACIÓN (REGRESAR) y INICIALIZACIÓN 🚩
         // =============================================================
 
         function handleNavigateBack() {
-            // Regresar a la página de selección de gestión de contenido físico
             window.location.href = 'admin_routines.html'; 
         }
 
 
-        // --- INICIALIZACIÓN ---
         window.onload = function() {
             const storedSession = localStorage.getItem('adminSession');
             
             if (!storedSession) {
-                // Si no hay sesión, redirigir al login
                 window.location.href = 'administration.html'; 
                 return;
             }
@@ -435,14 +521,12 @@
             });
             document.getElementById('routine-form').addEventListener('submit', handleRoutineFormSubmit);
             
-            // 🔍 Listener para el campo de búsqueda de rutinas 🔍
             const routineSearchInput = document.getElementById('routine-search-input');
             if (routineSearchInput) {
                 routineSearchInput.addEventListener('input', (event) => {
                     filterRoutinesTable(event.target.value);
                 });
             }
-
         };
     </script>
 </body>
