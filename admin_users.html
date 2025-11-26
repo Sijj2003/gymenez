@@ -331,7 +331,67 @@
         }
 
         // =============================================================
-        // LÓGICA DE LA TABLA (READ - Leer)
+        // 🚩 NUEVAS FUNCIONES DE BLOQUEO 🚩
+        // =============================================================
+
+        /**
+         * Lógica para manejar la comunicación con el backend para bloquear/desbloquear.
+         */
+        const handleToggleBlock = async (userId, isBlockedString) => {
+            // Convertir el string 'true'/'false' a booleano
+            const isBlocked = isBlockedString === 'true'; 
+            const action = isBlocked ? 'desbloquear' : 'bloquear';
+            const message = `¿Está seguro que desea ${action} a este usuario?`;
+
+            if (!confirm(message)) {
+                return;
+            }
+
+            try {
+                // 🔑 NUEVA RUTA: /api/admin/user/toggle-block/{userId}
+                const response = await fetch(API_BASE_URL.replace('/user', `/user/toggle-block/${userId}`), {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ is_blocked: !isBlocked }) // Alternar el estado
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(result.message);
+                    fetchAllUsers(); // Recargar la tabla para mostrar el nuevo estado
+                } else {
+                    alert(`Error al ${action}: ${result.error}`);
+                }
+            } catch (error) {
+                console.error(`Error en toggle block:`, error);
+                alert(`Error de conexión al ${action} usuario.`);
+            }
+        };
+
+
+        /**
+         * Listener para adjuntar el evento a los botones de Bloqueo, ya que la tabla se recarga dinámicamente.
+         */
+        const setupToggleBlockListeners = () => {
+            // Seleccionar todos los botones con la clase 'toggle-block-btn'
+            document.querySelectorAll('.toggle-block-btn').forEach(button => {
+                // Remover listener anterior para evitar duplicados al recargar la tabla
+                button.removeEventListener('click', button.handler); 
+                
+                button.handler = function() {
+                    const userId = this.getAttribute('data-user-id');
+                    // 'data-is-blocked' se almacena como string
+                    const isBlocked = this.getAttribute('data-is-blocked'); 
+                    handleToggleBlock(userId, isBlocked);
+                };
+                
+                button.addEventListener('click', button.handler);
+            });
+        };
+
+        // =============================================================
+        // LÓGICA DE LA TABLA (READ - Leer) - MODIFICADA
         // =============================================================
 
         async function fetchAllUsers() {
@@ -353,28 +413,28 @@
                 const data = await response.json();
                 
                 if (data.success && data.users) {
-                    // 🚨 Almacenar la lista completa de usuarios
                     allUsersData = data.users; 
-                    renderUsersTable(allUsersData);
+                    // 🔑 Llama a filterUsersTable para manejar la búsqueda activa
+                    const userSearchInput = document.getElementById('user-search-input');
+                    filterUsersTable(userSearchInput ? userSearchInput.value : '');
                 } else {
                     tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-red-400">Error al cargar: ${data.error || 'Desconocido'}</td></tr>`;
-                    allUsersData = []; // Limpiar si falla
+                    allUsersData = [];
                 }
 
             } catch (error) {
                 console.error("Error de red al obtener usuarios:", error);
                 tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-red-400">Error de conexión. 🔑 **Revisa la configuración CORS en api_server.py**.</td></tr>';
-                allUsersData = []; // Limpiar si falla
+                allUsersData = [];
             }
         }
 
-        // MODIFICADA para recibir una lista de usuarios a renderizar
+        // MODIFICADA: Ahora usa template literals (strings) para crear la fila, lo que permite insertar el botón de Bloqueo
         function renderUsersTable(usersToRender) {
             const tableBody = document.getElementById('users-table-body');
             tableBody.innerHTML = ''; 
 
             if (usersToRender.length === 0) {
-                // Mensaje de "No se encontraron resultados" si la búsqueda no encuentra nada
                 const searchTerm = document.getElementById('user-search-input').value;
                 const message = searchTerm.trim() !== '' 
                     ? `No se encontraron resultados para "${searchTerm}".` 
@@ -384,44 +444,65 @@
                 return;
             }
 
-            usersToRender.forEach(user => {
-                const row = tableBody.insertRow();
-                row.classList.add('hover:bg-gray-800/50'); 
+            const rowsHtml = usersToRender.map(user => {
+                // Asumo que el campo 'is_blocked' viene de la API.
+                const isBlocked = user.is_blocked === true; // Asegurar booleano
                 
+                // 🚩 LÓGICA PARA EL BOTÓN DE BLOQUEO/DESBLOQUEO
+                const blockButtonHtml = `
+                    <button
+                        type="button"
+                        class="toggle-block-btn p-2 rounded-full text-white transition duration-150 ease-in-out"
+                        data-user-id="${user.id}"
+                        data-is-blocked="${isBlocked}"
+                        title="${isBlocked ? 'Desbloquear Usuario' : 'Bloquear Usuario'}"
+                        style="background-color: ${isBlocked ? '#E53E3E' : '#38A169'};"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            ${isBlocked 
+                                ? '<path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />'
+                                : '<path d="M10 2a5 5 0 00-5 5v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2H7V7a3 3 0 016 0v2h2V7a5 5 0 00-5-5z" />'
+                            }
+                        </svg>
+                    </button>`;
+                // 🚩 FIN LÓGICA BOTÓN
+
                 // Formato de fecha para la tabla (ya viene en DD/MM/YYYY desde el backend)
                 function displayDate(dateValue) {
                     if (!dateValue || dateValue === 'N/A') return 'N/A';
                     return String(dateValue).split('T')[0]; // Simple string display
                 }
-                
-                // Celdas de información
-                row.insertCell().textContent = user.full_name || 'N/A';
-                row.insertCell().textContent = user.email || 'N/A';
-                // Cédula: Se muestra el valor completo guardado (ej: V-12.345.678)
-                row.insertCell().textContent = user.id_number || 'N/A'; 
-                // Teléfono: Se muestra el valor completo guardado (ej: 0414-1234567)
-                row.insertCell().textContent = user.phone_number || 'N/A';
-                // Suscripción: Usa STANDARD como fallback
-                row.insertCell().textContent = user.subscription_level || 'STANDARD';
-                row.insertCell().textContent = displayDate(user.activo_desde);
 
-                // Celda de Acciones
-                const actionsCell = row.insertCell();
-                actionsCell.classList.add('space-x-2');
+                // Escapar comillas dobles en el JSON para que funcione en el onclick
+                const userJsonString = JSON.stringify(user).replace(/"/g, "'");
                 
-                const editBtn = document.createElement('button');
-                editBtn.textContent = 'Editar';
-                // Botón de acción con color de acento AMARILLO
-                editBtn.classList.add('GYM-YELLOW', 'hover:text-yellow-400', 'font-semibold');
-                editBtn.onclick = () => openModalForEdit(user);
-                actionsCell.appendChild(editBtn);
+                // Se usa template literal para construir la fila
+                return `
+                    <tr class="hover:bg-gray-800/50 transition duration-150">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${user.full_name || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${user.email || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${user.id_number || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${user.phone_number || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold" style="color: ${user.subscription_level === 'PLUS' || user.subscription_level === 'ULTRA' ? '#FFC300' : '#E5E7EB'};">${user.subscription_level || 'STANDARD'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${displayDate(user.activo_desde)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <div class="flex space-x-2 items-center">
+                                ${blockButtonHtml}
+                                <button type="button" onclick="openModalForEdit(${userJsonString})" class="GYM-YELLOW hover:text-yellow-400 font-semibold text-sm transition duration-150 ease-in-out" title="Editar Usuario">
+                                     Editar
+                                </button>
+                                <button type="button" onclick="deleteUser('${user.id}', '${user.full_name}')" class="text-red-500 hover:text-red-400 font-semibold text-sm transition duration-150 ease-in-out ml-2" title="Eliminar Usuario">
+                                     Eliminar
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
 
-                const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = 'Eliminar';
-                deleteBtn.classList.add('text-red-500', 'hover:text-red-400', 'font-semibold', 'ml-2');
-                deleteBtn.onclick = () => deleteUser(user.id, user.full_name);
-                actionsCell.appendChild(deleteBtn);
-            });
+            tableBody.innerHTML = rowsHtml;
+            // 🔑 Llamada para adjuntar los listeners al nuevo DOM
+            setupToggleBlockListeners();
         }
 
         // =============================================================
@@ -432,7 +513,6 @@
             const normalizedSearch = searchTerm.toLowerCase().trim();
 
             if (normalizedSearch === '') {
-                // Si la búsqueda está vacía, mostrar todos los usuarios
                 renderUsersTable(allUsersData);
                 return;
             }
@@ -450,6 +530,7 @@
             });
 
             renderUsersTable(filteredUsers);
+            // setupToggleBlockListeners() se llama dentro de renderUsersTable.
         }
 
         // =============================================================
