@@ -763,25 +763,35 @@
          * Maneja el envío del formulario de verificación para cerrar forzadamente la sesión.
          */
         async function handleForceLogout(e) {
-            e.preventDefault();
-            const email = document.getElementById('force-email').value;
-            const password = document.getElementById('login-password').value; 
-            const name = document.getElementById('force-name').value;
-            const dob = document.getElementById('force-dob').value;
-            const phone = document.getElementById('force-phone').value;
-            const ci = document.getElementById('force-ci').value;
+    e.preventDefault();
+    const email = document.getElementById('force-email').value;
+    // La contraseña está en el input de login, no en el modal de fuerza.
+    const password = document.getElementById('login-password').value; 
+    const name = document.getElementById('force-name').value;
+    const dob = document.getElementById('force-dob').value;
+    
+    // 🔑 CORRECCIÓN CLAVE: Normalización de datos
+    // 1. Teléfono: Eliminar todos los caracteres que no sean dígitos.
+    const phoneInput = document.getElementById('force-phone').value;
+    const phone = phoneInput.replace(/\D/g, ''); 
+    
+    // 2. Cédula de Identidad: Eliminar todos los caracteres que no sean dígitos.
+    const ciInput = document.getElementById('force-ci').value;
+    const ci = ciInput.replace(/\D/g, ''); 
+    // ------------------------------------------
 
-            const btn = document.getElementById('force-logout-btn');
-            const modal = document.getElementById('active-session-modal');
+    const btn = document.getElementById('force-logout-btn');
+    const modal = document.getElementById('active-session-modal');
 
-            btn.disabled = true;
-            btn.textContent = 'VERIFICANDO DATOS...';
-            showForceLogoutMessage(''); 
+    btn.disabled = true;
+    btn.textContent = 'VERIFICANDO DATOS...';
+    showForceLogoutMessage(''); 
 
-            const response = await apiForceLogout(email, password, localDeviceId, name, dob, phone, ci);
+    // Se llama a la API con los datos normalizados: phone y ci
+    const response = await apiForceLogout(email, password, localDeviceId, name, dob, phone, ci);
 
-            if (response.success) {
-                const delayMs = 7000; 
+    if (response.success) {
+        const delayMs = 7000;
                 
                 modal.classList.add('hidden');
                 
@@ -921,5 +931,6 @@
     </script>
 </body>
 </html>
+
 
 
