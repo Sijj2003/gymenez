@@ -133,6 +133,10 @@
         <div class="content-container mt-8">
             <h2 class="text-xl font-semibold mb-6 border-b border-gray-700 pb-3 text-white">Lista de Usuarios</h2>
 
+            <div class="mb-6">
+                <input type="text" id="user-search-input" placeholder="Buscar por Nombre, Email o Cédula..." 
+                       class="w-full p-3 rounded-lg bg-[#1a1a2e] border border-gray-700 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-GYM-YELLOW focus:border-GYM-YELLOW transition duration-150">
+            </div>
             <div class="overflow-x-auto rounded-lg border border-gray-700">
                 <table class="admin-table">
                     <thead>
@@ -260,6 +264,9 @@
         // =============================================================
         const API_BASE_URL = 'https://sijj2003.pythonanywhere.com/api/admin/user'; 
 
+        // Variable para almacenar la lista completa de usuarios
+        let allUsersData = [];
+
         // =============================================================
         // FUNCIONES DE FORMATO Y UTILIDAD
         // =============================================================
@@ -325,27 +332,38 @@
                 const data = await response.json();
                 
                 if (data.success && data.users) {
-                    renderUsersTable(data.users);
+                    // 🚨 Almacenar la lista completa de usuarios
+                    allUsersData = data.users; 
+                    renderUsersTable(allUsersData);
                 } else {
                     tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-red-400">Error al cargar: ${data.error || 'Desconocido'}</td></tr>`;
+                    allUsersData = []; // Limpiar si falla
                 }
 
             } catch (error) {
                 console.error("Error de red al obtener usuarios:", error);
                 tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-red-400">Error de conexión. 🔑 **Revisa la configuración CORS en api_server.py**.</td></tr>';
+                allUsersData = []; // Limpiar si falla
             }
         }
 
-        function renderUsersTable(users) {
+        // MODIFICADA para recibir una lista de usuarios a renderizar
+        function renderUsersTable(usersToRender) {
             const tableBody = document.getElementById('users-table-body');
             tableBody.innerHTML = ''; 
 
-            if (users.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-400">No hay usuarios registrados.</td></tr>';
+            if (usersToRender.length === 0) {
+                // Mensaje de "No se encontraron resultados" si la búsqueda no encuentra nada
+                const searchTerm = document.getElementById('user-search-input').value;
+                const message = searchTerm.trim() !== '' 
+                    ? `No se encontraron resultados para "${searchTerm}".` 
+                    : 'No hay usuarios registrados.';
+
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-gray-400">${message}</td></tr>`;
                 return;
             }
 
-            users.forEach(user => {
+            usersToRender.forEach(user => {
                 const row = tableBody.insertRow();
                 row.classList.add('hover:bg-gray-800/50'); 
                 
@@ -383,6 +401,34 @@
                 deleteBtn.onclick = () => deleteUser(user.id, user.full_name);
                 actionsCell.appendChild(deleteBtn);
             });
+        }
+
+        // =============================================================
+        // 🔍 LÓGICA DE BÚSQUEDA AÑADIDA 🔍
+        // =============================================================
+
+        function filterUsersTable(searchTerm) {
+            const normalizedSearch = searchTerm.toLowerCase().trim();
+
+            if (normalizedSearch === '') {
+                // Si la búsqueda está vacía, mostrar todos los usuarios
+                renderUsersTable(allUsersData);
+                return;
+            }
+
+            const filteredUsers = allUsersData.filter(user => {
+                // Criterios de búsqueda
+                const fullName = (user.full_name || '').toLowerCase();
+                const email = (user.email || '').toLowerCase();
+                const idNumber = (user.id_number || '').toLowerCase(); // Incluye V-12.345.678
+                
+                // Búsqueda flexible (busca la coincidencia en cualquiera de los campos)
+                return fullName.includes(normalizedSearch) || 
+                       email.includes(normalizedSearch) || 
+                       idNumber.includes(normalizedSearch);
+            });
+
+            renderUsersTable(filteredUsers);
         }
 
         // =============================================================
@@ -669,6 +715,15 @@
                 document.getElementById('user-modal').classList.add('hidden');
             });
             document.getElementById('user-form').addEventListener('submit', handleUserFormSubmit);
+            
+            // 🔍 Listener para el campo de búsqueda de usuarios 🔍
+            const userSearchInput = document.getElementById('user-search-input');
+            if (userSearchInput) {
+                userSearchInput.addEventListener('input', (event) => {
+                    filterUsersTable(event.target.value);
+                });
+            }
+
         };
     </script>
 </body>
