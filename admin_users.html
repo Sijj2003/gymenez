@@ -122,7 +122,7 @@
                 <button id="back-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out">
                     ← Regresar
                 </button>
-                </nav>
+            </nav>
         </div>
     </header>
 
@@ -158,11 +158,11 @@
         </div>
     </main>
 
-    <div id="user-modal" class="fixed inset-0 bg-black bg-opacity-70 modal-backdrop hidden z-50 flex items-center justify-center p-4">
-        <div class="modal-content w-full max-w-2xl p-6 rounded-xl transform transition-all duration-300 scale-100">
+    <div id="user-modal" class="fixed inset-0 bg-black bg-opacity-70 modal-backdrop hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="modal-content w-full max-w-2xl p-6 rounded-xl transform transition-all duration-300 scale-100 my-8">
             <div class="flex justify-between items-center border-b border-gray-700 pb-3 mb-4">
                 <h3 id="modal-title" class="text-xl font-semibold text-white">Añadir Nuevo Usuario</h3>
-                <button id="close-modal-btn" class="text-gray-400 hover:text-white">&times;</button>
+                <button id="close-modal-btn" class="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
             </div>
 
             <form id="user-form" class="space-y-4">
@@ -205,7 +205,7 @@
                     <div>
                         <label for="phone_prefix" class="block text-sm font-medium text-gray-300">Teléfono <span class="text-red-500">*</span></label>
                         <div class="flex mt-1">
-                            <select id="phone_prefix" name="phone_prefix" required class="bg-gray-700/50 border border-gray-600 p-3 rounded-l-lg focus:border-GYM-YELLOW focus:ring-GYM-YELLOW text-white w-32">
+                            <select id="phone_prefix" name="phone_prefix" required class="bg-gray-700/50 border border-gray-600 p-3 rounded-l-lg focus:border-GYM-YELLOW focus:ring-GYM-YELLOW text-white w-24 sm:w-28">
                                 <option value="0414">0414</option>
                                 <option value="0424">0424</option>
                                 <option value="0412">0412</option>
@@ -258,7 +258,6 @@
             </form>
         </div>
     </div>
-
     <script>
         // =============================================================
         // 🚨 URL DE LA API: Usando tu dominio de PythonAnywhere
