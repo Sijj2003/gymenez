@@ -772,6 +772,12 @@
                 if (response.error && response.error.includes('bloqueada')) {
                     blockModal.classList.remove('hidden'); // Muestra el modal no cerrable
                     showMessage('Acceso Restringido.', 'error');
+                    
+                    // 🟢 [INICIO DE CORRECCIÓN] Cierra el modal de bloqueo después de 10 segundos 🟢
+                    setTimeout(() => {
+                        blockModal.classList.add('hidden');
+                    }, 10000); 
+                    // 🟢 [FIN DE CORRECCIÓN] 🟢
                 
                 // LÓGICA DE SESIÓN ACTIVA (ERROR 403 con mensaje específico)
                 } else if (response.error && response.error.includes('Ya hay una sesión activa')) {
