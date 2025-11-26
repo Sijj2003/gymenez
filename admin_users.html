@@ -369,7 +369,7 @@
             }
         }
 
-        // MODIFICADA: Ahora usa createElement para insertar el botón de Bloqueo/Desbloqueo
+        // MODIFICADA: Implementa el botón de Bloqueo/Desbloqueo dinámico
         function renderUsersTable(usersToRender) {
             const tableBody = document.getElementById('users-table-body');
             tableBody.innerHTML = ''; 
@@ -419,29 +419,30 @@
 
                 // --- Bloquear/Desbloquear Button ---
                 const blockBtn = document.createElement('button');
+                // 🟢 CRÍTICO: Leer el estado is_blocked desde el backend 🟢
                 const isBlocked = user.is_blocked === true; 
                 
                 // Texto y color dinámico
                 blockBtn.textContent = isBlocked ? 'Desbloquear' : 'Bloquear';
-                blockBtn.classList.add('font-semibold', 'text-sm', 'transition', 'duration-150', 'ease-in-out');
+                blockBtn.classList.add('font-semibold', 'text-sm', 'transition', 'duration-150', 'ease-in-out', 'p-1', 'rounded');
 
                 if (isBlocked) {
                     // Usuario BLOQUEADO -> Mostrar botón DESBLOQUEAR (Verde)
-                    blockBtn.classList.add('text-green-500', 'hover:text-green-400');
+                    blockBtn.classList.add('text-white', 'bg-green-600', 'hover:bg-green-500');
                 } else {
                     // Usuario DESBLOQUEADO -> Mostrar botón BLOQUEAR (Rojo)
-                    blockBtn.classList.add('text-red-500', 'hover:text-red-400');
+                    blockBtn.classList.add('text-white', 'bg-red-600', 'hover:bg-red-500');
                 }
                 
-                // Adjuntar la función de alternancia con los datos del usuario
-                blockBtn.onclick = () => toggleUserBlock(user.id, user.full_name, isBlocked);
+                // 🚩 Asignar el listener: Envía el estado OPUESTO del botón 🚩
+                blockBtn.addEventListener('click', () => handleBlockUser(user.id, isBlocked));
+
                 divContainer.appendChild(blockBtn);
 
                 // --- Botón Editar ---
                 const editBtn = document.createElement('button');
                 editBtn.textContent = 'Editar';
                 editBtn.classList.add('GYM-YELLOW', 'hover:text-yellow-400', 'font-semibold', 'text-sm', 'transition', 'duration-150', 'ease-in-out');
-                // Escapar comillas dobles en el JSON para que funcione en el onclick
                 editBtn.onclick = () => openModalForEdit(user);
                 divContainer.appendChild(editBtn);
 
@@ -705,22 +706,25 @@
         // 🚫 LÓGICA DE BLOQUEO / DESBLOQUEO (TOGGLE BLOCK) 🚫
         // =============================================================
 
-        async function toggleUserBlock(userId, fullName, isCurrentlyBlocked) {
-            const action = isCurrentlyBlocked ? 'desbloquear' : 'bloquear';
-            // El nuevo estado es el opuesto al actual
-            const newBlockStatus = !isCurrentlyBlocked; 
-
-            if (!confirm(`¿Está seguro de que desea ${action} a ${fullName}?`)) {
+        async function handleBlockUser(userId, currentState) {
+            // El nuevo estado es el opuesto del actual (de false a true, o de true a false)
+            const newBlockedState = !currentState;
+            const action = newBlockedState ? 'bloquear' : 'desbloquear';
+            
+            // Confirmación al usuario
+            if (!confirm(`¿Está seguro que desea ${action} al usuario ID: ${userId}?`)) {
                 return;
             }
 
             try {
-                // La URL utiliza el API_BASE_URL (que termina en /user) + /toggle-block/ + userId
-                const response = await fetch(`${API_BASE_URL}/toggle-block/${userId}`, { 
+                // Llama a la ruta PUT /api/admin/user/block/{userId}
+                const response = await fetch(`${API_BASE_URL}/block/${userId}`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    // Enviamos el nuevo estado de bloqueo
-                    body: JSON.stringify({ is_blocked: newBlockStatus }) 
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    // CRÍTICO: Envía el nuevo estado booleano
+                    body: JSON.stringify({ is_blocked: newBlockedState }),
                 });
 
                 if (!response.ok) {
@@ -732,14 +736,15 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert(data.message);
-                    fetchAllUsers(); // Recargar la tabla para mostrar el nuevo estado
+                    alert(`Usuario ${action} con éxito. El nuevo estado es: ${data.is_blocked ? 'BLOQUEADO' : 'DESBLOQUEADO'}`);
+                    // Recargar la tabla para mostrar el botón con el nuevo estado y color
+                    fetchAllUsers(); 
                 } else {
                     alert(`Error al ${action}: ${data.error}`);
                 }
             } catch (error) {
-                alert(`Error de red al ${action} el usuario: ${error.message}`);
-                console.error(error);
+                console.error(`Error al ${action} usuario:`, error);
+                alert(`Error de red al intentar ${action}: ${error.message}`);
             }
         }
 
@@ -748,7 +753,7 @@
         // =============================================================
 
         function handleNavigateBack() {
-            // Simplemente redirige a la página de administración sin cerrar la sesión
+            // Simplemente redirige a la página de administración
             window.location.href = 'administration.html'; 
         }
 
