@@ -71,6 +71,7 @@
         }
         
         .modal-backdrop { background-color: rgba(0, 0, 0, 0.85); }
+        /* 🚨 MODAL MÁS GRANDE */
         .modal-content {
             background-color: #1a1a2e;
             border: 1px solid #334155;
@@ -78,7 +79,7 @@
             max-height: calc(100vh - 40px);
             overflow-y: auto;
         }
-        .modal-content input[type="text"], .modal-content textarea {
+        .modal-content input[type="text"], .modal-content textarea, .modal-content input[type="number"] {
              background-color: #1a1a2e;
              border: 1px solid #334155;
              color: #e5e7eb;
@@ -99,7 +100,16 @@
             border-color: #FFC300;
             background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='black' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
         }
-
+        /* Estilos para el constructor */
+        .panel-builder {
+            background-color: #1a1a2e;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            min-height: 250px;
+        }
+        .list-item-hover:hover {
+            background-color: #334155;
+        }
     </style>
 </head>
 <body>
@@ -137,7 +147,8 @@
                         <tr>
                             <th class="rounded-tl-lg">Nombre de la Rutina</th>
                             <th>Días Asignados</th>
-                            <th>Descripción</th>
+                            <th># Ejercicios</th>
+                            <th># Usuarios</th>
                             <th class="rounded-tr-lg">Acciones</th>
                         </tr>
                     </thead>
@@ -150,7 +161,7 @@
 
     <div id="routine-modal" class="fixed inset-0 bg-black bg-opacity-80 modal-backdrop hidden z-[1010] flex justify-center p-4 overflow-y-auto">
         
-        <div class="modal-content w-full max-w-xl p-6 rounded-xl transform transition-all duration-300 scale-100">
+        <div class="modal-content w-full max-w-4xl p-6 rounded-xl transform transition-all duration-300 scale-100">
             
             <div class="flex justify-between items-center border-b border-gray-700 pb-4 mb-6">
                 <h3 id="modal-title" class="text-2xl font-semibold text-white">Añadir Nueva Rutina Base</h3>
@@ -160,51 +171,76 @@
             <form id="routine-form" class="space-y-6">
                 <input type="hidden" id="routine-id-field" name="id">
                 <input type="hidden" id="is-edit-mode" value="false">
-                <input type="hidden" id="exercises-field" name="exercises" value="[]"> 
-                <input type="hidden" id="assigned-users-field" name="assigned_users" value="[]"> 
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-300">Nombre de la Rutina <span class="text-red-500">*</span></label>
+                            <input type="text" id="name" name="name" required 
+                                class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW" 
+                                placeholder="Ej: Rutina Básico 3 Días (Full Body)">
+                        </div>
 
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-300">Nombre de la Rutina <span class="text-red-500">*</span></label>
-                    <input type="text" id="name" name="name" required 
-                           class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW" 
-                           placeholder="Ej: Rutina Básico 3 Días (Full Body)">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Días de Entrenamiento</label>
-                    <div class="grid grid-cols-3 gap-2 text-sm">
-                        <label class="inline-flex items-center text-gray-300">
-                            <input type="checkbox" name="assigned_days" value="Lunes" class="day-checkbox mr-2"> Lunes
-                        </label>
-                        <label class="inline-flex items-center text-gray-300">
-                            <input type="checkbox" name="assigned_days" value="Martes" class="day-checkbox mr-2"> Martes
-                        </label>
-                        <label class="inline-flex items-center text-gray-300">
-                            <input type="checkbox" name="assigned_days" value="Miércoles" class="day-checkbox mr-2"> Miércoles
-                        </label>
-                        <label class="inline-flex items-center text-gray-300">
-                            <input type="checkbox" name="assigned_days" value="Jueves" class="day-checkbox mr-2"> Jueves
-                        </label>
-                        <label class="inline-flex items-center text-gray-300">
-                            <input type="checkbox" name="assigned_days" value="Viernes" class="day-checkbox mr-2"> Viernes
-                        </label>
-                        <label class="inline-flex items-center text-gray-300">
-                            <input type="checkbox" name="assigned_days" value="Sábado" class="day-checkbox mr-2"> Sábado
-                        </label>
+                        <div>
+                            <label for="description" class="block text-sm font-medium text-gray-300">Descripción de la Rutina <span class="text-red-500">*</span></label>
+                            <textarea id="description" name="description" rows="4" required
+                                class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW" 
+                                placeholder="Describe el objetivo y nivel de esta rutina. (Se guardará como 'notes')"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Días de Entrenamiento</label>
+                        <div class="grid grid-cols-3 gap-2 text-sm panel-builder p-4">
+                            <label class="inline-flex items-center text-gray-300">
+                                <input type="checkbox" name="assigned_days" value="Lunes" class="day-checkbox mr-2"> Lunes
+                            </label>
+                            <label class="inline-flex items-center text-gray-300">
+                                <input type="checkbox" name="assigned_days" value="Martes" class="day-checkbox mr-2"> Martes
+                            </label>
+                            <label class="inline-flex items-center text-gray-300">
+                                <input type="checkbox" name="assigned_days" value="Miércoles" class="day-checkbox mr-2"> Miércoles
+                            </label>
+                            <label class="inline-flex items-center text-gray-300">
+                                <input type="checkbox" name="assigned_days" value="Jueves" class="day-checkbox mr-2"> Jueves
+                            </label>
+                            <label class="inline-flex items-center text-gray-300">
+                                <input type="checkbox" name="assigned_days" value="Viernes" class="day-checkbox mr-2"> Viernes
+                            </label>
+                            <label class="inline-flex items-center text-gray-300">
+                                <input type="checkbox" name="assigned_days" value="Sábado" class="day-checkbox mr-2"> Sábado
+                            </label>
+                        </div>
                     </div>
                 </div>
 
+                <h4 class="text-lg font-semibold text-white border-b border-gray-700 pb-2 mt-8">Asignación de Ejercicios</h4>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="panel-builder p-4">
+                        <h5 class="text-md font-medium text-gray-400 mb-3">Ejercicios para Añadir</h5>
+                        <input type="text" id="exercise-search" placeholder="Buscar ejercicio..." class="w-full p-2 mb-3 rounded-lg bg-[#0d0d1a] border border-gray-700 text-gray-300">
+                        <div id="available-exercises-list" class="h-[250px] overflow-y-auto space-y-1">
+                            <div class="text-gray-500 text-center py-4">Cargando ejercicios...</div>
+                        </div>
+                    </div>
 
-                <div>
-                    <label for="description" class="block text-sm font-medium text-gray-300">Descripción de la Rutina <span class="text-red-500">*</span></label>
-                    <textarea id="description" name="description" rows="4" required
-                              class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW" 
-                              placeholder="Describe el objetivo y nivel de esta rutina. (Se guardará como 'notes')"></textarea>
+                    <div class="panel-builder p-4">
+                        <h5 class="text-md font-medium text-gray-400 mb-3 flex justify-between items-center">
+                            Ejercicios Asignados
+                            <span class="text-sm text-GYM-YELLOW" id="selected-exercise-count">0 Ejercicios</span>
+                        </h5>
+                        <div id="routine-exercises-list" class="h-[280px] overflow-y-auto space-y-3 p-1">
+                            <div class="text-gray-500 text-center py-4">Añade ejercicios desde el panel izquierdo.</div>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="text-sm text-gray-500 p-3 border border-gray-700 rounded-lg">
-                    <p class="font-semibold text-gray-300">Nota:</p>
-                    <p>La gestión de **Ejercicios** y **Usuarios Asignados** se mantiene en segundo plano. Para construir una rutina detallada, se requerirá una página de "Constructor de Rutinas" separada.</p>
+                
+                <h4 class="text-lg font-semibold text-white border-b border-gray-700 pb-2 mt-8">Asignación de Usuarios</h4>
+                <div class="panel-builder p-4">
+                    <h5 class="text-md font-medium text-gray-400 mb-3">Usuarios Asignados (<span id="assigned-user-count">0</span>)</h5>
+                    <input type="text" id="user-search" placeholder="Buscar usuario (Nombre, Email)..." class="w-full p-2 mb-3 rounded-lg bg-[#0d0d1a] border border-gray-700 text-gray-300">
+                    <div id="available-users-list" class="h-[150px] overflow-y-auto space-y-1 grid grid-cols-2 md:grid-cols-3 gap-2">
+                        <div class="text-gray-500 text-center py-4 col-span-full">Cargando usuarios...</div>
+                    </div>
                 </div>
 
 
@@ -222,53 +258,63 @@
     
     <script>
         // =============================================================
-        // 🚨 URL BASE DE LA API 
+        // 🚨 URLS DE LA API
         // =============================================================
-        const API_BASE_URL = 'https://sijj2003.pythonanywhere.com/api/admin/routine'; 
+        const API_ROUTINE_BASE = 'https://sijj2003.pythonanywhere.com/api/admin/routine'; 
+        const API_EXERCISES = 'https://sijj2003.pythonanywhere.com/api/admin/exercises';
+        const API_USERS = 'https://sijj2003.pythonanywhere.com/api/admin/users';
 
-        // Variable para almacenar la lista completa de rutinas
         let allRoutinesData = [];
-        const dayNames = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+        let allAvailableExercises = [];
+        let allAvailableUsers = [];
+        
+        // Objeto que mantendrá los datos de la rutina que se está editando/creando
+        // Esto es crucial para mantener los arrays complejos en memoria
+        let currentRoutineState = {
+            id: null,
+            name: '',
+            description: '',
+            assigned_days: [],
+            exercises: [],
+            assigned_users: []
+        };
+        
+        // =============================================================
+        // LÓGICA DE CARGA DE DATOS INICIAL
+        // =============================================================
+
+        async function fetchAllDataInitial() {
+            // 1. Fetch de Rutinas
+            const routinesPromise = fetch(API_ROUTINE_BASE.replace('/routine', '/routines')).then(r => r.json());
+            
+            // 2. Fetch de Ejercicios
+            const exercisesPromise = fetch(API_EXERCISES).then(r => r.json());
+            
+            // 3. Fetch de Usuarios
+            const usersPromise = fetch(API_USERS).then(r => r.json());
+
+            try {
+                const [routinesData, exercisesData, usersData] = await Promise.all([
+                    routinesPromise, 
+                    exercisesPromise, 
+                    usersPromise
+                ]);
+
+                allRoutinesData = routinesData.success ? routinesData.routines : [];
+                allAvailableExercises = exercisesData.success ? exercisesData.exercises : [];
+                allAvailableUsers = usersData.success ? usersData.users : [];
+                
+                renderRoutinesTable(allRoutinesData);
+            } catch (error) {
+                console.error("Error de red al obtener todos los datos:", error);
+                document.getElementById('routines-table-body').innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-400">Error al cargar datos iniciales.</td></tr>';
+            }
+        }
 
         // =============================================================
         // LÓGICA DE LA TABLA (READ - Leer y Mostrar)
         // =============================================================
 
-        async function fetchAllRoutines() {
-            // ... (Función fetchAllRoutines sin cambios significativos)
-            const tableBody = document.getElementById('routines-table-body');
-            tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 GYM-YELLOW">Cargando rutinas...</td></tr>';
-            
-            try {
-                // Se usa la ruta plural /api/admin/routines
-                const response = await fetch(API_BASE_URL.replace('/routine', '/routines'), { 
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Error HTTP: ${response.status} - ${errorText.substring(0, 100)}...`);
-                }
-
-                const data = await response.json();
-                
-                if (data.success && data.routines) {
-                    allRoutinesData = data.routines; 
-                    renderRoutinesTable(allRoutinesData);
-                } else {
-                    tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-400">Error al cargar: ${data.error || 'Desconocido'}</td></tr>`;
-                    allRoutinesData = [];
-                }
-
-            } catch (error) {
-                console.error("Error de red al obtener rutinas:", error);
-                tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-400">Error de conexión.</td></tr>';
-                allRoutinesData = [];
-            }
-        }
-
-        // Función para renderizar la tabla con una lista de rutinas
         function renderRoutinesTable(routinesToRender) {
             const tableBody = document.getElementById('routines-table-body');
             tableBody.innerHTML = ''; 
@@ -279,7 +325,7 @@
                     ? `No se encontraron rutinas para "${searchTerm}".` 
                     : 'No hay rutinas registradas.';
 
-                tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-400">${message}</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-gray-400">${message}</td></tr>`;
                 return;
             }
 
@@ -290,99 +336,114 @@
                 // Celdas de información
                 row.insertCell().textContent = routine.name || 'N/A';
                 
-                // Días Asignados
-                const assignedDays = routine.assigned_days && routine.assigned_days.length > 0
+                const assignedDays = (routine.assigned_days && routine.assigned_days.length > 0)
                     ? routine.assigned_days.join(', ')
                     : 'Ninguno';
-                row.insertCell().textContent = assignedDays;
-
-
-                // Descripción (limitada)
-                const descriptionText = routine.description || routine.notes || 'N/A'; // Usa 'description' o 'notes'
-                row.insertCell().textContent = descriptionText.length > 50 ? descriptionText.substring(0, 50) + '...' : descriptionText;
+                row.insertCell().textContent = assignedDays.length > 20 ? assignedDays.substring(0, 20) + '...' : assignedDays;
+                
+                const numExercises = (routine.exercises || []).length;
+                row.insertCell().textContent = numExercises;
+                
+                const numUsers = (routine.assigned_users || []).length;
+                row.insertCell().textContent = numUsers;
 
 
                 // Celda de Acciones
                 const actionsCell = row.insertCell();
-                actionsCell.classList.add('space-x-2');
+                actionsCell.classList.add('space-x-2', 'whitespace-nowrap');
                 
                 const editBtn = document.createElement('button');
                 editBtn.textContent = 'Editar';
-                editBtn.classList.add('GYM-YELLOW', 'hover:text-yellow-400', 'font-semibold');
-                editBtn.onclick = () => openModalForEdit(routine);
+                editBtn.classList.add('GYM-YELLOW', 'hover:text-yellow-400', 'font-semibold', 'text-sm');
+                editBtn.onclick = () => openModalForEdit(routine.id);
                 actionsCell.appendChild(editBtn);
 
                 const deleteBtn = document.createElement('button');
                 deleteBtn.textContent = 'Eliminar';
-                deleteBtn.classList.add('text-red-500', 'hover:text-red-400', 'font-semibold', 'ml-2');
+                deleteBtn.classList.add('text-red-500', 'hover:text-red-400', 'font-semibold', 'ml-2', 'text-sm');
                 deleteBtn.onclick = () => deleteRoutine(routine.id, routine.name);
                 actionsCell.appendChild(deleteBtn);
             });
         }
 
         // =============================================================
-        // LÓGICA DEL MODAL (CREATE/UPDATE - Crear/Actualizar)
+        // LÓGICA DEL MODAL (CREATE/UPDATE)
         // =============================================================
         
-        // Helper para resetear las casillas de los días
-        function resetDaysCheckboxes() {
-            document.querySelectorAll('input[name="assigned_days"]').forEach(cb => {
-                cb.checked = false;
-            });
-        }
-        // Helper para obtener la rutina completa (del array local)
-        function findRoutineById(id) {
-            return allRoutinesData.find(r => r.id === id);
+        function resetModalState() {
+            // Limpiar el estado de la rutina actual
+            currentRoutineState = {
+                id: null,
+                name: '',
+                description: '',
+                assigned_days: [],
+                exercises: [],
+                assigned_users: []
+            };
+
+            // Resetear el formulario y los inputs
+            document.getElementById('routine-form').reset(); 
+            document.getElementById('routine-id-field').value = '';
+            document.getElementById('is-edit-mode').value = 'false';
+            
+            // Renderizar las listas vacías
+            renderRoutineExercises(); 
+            renderAvailableExercises();
+            renderAvailableUsers();
+            updateSelectedExerciseCount();
+            updateAssignedUserCount();
         }
 
         function openModalForCreate() {
-            const form = document.getElementById('routine-form');
-            form.reset(); 
+            resetModalState();
             document.getElementById('modal-title').textContent = 'Añadir Nueva Rutina Base';
-            document.getElementById('routine-id-field').value = '';
-            document.getElementById('is-edit-mode').value = 'false';
             document.getElementById('submit-btn').textContent = 'Crear Rutina';
-            
-            // Inicializar arrays complejos vacíos para nueva creación
-            document.getElementById('exercises-field').value = '[]';
-            document.getElementById('assigned-users-field').value = '[]';
-            resetDaysCheckboxes();
 
             document.getElementById('routine-modal').classList.remove('hidden');
         }
 
-        function openModalForEdit(simplifiedRoutine) {
-            const fullRoutine = findRoutineById(simplifiedRoutine.id);
+        function openModalForEdit(routineId) {
+            const fullRoutine = allRoutinesData.find(r => r.id === routineId);
             if (!fullRoutine) {
                 alert("Error: No se encontró la información completa de la rutina.");
                 return;
             }
 
-            const form = document.getElementById('routine-form');
-            form.reset(); 
+            resetModalState();
             
-            document.getElementById('modal-title').textContent = `Editar Rutina: ${fullRoutine.name}`;
-            document.getElementById('routine-id-field').value = fullRoutine.id;
+            // Cargar el estado de la rutina
+            currentRoutineState = {
+                id: fullRoutine.id,
+                name: fullRoutine.name || '',
+                description: fullRoutine.description || fullRoutine.notes || '',
+                assigned_days: fullRoutine.assigned_days || [],
+                // Clonar los arrays complejos para trabajar con ellos
+                exercises: [...(fullRoutine.exercises || [])], 
+                assigned_users: [...(fullRoutine.assigned_users || [])]
+            };
+
+            document.getElementById('modal-title').textContent = `Editar Rutina: ${currentRoutineState.name}`;
+            document.getElementById('routine-id-field').value = currentRoutineState.id;
             document.getElementById('is-edit-mode').value = 'true';
             document.getElementById('submit-btn').textContent = 'Guardar Cambios';
 
             // Llenar campos simples
-            document.getElementById('name').value = fullRoutine.name || '';
-            document.getElementById('description').value = fullRoutine.description || fullRoutine.notes || ''; // Usar 'description' o 'notes'
+            document.getElementById('name').value = currentRoutineState.name;
+            document.getElementById('description').value = currentRoutineState.description;
 
-            // 1. Días Asignados (assigned_days)
-            resetDaysCheckboxes();
-            const days = fullRoutine.assigned_days || [];
+            // Llenar Días Asignados
             document.querySelectorAll('input[name="assigned_days"]').forEach(cb => {
-                if (days.includes(cb.value)) {
+                if (currentRoutineState.assigned_days.includes(cb.value)) {
                     cb.checked = true;
                 }
             });
-
-            // 2. Preservar Ejercicios y Usuarios (Datos complejos)
-            document.getElementById('exercises-field').value = JSON.stringify(fullRoutine.exercises || []);
-            document.getElementById('assigned-users-field').value = JSON.stringify(fullRoutine.assigned_users || []);
-
+            
+            // Renderizar las secciones dinámicas
+            renderRoutineExercises(); 
+            renderAvailableExercises();
+            renderAvailableUsers();
+            updateSelectedExerciseCount();
+            updateAssignedUserCount();
 
             document.getElementById('routine-modal').classList.remove('hidden');
         }
@@ -395,42 +456,38 @@
             const isEditMode = document.getElementById('is-edit-mode').value === 'true';
             const routineId = document.getElementById('routine-id-field').value;
 
-            // 1. Recoger Días Asignados
+            // 1. Recoger Días Asignados del formulario (el único campo que se toma directamente de los inputs)
             const selectedDays = Array.from(document.querySelectorAll('input[name="assigned_days"]:checked')).map(cb => cb.value);
 
-            // 2. Recoger datos simples
-            const baseData = {
+            // 2. Construir el payload final desde el estado y los campos simples
+            const payload = {
                 name: form.name.value.trim(),
                 description: form.description.value.trim(), // Mapeado a 'notes' en el backend
-                assigned_days: selectedDays
+                assigned_days: selectedDays,
+                
+                // Arrays complejos que ya se actualizaron en el JS
+                exercises: currentRoutineState.exercises,
+                assigned_users: currentRoutineState.assigned_users
             };
             
             // Validaciones básicas
-            if (!baseData.name || !baseData.description) {
+            if (!payload.name || !payload.description) {
                 alert("El Nombre y la Descripción de la rutina son obligatorios.");
                 return;
             }
 
-            // 3. Obtener/Preservar datos complejos para el payload
-            const complexData = {
-                exercises: JSON.parse(document.getElementById('exercises-field').value || '[]'),
-                assigned_users: JSON.parse(document.getElementById('assigned-users-field').value || '[]')
-            };
-
-            const payload = {
-                ...baseData,
-                ...complexData
-            };
-            
             const method = isEditMode ? 'PUT' : 'POST';
-            const url = isEditMode ? `${API_BASE_URL}/${routineId}` : API_BASE_URL;
+            const url = isEditMode ? `${API_ROUTINE_BASE}/${routineId}` : API_ROUTINE_BASE;
             const actionText = isEditMode ? 'Edición' : 'Creación';
+
+            document.getElementById('submit-btn').textContent = 'Guardando...';
+            document.getElementById('submit-btn').disabled = true;
 
             try {
                 const response = await fetch(url, {
                     method: method,
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload) // Envía el objeto completo
+                    body: JSON.stringify(payload)
                 });
                 
                 if (!response.ok) {
@@ -444,38 +501,197 @@
                 if (data.success) {
                     alert(`${actionText} de rutina exitosa: ${data.message}`);
                     document.getElementById('routine-modal').classList.add('hidden');
-                    fetchAllRoutines(); // Recargar la tabla
+                    await fetchAllDataInitial(); // Recargar la tabla
                 } else {
                     alert(`Error al ${actionText.toLowerCase()} rutina: ${data.error}`);
                 }
             } catch (error) {
                 alert(`Error de red al procesar la rutina: ${error.message}`);
                 console.error(error);
+            } finally {
+                document.getElementById('submit-btn').textContent = isEditMode ? 'Guardar Cambios' : 'Crear Rutina';
+                document.getElementById('submit-btn').disabled = false;
             }
         }
         
         // =============================================================
-        // LÓGICA DE ELIMINACIÓN (DELETE) y BÚSQUEDA
+        // LÓGICA DE ASIGNACIÓN DE USUARIOS
         // =============================================================
-        // Las funciones deleteRoutine y filterRoutinesTable no necesitan cambios.
+        
+        function updateAssignedUserCount() {
+            const count = (currentRoutineState.assigned_users || []).length;
+            document.getElementById('assigned-user-count').textContent = count;
+        }
+
+        function renderAvailableUsers(searchTerm = '') {
+            const list = document.getElementById('available-users-list');
+            list.innerHTML = '';
+            const assignedUserIds = new Set(currentRoutineState.assigned_users || []);
+            const normalizedSearch = searchTerm.toLowerCase().trim();
+
+            const filteredUsers = allAvailableUsers.filter(user => {
+                const name = (user.name || '').toLowerCase();
+                const email = (user.email || '').toLowerCase();
+                return name.includes(normalizedSearch) || email.includes(normalizedSearch);
+            }).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+            if (filteredUsers.length === 0) {
+                list.innerHTML = `<div class="text-gray-500 text-center py-4 col-span-full">No se encontraron usuarios.</div>`;
+                return;
+            }
+
+            filteredUsers.forEach(user => {
+                const isAssigned = assignedUserIds.has(user.id);
+                const item = document.createElement('label');
+                item.classList.add('inline-flex', 'items-center', 'text-sm', 'text-gray-300', 'p-2', 'list-item-hover', 'rounded-md', isAssigned ? 'bg-green-700/50' : 'bg-transparent');
+                item.innerHTML = `
+                    <input type="checkbox" data-user-id="${user.id}" 
+                           class="w-4 h-4 text-GYM-YELLOW bg-gray-600 border-gray-500 rounded focus:ring-GYM-YELLOW" 
+                           ${isAssigned ? 'checked' : ''}
+                           onchange="toggleUserAssignment('${user.id}')">
+                    <span class="ml-2 truncate" title="${user.name || user.email || 'Usuario sin nombre'}">${user.name || user.email || 'N/A'}</span>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function toggleUserAssignment(userId) {
+            let assignedUsers = currentRoutineState.assigned_users || [];
+            
+            if (assignedUsers.includes(userId)) {
+                currentRoutineState.assigned_users = assignedUsers.filter(id => id !== userId);
+            } else {
+                currentRoutineState.assigned_users.push(userId);
+            }
+            updateAssignedUserCount();
+            renderAvailableUsers(document.getElementById('user-search').value);
+        }
+
+        // =============================================================
+        // LÓGICA DE ASIGNACIÓN Y CONFIGURACIÓN DE EJERCICIOS
+        // =============================================================
+
+        function updateSelectedExerciseCount() {
+            const count = (currentRoutineState.exercises || []).length;
+            document.getElementById('selected-exercise-count').textContent = `${count} Ejercicios`;
+        }
+        
+        function renderAvailableExercises(searchTerm = '') {
+            const list = document.getElementById('available-exercises-list');
+            list.innerHTML = '';
+            const assignedExerciseIds = new Set((currentRoutineState.exercises || []).map(e => e.exercise_id));
+            const normalizedSearch = searchTerm.toLowerCase().trim();
+
+            const filteredExercises = allAvailableExercises.filter(exercise => {
+                const name = (exercise.name || '').toLowerCase();
+                const description = (exercise.description || '').toLowerCase();
+                return name.includes(normalizedSearch) || description.includes(normalizedSearch);
+            }).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+            if (filteredExercises.length === 0) {
+                list.innerHTML = `<div class="text-gray-500 text-center py-4">No se encontraron ejercicios.</div>`;
+                return;
+            }
+
+            filteredExercises.forEach(exercise => {
+                const isAssigned = assignedExerciseIds.has(exercise.id);
+                const item = document.createElement('div');
+                item.classList.add('p-3', 'rounded-md', 'flex', 'justify-between', 'items-center', 'text-sm', 'list-item-hover', isAssigned ? 'bg-GYM-YELLOW/20' : 'bg-[#25253e]');
+                item.innerHTML = `
+                    <span class="${isAssigned ? 'text-GYM-YELLOW font-semibold' : 'text-gray-300'}">${exercise.name}</span>
+                    <button class="${isAssigned ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-black text-xs font-bold py-1 px-3 rounded"
+                            onclick="toggleExerciseAssignment('${exercise.id}', '${exercise.name.replace(/'/g, "\\'")}', ${isAssigned})">
+                        ${isAssigned ? 'Quitar' : 'Añadir'}
+                    </button>
+                `;
+                list.appendChild(item);
+            });
+        }
+        
+        function renderRoutineExercises() {
+            const list = document.getElementById('routine-exercises-list');
+            list.innerHTML = '';
+            
+            if ((currentRoutineState.exercises || []).length === 0) {
+                list.innerHTML = `<div class="text-gray-500 text-center py-4">Añade ejercicios desde el panel izquierdo.</div>`;
+                return;
+            }
+
+            currentRoutineState.exercises.forEach((exercise, index) => {
+                const item = document.createElement('div');
+                item.classList.add('bg-[#1a1a2e]', 'p-3', 'rounded-lg', 'border', 'border-gray-700', 'space-y-3');
+                item.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-base font-bold text-GYM-YELLOW">${index + 1}. ${exercise.exercise_name}</span>
+                        <button class="text-red-400 hover:text-red-600 text-xl leading-none" onclick="toggleExerciseAssignment('${exercise.exercise_id}', '${exercise.exercise_name.replace(/'/g, "\\'")}', true)">&times;</button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-400">Series (Sets)</label>
+                            <input type="number" min="1" value="${exercise.sets || 3}" 
+                                   onchange="updateExerciseDetail('${exercise.exercise_id}', 'sets', this.value)"
+                                   class="mt-1 w-full p-2 rounded-lg bg-[#0d0d1a] border border-gray-600 text-white focus:ring-GYM-YELLOW focus:border-GYM-YELLOW">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-400">Repeticiones</label>
+                            <input type="number" min="1" value="${exercise.repetitions || 10}" 
+                                   onchange="updateExerciseDetail('${exercise.exercise_id}', 'repetitions', this.value)"
+                                   class="mt-1 w-full p-2 rounded-lg bg-[#0d0d1a] border border-gray-600 text-white focus:ring-GYM-YELLOW focus:border-GYM-YELLOW">
+                        </div>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+        
+        function toggleExerciseAssignment(exerciseId, exerciseName, isAssigned) {
+            if (!currentRoutineState.exercises) currentRoutineState.exercises = [];
+
+            if (isAssigned) {
+                // Quitar
+                currentRoutineState.exercises = currentRoutineState.exercises.filter(e => e.exercise_id !== exerciseId);
+            } else {
+                // Añadir con valores por defecto
+                currentRoutineState.exercises.push({
+                    exercise_id: exerciseId,
+                    exercise_name: exerciseName,
+                    sets: 3, 
+                    repetitions: 10
+                });
+            }
+
+            // Re-renderizar ambos paneles
+            renderAvailableExercises(document.getElementById('exercise-search').value);
+            renderRoutineExercises();
+            updateSelectedExerciseCount();
+        }
+
+        function updateExerciseDetail(exerciseId, field, value) {
+            const index = currentRoutineState.exercises.findIndex(e => e.exercise_id === exerciseId);
+            if (index > -1) {
+                // Asegurar que sea un número (o 0 si no es válido)
+                currentRoutineState.exercises[index][field] = parseInt(value) > 0 ? parseInt(value) : 1; 
+                renderRoutineExercises(); // Opcional: Re-renderizar para reflejar el cambio o reordenar si se implementa.
+            }
+        }
+        
+        // =============================================================
+        // LÓGICA DE ELIMINACIÓN (DELETE) Y BÚSQUEDA
+        // =============================================================
+        
         async function deleteRoutine(routineId, routineName) {
             if (!confirm(`¿Está seguro de que desea ELIMINAR permanentemente la rutina: "${routineName}"? Esta acción es irreversible.`)) {
                 return;
             }
 
             try {
-                const response = await fetch(`${API_BASE_URL}/${routineId}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Error HTTP: ${response.status} - ${errorText.substring(0, 100)}...`);
-                }
-                
+                const response = await fetch(`${API_ROUTINE_BASE}/${routineId}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } });
+                if (!response.ok) { throw new Error(`Error HTTP: ${response.status}`); }
                 const data = await response.json();
                 
                 if (data.success) {
                     alert(`Rutina "${routineName}" eliminada con éxito!`);
-                    fetchAllRoutines();
+                    await fetchAllDataInitial();
                 } else {
                     alert(`Error al eliminar: ${data.error}`);
                 }
@@ -494,15 +710,10 @@
             renderRoutinesTable(filteredRoutines);
         }
         
-        // =============================================================
-        // 🚩 LÓGICA DE NAVEGACIÓN (REGRESAR) y INICIALIZACIÓN 🚩
-        // =============================================================
-
-        function handleNavigateBack() {
-            window.location.href = 'admin_routines.html'; 
-        }
+        function handleNavigateBack() { window.location.href = 'admin_routines.html'; }
 
 
+        // --- INICIALIZACIÓN ---
         window.onload = function() {
             const storedSession = localStorage.getItem('adminSession');
             
@@ -511,7 +722,7 @@
                 return;
             }
 
-            fetchAllRoutines();
+            fetchAllDataInitial();
 
             // LISTENERS GLOBALES
             document.getElementById('back-btn').addEventListener('click', handleNavigateBack);
@@ -521,12 +732,17 @@
             });
             document.getElementById('routine-form').addEventListener('submit', handleRoutineFormSubmit);
             
-            const routineSearchInput = document.getElementById('routine-search-input');
-            if (routineSearchInput) {
-                routineSearchInput.addEventListener('input', (event) => {
-                    filterRoutinesTable(event.target.value);
-                });
-            }
+            document.getElementById('routine-search-input').addEventListener('input', (event) => { 
+                filterRoutinesTable(event.target.value);
+            });
+            
+            // Listeners dentro del Modal para búsqueda de Ejercicios y Usuarios
+            document.getElementById('exercise-search').addEventListener('input', (event) => {
+                renderAvailableExercises(event.target.value);
+            });
+            document.getElementById('user-search').addEventListener('input', (event) => {
+                renderAvailableUsers(event.target.value);
+            });
         };
     </script>
 </body>
