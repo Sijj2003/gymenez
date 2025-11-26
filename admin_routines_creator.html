@@ -449,70 +449,84 @@
         }
 
         // Manejador del Formulario (Crear y Editar)
-        async function handleRoutineFormSubmit(event) {
-            event.preventDefault();
+async function handleRoutineFormSubmit(event) {
+    event.preventDefault();
 
-            const form = event.target;
-            const isEditMode = document.getElementById('is-edit-mode').value === 'true';
-            const routineId = document.getElementById('routine-id-field').value;
+    const form = event.target;
+    const isEditMode = document.getElementById('is-edit-mode').value === 'true';
+    const routineId = document.getElementById('routine-id-field').value;
 
-            // 1. Recoger Días Asignados del formulario (el único campo que se toma directamente de los inputs)
-            const selectedDays = Array.from(document.querySelectorAll('input[name="assigned_days"]:checked')).map(cb => cb.value);
+    // 1. Recoger Días Asignados del formulario (el único campo que se toma directamente de los inputs)
+    const selectedDays = Array.from(document.querySelectorAll('input[name="assigned_days"]:checked')).map(cb => cb.value);
 
-            // 2. Construir el payload final desde el estado y los campos simples
-            const payload = {
-                name: form.name.value.trim(),
-                description: form.description.value.trim(), // Mapeado a 'notes' en el backend
-                assigned_days: selectedDays,
-                
-                // Arrays complejos que ya se actualizaron en el JS
-                exercises: currentRoutineState.exercises,
-                assigned_users: currentRoutineState.assigned_users
-            };
-            
-            // Validaciones básicas
-            if (!payload.name || !payload.description) {
-                alert("El Nombre y la Descripción de la rutina son obligatorios.");
-                return;
-            }
+    // 2. Construir el payload final desde el estado y los campos simples
+    const payload = {
+        name: form.name.value.trim(),
+        description: form.description.value.trim(), // Mapeado a 'notes' en el backend
+        assigned_days: selectedDays,
+        
+        // Arrays complejos que ya se actualizaron en el JS
+        exercises: currentRoutineState.exercises,
+        assigned_users: currentRoutineState.assigned_users
+    };
+    
+    // Validaciones básicas
+    if (!payload.name || !payload.description) {
+        alert("El Nombre y la Descripción de la rutina son obligatorios.");
+        return;
+    }
 
-            const method = isEditMode ? 'PUT' : 'POST';
-            const url = isEditMode ? `${API_ROUTINE_BASE}/${routineId}` : API_ROUTINE_BASE;
-            const actionText = isEditMode ? 'Edición' : 'Creación';
+    const method = isEditMode ? 'PUT' : 'POST';
+    const url = isEditMode ? `${API_ROUTINE_BASE}/${routineId}` : API_ROUTINE_BASE;
+    const actionText = isEditMode ? 'Edición' : 'Creación';
 
-            document.getElementById('submit-btn').textContent = 'Guardando...';
-            document.getElementById('submit-btn').disabled = true;
+    document.getElementById('submit-btn').textContent = 'Guardando...';
+    document.getElementById('submit-btn').disabled = true;
 
+    try {
+        const response = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            let errorMessage;
             try {
-                const response = await fetch(url, {
-                    method: method,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    const errorMessage = errorText.includes('error') ? JSON.parse(errorText).error : errorText.substring(0, 150) + '...';
-                    throw new Error(`Error HTTP: ${response.status} - ${errorMessage}`);
-                }
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    alert(`${actionText} de rutina exitosa: ${data.message}`);
-                    document.getElementById('routine-modal').classList.add('hidden');
-                    await fetchAllDataInitial(); // Recargar la tabla
-                } else {
-                    alert(`Error al ${actionText.toLowerCase()} rutina: ${data.error}`);
-                }
-            } catch (error) {
-                alert(`Error de red al procesar la rutina: ${error.message}`);
-                console.error(error);
-            } finally {
-                document.getElementById('submit-btn').textContent = isEditMode ? 'Guardar Cambios' : 'Crear Rutina';
-                document.getElementById('submit-btn').disabled = false;
+                // Intenta parsear como JSON si el texto contiene 'error'
+                errorMessage = errorText.includes('error') ? JSON.parse(errorText).error : errorText.substring(0, 150) + '...';
+            } catch {
+                errorMessage = errorText.substring(0, 150) + '...';
             }
+            throw new Error(`Error HTTP: ${response.status} - ${errorMessage}`);
         }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // 🚨 AJUSTE DE MENSAJE DE ÉXITO
+            let successMessage = `${actionText} de rutina exitosa: ${data.message}`;
+            
+            // Añadir el mensaje de la desasignación si existe
+            if (isEditMode && data.message.includes('desasignados automáticamente')) {
+                 successMessage = `Rutina actualizada exitosamente. ¡Atención! Los usuarios asignados fueron **desasignados automáticamente** de cualquier otra rutina base para evitar conflictos.`;
+            }
+
+            alert(successMessage);
+            document.getElementById('routine-modal').classList.add('hidden');
+            await fetchAllDataInitial(); // Recargar la tabla
+        } else {
+            alert(`Error al ${actionText.toLowerCase()} rutina: ${data.error}`);
+        }
+    } catch (error) {
+        alert(`Error de red al procesar la rutina: ${error.message}`);
+        console.error(error);
+    } finally {
+        document.getElementById('submit-btn').textContent = isEditMode ? 'Guardar Cambios' : 'Crear Rutina';
+        document.getElementById('submit-btn').disabled = false;
+    }
+}
         
         // =============================================================
         // LÓGICA DE ASIGNACIÓN DE USUARIOS
