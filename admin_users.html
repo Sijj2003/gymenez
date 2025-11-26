@@ -331,7 +331,7 @@
         }
 
         // =============================================================
-        // 🚩 NUEVAS FUNCIONES DE BLOQUEO 🚩
+        // 🚩 FUNCIONES DE BLOQUEO/DESBLOQUEO (TOGGLE) 🚩
         // =============================================================
 
         /**
@@ -340,6 +340,9 @@
         const handleToggleBlock = async (userId, isBlockedString) => {
             // Convertir el string 'true'/'false' a booleano
             const isBlocked = isBlockedString === 'true'; 
+            
+            // Si está bloqueado (true) -> la acción es desbloquear. 
+            // Si está desbloqueado (false) -> la acción es bloquear.
             const action = isBlocked ? 'desbloquear' : 'bloquear';
             const message = `¿Está seguro que desea ${action} a este usuario?`;
 
@@ -348,11 +351,12 @@
             }
 
             try {
-                // 🔑 NUEVA RUTA: /api/admin/user/toggle-block/{userId}
+                // RUTA: /api/admin/user/toggle-block/{userId}
                 const response = await fetch(API_BASE_URL.replace('/user', `/user/toggle-block/${userId}`), {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ is_blocked: !isBlocked }) // Alternar el estado
+                    // Enviar el estado opuesto al actual
+                    body: JSON.stringify({ is_blocked: !isBlocked }) 
                 });
 
                 const result = await response.json();
@@ -391,7 +395,7 @@
         };
 
         // =============================================================
-        // LÓGICA DE LA TABLA (READ - Leer) - MODIFICADA
+        // LÓGICA DE LA TABLA (READ - Leer) 
         // =============================================================
 
         async function fetchAllUsers() {
@@ -414,7 +418,7 @@
                 
                 if (data.success && data.users) {
                     allUsersData = data.users; 
-                    // 🔑 Llama a filterUsersTable para manejar la búsqueda activa
+                    // Llama a filterUsersTable para manejar la búsqueda activa
                     const userSearchInput = document.getElementById('user-search-input');
                     filterUsersTable(userSearchInput ? userSearchInput.value : '');
                 } else {
@@ -460,8 +464,8 @@
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             ${isBlocked 
-                                ? '<path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />'
-                                : '<path d="M10 2a5 5 0 00-5 5v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2H7V7a3 3 0 016 0v2h2V7a5 5 0 00-5-5z" />'
+                                ? '<path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />' // Candado Cerrado (Bloqueado)
+                                : '<path d="M10 2a5 5 0 00-5 5v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2H7V7a3 3 0 016 0v2h2V7a5 5 0 00-5-5z" />' // Candado Abierto (Desbloqueado/Activo)
                             }
                         </svg>
                     </button>`;
@@ -501,7 +505,7 @@
             }).join('');
 
             tableBody.innerHTML = rowsHtml;
-            // 🔑 Llamada para adjuntar los listeners al nuevo DOM
+            // Llamada para adjuntar los listeners al nuevo DOM
             setupToggleBlockListeners();
         }
 
