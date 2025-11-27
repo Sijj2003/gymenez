@@ -15,12 +15,14 @@
             font-family: 'Inter', sans-serif;
             background-color: #0d0d1a;
             color: #e5e7eb; 
-            background-image: url('PROFILE_FONDO.png') !important; /* Usamos el fondo del dashboard */
+            /* Usamos el fondo del dashboard */
+            background-image: url('PROFILE_FONDO.png') !important; 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
             transition: background-image 1s ease-in-out; 
+            /* Borde negro para todas las letras (Text Stroke Effect) */
             text-shadow: 
                 -0.5px -0.5px 0 #000,  
                  0.5px -0.5px 0 #000,
@@ -63,7 +65,8 @@
         /* Estilo para el área de mensajes/notificaciones */
         .message-area {
             overflow-y: auto;
-            max-height: calc(75vh - 120px); /* Ajuste basado en el tamaño del contenedor principal */
+            /* Calcula el espacio para el área de scroll */
+            max-height: calc(75vh - 120px); 
         }
         
         /* Estilo: Sombra/Borde para el texto del Header (Gris) */
@@ -82,16 +85,11 @@
                 <span class="text-amber-400">GYM</span><span class="text-white">ENEZ</span>
             </a>
             
-            <div class="flex space-x-4">
-                <a href="profile.html" 
-                   class="px-4 py-2 text-sm font-semibold rounded-full bg-amber-600 text-white hover:bg-amber-500 transition duration-300">
-                    PROFILE
-                </a>
-                <button id="logout-button"
-                        class="px-4 py-2 text-sm font-semibold rounded-full bg-red-600 hover:bg-red-500 transition duration-300">
-                    Salir
-                </button>
-            </div>
+            <a href="index.html" 
+               class="px-6 py-2 text-sm font-semibold rounded-full bg-blue-600 text-white hover:bg-blue-500 transition duration-300 uppercase tracking-widest shadow-lg shadow-blue-500/50">
+                REGRESAR
+            </a>
+            
         </header>
 
         <main class="w-full max-w-7xl mx-auto">
@@ -118,7 +116,7 @@
 
                     <div id="nav-admin-chat" class="pulse-nav-item">
                         <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M12 20.91a8.962 8.962 0 01-5-1.748L4 20l1.378-3.093c.12-.266.309-.50.518-.707A8.96 8.96 0 0112 14v6.91zM20 18l-1.378-3.093c-.12-.266-.309-.50-.518-.707A8.96 8.96 0 0112 14v6.91a8.962 8.962 0 005-1.748L20 18z"></path></svg>
-                        Chat: Administrador
+                        Chat: Administrador (Soporte)
                     </div>
                     
                     <div id="nav-group-channel" class="pulse-nav-item">
@@ -158,7 +156,7 @@
                                    class="flex-grow px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition placeholder-gray-400 text-base"
                                    required>
                             <button type="submit" 
-                                    class="neon-button px-6 py-3 rounded-lg bg-gray-800 text-amber-400 font-bold uppercase tracking-wider border-2 border-amber-400/50">
+                                    class="neon-button px-6 py-3 rounded-lg bg-gray-800 text-amber-400 font-bold uppercase tracking-wider border-2 border-amber-400/50 hover:bg-gray-700">
                                 Enviar
                             </button>
                         </form>
@@ -180,17 +178,20 @@
             document.getElementById(id).classList.add('active');
             
             contentTitle.textContent = title;
+            // Simula la carga de contenido
             messageList.innerHTML = `<div class="p-8 text-center text-gray-400">Cargando mensajes para: ${title}...</div>`;
             
+            // Muestra u oculta la caja de texto para enviar mensajes
             if (isChat) {
                 chatInputArea.classList.remove('hidden');
             } else {
                 chatInputArea.classList.add('hidden');
             }
             
-            // Lógica de carga de datos real iría aquí
+            // Aquí iría la lógica AJAX/Fetch para cargar los datos reales del servidor
         }
 
+        // Asigna la funcionalidad a los elementos de navegación
         document.getElementById('nav-notifications').addEventListener('click', () => {
             switchContent('nav-notifications', 'Notificaciones Globales', false);
         });
@@ -204,11 +205,8 @@
             switchContent('nav-group-channel', 'Canal de Grupo: [Nombre de la Rutina]', false);
         });
         
-        // Función de Logout de ejemplo (deberías copiar la función completa de index.html)
-        document.getElementById('logout-button').addEventListener('click', () => {
-             alert('Cerrando sesión (Lógica real pendiente).');
-             window.location.href = 'index.html';
-        });
+        // Inicializa la vista por defecto (Notificaciones)
+        switchContent('nav-notifications', 'Notificaciones Globales', false);
     </script>
 </body>
 </html>
