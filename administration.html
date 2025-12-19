@@ -32,315 +32,176 @@
             margin: 0;
         }
 
-        /* Contenedor principal que se reemplazará (Login Card) */
-        #main-container {
-            width: 100%;
-            max-width: 448px; 
-            padding: 1rem;
-        }
+        .GYM-YELLOW { color: #FFC300; }
+        .bg-GYM-YELLOW { background-color: #FFC300; }
 
-        /* Efecto de cristal esmerilado para el contenedor de login */
-        .glass-effect {
-            background-color: rgba(13, 13, 26, 0.7); 
-            backdrop-filter: blur(12px); 
-            border: 1px solid rgba(255, 255, 255, 0.15); 
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4); 
-            border-radius: 20px; 
-            padding: 2.5rem; 
-        }
-
-        /* Estilo para inputs más oscuros y modernos */
-        .custom-input {
-            background-color: #1a1a2e; 
-            border: 1px solid #3d3d5c;
-            color: #e5e7eb; 
-            padding: 0.85rem 1rem; 
-            border-radius: 0.6rem; 
-            transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s; 
-        }
-
-        .custom-input:focus {
-            border-color: #0ea5e9; 
-            outline: none;
-            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.3); 
-            background-color: #252540; 
-        }
-
-        /* Estilo específico para el logo GYMENEZ para asegurar el borde negro */
-        .logo-text {
-            text-shadow: 
-                -1px -1px 0 #000,  
-                 1px -1px 0 #000,
-                -1px  1px 0 #000,
-                 1px  1px 0 #000,
-                -1.5px -1.5px 0 #000, 
-                 1.5px -1.5px 0 #000,
-                -1.5px  1.5px 0 #000,
-                 1.5px  1.5px 0 #000;
-        }
-
-        /* Clases de color específicas para el logo */
-        .logo-yellow {
-            color: #facc15; /* Color amarillo */
-        }
-
-        .logo-white {
-            color: #ffffff; /* Color blanco */
-        }
-
-        /* --- ESTILOS DEL DASHBOARD --- */
-        
-        .dashboard-header {
-            background-color: rgba(13, 13, 26, 0.8); 
-            backdrop-filter: blur(5px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            padding: 1rem;
-        }
-
-        .dashboard-content {
-            padding-top: 80px; 
-            padding-left: 1.5rem;
-            padding-right: 1.5rem;
-            padding-bottom: 1.5rem;
-            width: 100%;
-            max-width: 1280px; 
-            margin: 0 auto;
-        }
-
-        /* Estilo del Botón de Panel */
-        .panel-button {
-            transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
+        /* Estilo de Tarjetas (Glassmorphism) */
+        .glass-card {
+            background: rgba(26, 26, 46, 0.8); /* Fondo semi-transparente */
+            backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .panel-button:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+
+        .management-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            transition: all 0.3s ease;
         }
 
+        .management-card:hover {
+            background: rgba(255, 255, 255, 0.07);
+            transform: translateY(-5px);
+            border-color: #FFC300;
+        }
+
+        /* Animación de entrada */
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fade-in 0.5s ease-out forwards;
+        }
     </style>
 </head>
 <body>
 
-    <div id="main-container" class="glass-effect w-full max-w-sm space-y-7 rounded-2xl"> 
+    <div id="admin-container" class="w-full flex justify-center items-center py-10 px-4">
+        
+        <div class="glass-card p-8 rounded-3xl shadow-2xl w-full max-w-md animate-fade-in">
+            <div class="text-center mb-8">
+                <img src="mini_logo.png" alt="Logo" class="w-20 h-20 mx-auto mb-4">
+                <h1 class="text-3xl font-black GYM-YELLOW tracking-tighter italic uppercase">Admin Access</h1>
+                <p class="text-gray-400 text-sm">Panel de Control Exclusivo</p>
+            </div>
 
-        <div class="text-center">
-            
-            <h1 class="text-4xl font-extrabold logo-text tracking-wider"> 
-                <span class="logo-yellow">GYM</span><span class="logo-white">ENEZ</span>
-            </h1> 
-            <p class="mt-3 text-xl font-semibold text-gray-200">Acceso Administrativo</p> 
+            <form id="admin-login-form" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Usuario Administrador</label>
+                    <input type="text" id="admin-user" required 
+                           class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none transition-all text-white placeholder-gray-600"
+                           placeholder="Ingresa tu usuario">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Contraseña</label>
+                    <input type="password" id="admin-pass" required 
+                           class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none transition-all text-white placeholder-gray-600"
+                           placeholder="••••••••">
+                </div>
 
-        </div>
+                <button type="submit" class="w-full bg-GYM-YELLOW hover:bg-yellow-500 text-black font-black py-4 rounded-xl transition duration-300 shadow-lg shadow-yellow-500/20 uppercase tracking-widest text-sm mt-4">
+                    ENTRAR AL PANEL
+                </button>
+            </form>
 
-        <form id="admin-login-form" class="space-y-5"> 
-            <div><label for="login-email" class="text-sm font-medium text-gray-300 block mb-2">Correo Electrónico:</label> <input type="email" id="login-email" name="email" required class="custom-input w-full" placeholder="admin@tudominio.com"></div>
-            <div><label for="login-password" class="text-sm font-medium text-gray-300 block mb-2">Contraseña:</label> <input type="password" id="login-password" name="password" required class="custom-input w-full" placeholder="••••••••"></div>
-            <p id="login-error-message" class="text-red-400 text-center font-semibold mt-4 mb-4 hidden"></p>
-            <button type="submit" id="login-button" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3.5 rounded-xl transition duration-300 transform hover:scale-105 tracking-wider uppercase shadow-lg"> 
-                Iniciar Sesión
-            </button>
-        </form>
-
-        <div class="text-center text-sm space-y-3">
-            <a href="#" id="forgot-password-link" class="text-sky-400 hover:text-sky-300 transition duration-200 block">¿Olvidaste tu contraseña?</a>
-            <a href="#" id="return-to-client-login" class="text-gray-400 hover:text-gray-300 transition duration-200 block">Volver a acceso de clientes</a>
+            <div class="mt-8 pt-6 border-t border-white/5 flex flex-col gap-3">
+                <button id="forgot-password-link" class="text-xs text-gray-500 hover:text-white transition text-center uppercase font-bold tracking-tighter">
+                    ¿Olvidaste tus credenciales? Contactar Soporte
+                </button>
+                <button id="return-to-client-login" class="text-xs text-sky-400 hover:text-sky-300 transition text-center uppercase font-bold tracking-tighter">
+                    Volver al Acceso de Clientes
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
-        // ----------------------------------------------------
-        // --- CONFIGURACIÓN Y LÓGICA DE INICIO DE SESIÓN ---
-        // ----------------------------------------------------
-        
-        const API_BASE_URL = "https://sijj2003.pythonanywhere.com"; 
-        const ADMIN_LOGIN_ENDPOINT = `${API_BASE_URL}/api/admin_login`;
-        const WHATSAPP_NUMBER = "+584148780392"; 
-        const WHATSAPP_MESSAGE_RECOVERY = "Hola, necesito ayuda para recuperar mi acceso de administrador en GYMENEZ. Mi correo es... [Indicar Correo]"; 
+        const API_URL = 'https://gymenez-server-ca59c6328328.herokuapp.com';
+        const WHATSAPP_NUMBER = "+5491123916995";
+        const WHATSAPP_MESSAGE_RECOVERY = "Hola, soy administrador de GYMENEZ y necesito recuperar mis credenciales de acceso.";
 
-
-        // --------------------------------
-        // --- DASHBOARD RENDERER Y LOGOUT ---
-        // --------------------------------
-
-        /**
-         * Renderiza el layout visual del dashboard con los paneles de control.
-         */
+        // --- Renderizar el Dashboard tras el Login ---
         function renderAdminDashboard(adminData) {
-            const body = document.body;
-            const adminName = adminData.name || "Administrador";
+            const container = document.getElementById('admin-container');
+            container.classList.remove('max-w-md'); 
+            
+            // Cambiamos el fondo a modo administración
+            document.body.style.backgroundImage = "url('FONDO.png')"; 
 
-            // 1. Quitar las clases de centrado del body
-            body.classList.remove('flex', 'items-center', 'justify-center', 'min-h-screen');
-            body.style.display = 'block';
-            body.style.padding = '0';
-            body.style.margin = '0';
-
-            // 2. Definir la estructura HTML del Dashboard con los nuevos botones
-            const dashboardHTML = `
-                <header class="dashboard-header flex justify-between items-center px-6 py-3">
-                    <div class="flex items-center space-x-4">
-                        <h1 class="text-3xl font-extrabold logo-text tracking-wider">
-                            <span class="logo-yellow">GYM</span><span class="logo-white">ENEZ</span>
-                    </div>
-                    <nav>
-                        <button id="logout-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-200 shadow-lg">
-                            Cerrar Sesión
+            container.innerHTML = `
+                <div class="max-w-5xl w-full p-6 animate-fade-in">
+                    <header class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
+                        <div class="flex items-center gap-4">
+                            <img src="mini_logo.png" alt="Logo" class="w-16 h-16">
+                            <div>
+                                <h1 class="text-3xl font-black GYM-YELLOW tracking-tighter uppercase italic leading-none">Panel de Control</h1>
+                                <p class="text-gray-400 mt-1">Bienvenido de nuevo, ${adminData.username}</p>
+                            </div>
+                        </div>
+                        <button id="logout-btn" class="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-6 py-2 rounded-full border border-red-500/50 transition duration-300 font-bold text-sm tracking-widest">
+                            CERRAR SESIÓN
                         </button>
-                    </nav>
-                </header>
-
-                <main class="dashboard-content">
-                    <h2 class="text-4xl font-bold text-gray-100 mb-8 mt-4">
-                        Bienvenido, ${adminName}
-                    </h2>
+                    </header>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         
-                        <a href="admin_users.html" class="panel-button glass-effect p-8 space-y-4 rounded-xl flex flex-col items-center justify-center bg-sky-600/20 hover:bg-sky-600/40 text-sky-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20v-2h2m-6-8a5 5 0 11-10 0 5 5 0 0110 0zM4 16v4h4m-4-4l-1-1m8-1a5 5 0 100-10 5 5 0 000 10z"/>
-                            </svg>
-                            <h3 class="text-2xl font-bold text-white">Gestión de Usuarios</h3>
-                            <p class="text-sm text-gray-300 text-center">Gestiona perfiles, accesos y sesiones de todos los clientes.</p>
-                        </a>
-                        
-                        <a href="admin_routines.html" class="panel-button glass-effect p-8 space-y-4 rounded-xl flex flex-col items-center justify-center bg-yellow-600/20 hover:bg-yellow-600/40 text-yellow-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-                            </svg>
-                            <h3 class="text-2xl font-bold text-white">Gestión de Rutinas</h3>
-                            <p class="text-sm text-gray-300 text-center">Crea, edita y asigna planes de entrenamiento personalizados.</p>
-                        </a>
-                        
-                        <a href="admin_pulse.html" class="panel-button glass-effect p-8 space-y-4 rounded-xl flex flex-col items-center justify-center bg-gray-600/20 hover:bg-gray-600/40 text-gray-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18m-9-4v4m0 0l-3 3m3-3l3 3"/>
-                            </svg>
-                            <h3 class="text-2xl font-bold text-white">GYMENEZ PULSE</h3>
-                            <p class="text-sm text-gray-300 text-center">Centro de mensajeria exclusivo.</p>
+                        <a href="admin_users.html" class="management-card p-8 block group">
+                            <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">👥</div>
+                            <h3 class="text-xl font-bold text-white mb-2 uppercase italic tracking-tighter">Gestión de Usuarios</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed">Administra accesos, fechas de nacimiento y perfiles de clientes de forma segura.</p>
                         </a>
 
-                        <a href="admin_billing.html" class="panel-button glass-effect p-8 space-y-4 rounded-xl flex flex-col items-center justify-center bg-green-600/20 hover:bg-green-600/40 text-green-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c1.657 0 3 .895 3 2s-1.343 2-3 2v5m5-5H7m5 5a2 2 0 100-4 2 2 0 000 4zM19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2z"/>
-                            </svg>
-                            <h3 class="text-2xl font-bold text-white">Gestión de Suscripciones</h3>
-                            <p class="text-sm text-gray-300 text-center">Revisa pagos, vencimientos y planes activos de los clientes.</p>
+                        <a href="admin_routines.html" class="management-card p-8 block group">
+                            <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">🏋️</div>
+                            <h3 class="text-xl font-bold text-white mb-2 uppercase italic tracking-tighter">Entrenamientos</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed">Crea ejercicios y construye rutinas personalizadas basadas en objetivos específicos.</p>
                         </a>
-                        
-                        <a href="admin_trainers.html" class="panel-button glass-effect p-8 space-y-4 rounded-xl flex flex-col items-center justify-center bg-purple-600/20 hover:bg-purple-600/40 text-purple-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H9a2 2 0 01-2-2v-1a4 4 0 014-4h2a4 4 0 014 4v1a2 2 0 01-2 2z"/>
-                            </svg>
-                            <h3 class="text-2xl font-bold text-white">Gestión de Entrenadores</h3>
-                            <p class="text-sm text-gray-300 text-center">Administra el personal, sus asignaciones y credenciales.</p>
+
+                        <a href="admin_goals.html" class="management-card p-8 block group">
+                            <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">🎯</div>
+                            <h3 class="text-xl font-bold text-white mb-2 uppercase italic tracking-tighter">Users Goals</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed">Plantea y actualiza los objetivos trimestrales dinámicos para todos los usuarios.</p>
                         </a>
-                        
+
                     </div>
-
-                    <p class="mt-12 text-gray-500 text-center">
-                        Haz clic en un panel para gestionar ese módulo.
-                    </p>
-                </main>
+                </div>
             `;
 
-            // 3. Reemplazar todo el contenido del body
-            body.innerHTML = dashboardHTML;
-
-            // 4. Adjuntar listener para el botón de Cerrar Sesión
-            document.getElementById('logout-btn').addEventListener('click', handleAdminLogout);
+            // Listener para el botón de cierre de sesión
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                localStorage.removeItem('adminSession');
+                location.reload();
+            });
         }
 
-        /**
-         * Función para cerrar la sesión (limpia localStorage y recarga la página)
-         */
-        function handleAdminLogout() {
-            localStorage.removeItem('adminSession');
-            localStorage.removeItem('deviceId'); 
-            window.location.reload(); 
-        }
-
-        // --------------------------------
-        // --- FUNCIONES DE SOPORTE Y LOGIN (SIN CAMBIOS) ---
-        // --------------------------------
-        
-        function getDeviceId() {
-            let deviceId = localStorage.getItem('deviceId');
-            if (!deviceId) {
-                deviceId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-                    return v.toString(16);
-                });
-                localStorage.setItem('deviceId', deviceId);
-            }
-            return deviceId;
-        }
-
-        function displayError(message) {
-            const errorElement = document.getElementById('login-error-message');
-            if (errorElement) {
-                errorElement.textContent = message;
-                errorElement.classList.remove('hidden');
-                setTimeout(() => {
-                    errorElement.classList.add('hidden');
-                    errorElement.textContent = '';
-                }, 5000);
-            }
-        }
-
-        async function handleAdminLogin(event) {
-            event.preventDefault(); 
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            const deviceId = getDeviceId(); 
-            
-            document.getElementById('login-error-message').classList.add('hidden');
-
-            if (!email || !password) {
-                displayError('Por favor, ingresa tu correo electrónico y contraseña.');
-                return;
-            }
+        // --- Manejo del Login ---
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('admin-user').value;
+            const password = document.getElementById('admin-pass').value;
 
             try {
-                const response = await fetch(ADMIN_LOGIN_ENDPOINT, {
+                const response = await fetch(`${API_URL}/api/admin/login`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password, deviceId })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
                 });
 
-                const responseText = await response.text();
-                let data;
-                try {
-                    data = JSON.parse(responseText);
-                } catch (e) {
-                    console.error('La respuesta no es JSON, es HTML o texto plano:', responseText);
-                    displayError('Error de servidor: La API no devolvió una respuesta válida. (404/500)');
-                    return;
-                }
-                
-                if (response.ok && data.success) {
-                    localStorage.setItem('adminSession', JSON.stringify(data.admin));
-                    renderAdminDashboard(data.admin); 
+                const data = await response.json();
+
+                if (data.success) {
+                    // Guardamos la sesión
+                    localStorage.setItem('adminSession', JSON.stringify({
+                        username: data.admin.username,
+                        token: data.token,
+                        loginTime: new Date().getTime()
+                    }));
+
+                    // Renderizamos el Dashboard
+                    renderAdminDashboard(data.admin);
                 } else {
-                    const errorMessage = data.error || 'Credenciales inválidas. Por favor, verifica el correo y la contraseña.';
-                    displayError(errorMessage);
+                    alert(data.error || 'Credenciales incorrectas');
                 }
             } catch (error) {
-                console.error('Error al intentar iniciar sesión:', error);
-                displayError('Error de red. No se pudo conectar con el servidor API.');
+                console.error('Error:', error);
+                alert('Error de red. No se pudo conectar con el servidor API.');
             }
         }
 
         function handleForgotPassword() {
             const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE_RECOVERY);
-            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\\d+]/g, '')}?text=${encodedMessage}`;
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\d+]/g, '')}?text=${encodedMessage}`;
             window.open(whatsappUrl, '_blank');
         }
         
