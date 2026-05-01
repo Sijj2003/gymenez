@@ -861,6 +861,57 @@
             btn.textContent = 'INGRESAR';
         }
         
+        async function handleRegister(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    
+    // Captura de datos desde los IDs del modal de registro
+    const data = {
+        name: document.getElementById('reg-name').value,
+        last_name: document.getElementById('reg-lastname').value,
+        email: document.getElementById('reg-email').value,
+        password: document.getElementById('reg-password').value,
+        force_blocked: true // El usuario se crea bloqueado por defecto para aprobación manual
+    };
+
+    // Feedback visual en el botón
+    const originalText = 'Crear Cuenta';
+    btn.disabled = true;
+    btn.textContent = 'PROCESANDO...';
+
+    try {
+        // Petición POST a tu API en PythonAnywhere
+        const response = await fetch(`${API_BASE_URL}/api/admin/user`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        const res = await response.json();
+        
+        if (res.success) {
+            // Notificación de éxito y cierre de modal
+            showMessage('¡Registro exitoso! Escríbenos por WhatsApp para activar tu acceso.', 'success');
+            
+            // Función para cerrar el modal visualmente
+            if (typeof handleCloseRegisterModal === 'function') {
+                handleCloseRegisterModal();
+            }
+            
+            e.target.reset(); // Limpia los campos del formulario
+        } else {
+            // Muestra el error específico del backend (ej: "Email ya registrado")
+            showMessage(res.error || 'Error al registrar.', 'error');
+        }
+    } catch (err) {
+        console.error('Error en registro:', err);
+        showMessage('Error de conexión con el servidor.', 'error');
+    } finally {
+        // Restaurar estado del botón
+        btn.disabled = false;
+        btn.textContent = originalText;
+    }
+}
         async function handleForceLogout(e) {
             e.preventDefault();
             const email = document.getElementById('force-email').value;
@@ -979,6 +1030,7 @@
 
             document.getElementById('login-form').addEventListener('submit', handleLogin);
             document.getElementById('logout-button').addEventListener('click', handleLogout);
+            document.getElementById('register-form').addEventListener('submit', handleRegister);
             
             // --- NUEVO: AHORA ABRE EL MODAL EN VEZ DE WHATSAPP ---
             document.getElementById('register-request-link').addEventListener('click', handleOpenRegisterModal); 
