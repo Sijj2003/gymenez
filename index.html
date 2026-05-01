@@ -435,6 +435,63 @@
             </div>
     </div>
 
+    <!-- Modal de Registro AÑADIDO AQUÍ -->
+    <div id="register-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[1100] transition-opacity duration-300 opacity-0">
+        <div class="glass-card p-6 md:p-8 w-full max-w-lg mx-auto rounded-2xl shadow-2xl border-t-2 border-emerald-400/50">
+            
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-white uppercase tracking-wider mb-2">Crear Cuenta</h2>
+                <p class="text-gray-400 text-sm">Únete a GYMENEZ hoy mismo.</p>
+            </div>
+
+            <!-- Botón de Registro con Google -->
+            <button id="btn-google-register" class="w-full py-3 mb-6 rounded-lg bg-white text-gray-900 font-bold text-base hover:bg-gray-200 transition duration-300 flex items-center justify-center gap-3">
+                <svg class="w-5 h-5" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Registrarse con Google
+            </button>
+
+            <div class="flex items-center mb-6">
+                <div class="flex-grow border-t border-gray-600"></div>
+                <span class="px-3 text-gray-400 text-sm">O usa tu correo</span>
+                <div class="flex-grow border-t border-gray-600"></div>
+            </div>
+
+            <!-- Formulario de Registro Estándar -->
+            <form id="register-form">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="reg-name" class="block text-sm font-medium text-white mb-2">Nombre</label>
+                        <input type="text" id="reg-name" class="w-full px-4 py-3 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" required>
+                    </div>
+                    <div>
+                        <label for="reg-lastname" class="block text-sm font-medium text-white mb-2">Apellido</label>
+                        <input type="text" id="reg-lastname" class="w-full px-4 py-3 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" required>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="reg-email" class="block text-sm font-medium text-white mb-2">Correo Electrónico</label>
+                    <input type="email" id="reg-email" class="w-full px-4 py-3 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" required>
+                </div>
+                <div class="mb-8">
+                    <label for="reg-password" class="block text-sm font-medium text-white mb-2">Contraseña</label>
+                    <input type="password" id="reg-password" class="w-full px-4 py-3 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" required>
+                </div>
+
+                <button type="submit" class="neon-button w-full py-3 rounded-lg bg-gray-800 text-emerald-400 font-bold text-lg hover:bg-gray-700 uppercase border-2 border-emerald-400/50">
+                    Crear Cuenta
+                </button>
+                <button type="button" id="close-register-modal" class="mt-4 w-full py-3 text-sm rounded-lg bg-transparent text-gray-400 hover:text-white transition duration-300">
+                    Cancelar
+                </button>
+            </form>
+        </div>
+    </div>
+
 
     <script>
         // --- CONFIGURACIÓN DE SEGURIDAD Y SESIÓN ---
@@ -455,7 +512,6 @@
 
         // --- CONSTANTES PARA WHATSAPP ---
         const WHATSAPP_NUMBER = '+584148780392';
-        const WHATSAPP_MESSAGE_REGISTER = 'Hola, estoy interesado(a) en solicitar mi registro en GYMENEZ.';
         const WHATSAPP_MESSAGE_RECOVERY = 'Hola quisiera solicitar la recuperacion de usuario/contraseña';
 
         /**
@@ -475,7 +531,6 @@
 
                 const data = await response.json();
 
-                // 🚩 CAMBIO CLAVE: Manejar el estado 403 (Bloqueo o Sesión Activa)
                 if (response.status === 403) {
                      return { success: false, error: data.error || 'Acceso denegado (403).' };
                 }
@@ -519,7 +574,7 @@
                 },
                 body: JSON.stringify({ 
                     userId: userId,
-                    deviceId: localDeviceId // 👈 ¡ESTO ES LO CLAVE!
+                    deviceId: localDeviceId 
                 })
             });
         }
@@ -572,7 +627,6 @@
         const messagebox = document.getElementById('message-box');
         const body = document.body;
 
-        // Función para mostrar mensajes de estado (éxito/error) EN LA PARTE SUPERIOR
         function showMessage(message, type = 'success') {
             messagebox.textContent = message;
             messagebox.className = ''; 
@@ -621,8 +675,6 @@
             }
         }
 
-
-        // Función de navegación entre pantallas
         function navigateTo(targetId) {
             screens.forEach(id => {
                 const screen = document.getElementById(id);
@@ -656,10 +708,6 @@
                 }
             }
         }
-        
-        // ===============================================
-        // LÓGICA DE CIERRE DE SESIÓN FORZADO (Heartbeat)
-        // ===============================================
         
         const SESSION_CHECK_INTERVAL_MS = 1000; 
 
@@ -709,9 +757,6 @@
             }
         }
 
-        // ===============================================
-
-        // Función para manejar la transición del splash
         function transitionToLogin() {
             const splashScreen = document.getElementById('splash-screen');
             splashScreen.style.transition = 'opacity 1s ease-out';
@@ -739,9 +784,6 @@
             input.value = value;
         }
 
-        /**
-         * Llama a la API REST para forzar el cierre de sesión y loguear al usuario.
-         */
         async function apiForceLogout(email, password, deviceId, name, dob, phone, ci) {
             console.log(`API: Llamada a ${API_BASE_URL}/api/force_logout para forzar el cierre de sesión de ${email}. Device ID: ${deviceId}`);
             
@@ -770,40 +812,32 @@
             }
         }
 
-        /**
-         * Maneja el login, incluyendo la lógica de sesión activa y BLOQUEO (MODIFICADO).
-         */
         async function handleLogin(e) {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             const btn = document.getElementById('login-btn');
             const sessionModal = document.getElementById('active-session-modal'); 
-            const blockModal = document.getElementById('block-modal'); // 🚩 NUEVA REFERENCIA
+            const blockModal = document.getElementById('block-modal'); 
 
             btn.disabled = true;
             btn.textContent = 'VERIFICANDO SESIÓN...';
 
             const response = await apiLogin(email, password, localDeviceId);
             
-            // Si hay un error, el 'response' contendrá el error y la propiedad success: false
             if (!response.success) {
                 
                 btn.disabled = false;
                 btn.textContent = 'INGRESAR';
                 
-                // 🚩 LÓGICA DE BLOQUEO (ERROR 403 con mensaje específico)
                 if (response.error && response.error.includes('bloqueada')) {
-                    blockModal.classList.remove('hidden'); // Muestra el modal no cerrable
+                    blockModal.classList.remove('hidden'); 
                     showMessage('Acceso Restringido.', 'error');
                     
-                    // 🟢 [INICIO DE CORRECCIÓN] Cierra el modal de bloqueo después de 10 segundos 🟢
                     setTimeout(() => {
                         blockModal.classList.add('hidden');
                     }, 10000); 
-                    // 🟢 [FIN DE CORRECCIÓN] 🟢
                 
-                // LÓGICA DE SESIÓN ACTIVA (ERROR 403 con mensaje específico)
                 } else if (response.error && response.error.includes('Ya hay una sesión activa')) {
                     sessionModal.classList.remove('hidden');
                     showMessage('Sesión activa detectada.', 'error');
@@ -813,14 +847,12 @@
                     showForceLogoutMessage(''); 
 
                 } else {
-                    // Otros errores (credenciales inválidas, 500, etc.)
                     showMessage(response.error, 'error');
                 }
                 
                 return;
             } 
             
-            // Éxito en el Login
             showMessage('¡Inicio de sesión exitoso!', 'success');
             navigateTo('dashboard-screen');
             sessionModal.classList.add('hidden'); 
@@ -829,40 +861,31 @@
             btn.textContent = 'INGRESAR';
         }
         
-        /**
-         * Maneja el envío del formulario de verificación para cerrar forzadamente la sesión.
-         */
         async function handleForceLogout(e) {
-    e.preventDefault();
-    const email = document.getElementById('force-email').value;
-    // La contraseña está en el input de login, no en el modal de fuerza.
-    const password = document.getElementById('login-password').value; 
-    const name = document.getElementById('force-name').value;
-    const dob = document.getElementById('force-dob').value;
-    
-    // 🔑 CORRECCIÓN CLAVE: Normalización de datos
-    // 1. Teléfono: Eliminar todos los caracteres que no sean dígitos.
-    const phoneInput = document.getElementById('force-phone').value;
-    const phone = phoneInput.replace(/\D/g, ''); 
-    
-    // 2. Cédula de Identidad: Eliminar todos los caracteres que no sean dígitos.
-    const ciInput = document.getElementById('force-ci').value;
-    const ci = ciInput.replace(/\D/g, ''); 
-    // ------------------------------------------
+            e.preventDefault();
+            const email = document.getElementById('force-email').value;
+            const password = document.getElementById('login-password').value; 
+            const name = document.getElementById('force-name').value;
+            const dob = document.getElementById('force-dob').value;
+            
+            const phoneInput = document.getElementById('force-phone').value;
+            const phone = phoneInput.replace(/\D/g, ''); 
+            
+            const ciInput = document.getElementById('force-ci').value;
+            const ci = ciInput.replace(/\D/g, ''); 
 
-    const btn = document.getElementById('force-logout-btn');
-    const modal = document.getElementById('active-session-modal');
+            const btn = document.getElementById('force-logout-btn');
+            const modal = document.getElementById('active-session-modal');
 
-    btn.disabled = true;
-    btn.textContent = 'VERIFICANDO DATOS...';
-    showForceLogoutMessage(''); 
+            btn.disabled = true;
+            btn.textContent = 'VERIFICANDO DATOS...';
+            showForceLogoutMessage(''); 
 
-    // Se llama a la API con los datos normalizados: phone y ci
-    const response = await apiForceLogout(email, password, localDeviceId, name, dob, phone, ci);
+            const response = await apiForceLogout(email, password, localDeviceId, name, dob, phone, ci);
 
-    if (response.success) {
-        const delayMs = 7000;
-                
+            if (response.success) {
+                const delayMs = 7000;
+                        
                 modal.classList.add('hidden');
                 
                 const successMessage = `Proceso completado. La sesión anterior ha sido cerrada exitosamente. Por favor, inicie sesión nuevamente para acceder.`;
@@ -904,47 +927,46 @@
             btn.textContent = originalText;
         }
         
-        // FUNCIÓN PARA REDIRECCIONAR A WHATSAPP (Registro)
-        function handleRegisterRequest() {
-            const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE_REGISTER);
-            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\d+]/g, '')}?text=${encodedMessage}`;
-            window.open(whatsappUrl, '_blank');
+        // --- FUNCIONES DEL NUEVO MODAL DE REGISTRO ---
+        function handleOpenRegisterModal() {
+            const ventanaModal = document.getElementById('register-modal');
+            ventanaModal.classList.remove('hidden');
+            setTimeout(() => {
+                ventanaModal.style.opacity = '1';
+            }, 10);
         }
 
-        // FUNCIÓN PARA RECUPERACIÓN DE USUARIO/CONTRASEÑA (WhatsApp)
+        function handleCloseRegisterModal() {
+            const ventanaModal = document.getElementById('register-modal');
+            ventanaModal.style.opacity = '0';
+            setTimeout(() => {
+                ventanaModal.classList.add('hidden');
+            }, 300);
+        }
+
         function handleForgotPassword() {
             const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE_RECOVERY);
             const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\d+]/g, '')}?text=${encodedMessage}`;
             window.open(whatsappUrl, '_blank');
         }
         
-        // --- NUEVAS FUNCIONES PARA EL MODAL DE STAFF ---
-        
-        // FUNCIÓN PRINCIPAL: Abre el modal de selección de área de Staff
         function handleStaffAccess() {
             document.getElementById('area-selection-modal').classList.remove('hidden');
         }
         
-        // FUNCIÓN DE REDIRECCIÓN A ENTRENADORES
         function handleSelectTrainer() {
-            window.location.href = 'trainer.html'; // Redirige a trainer.html
+            window.location.href = 'trainer.html'; 
         }
         
-        // FUNCIÓN DE REDIRECCIÓN A ADMINISTRACIÓN
         function handleSelectAdmin() {
-            window.location.href = 'administration.html'; // Redirige a administration.html
+            window.location.href = 'administration.html'; 
         }
 
-        // FUNCIÓN PARA CERRAR EL MODAL
         function handleCloseAreaSelectionModal() {
             document.getElementById('area-selection-modal').classList.add('hidden');
         }
-        // ---------------------------------------------
 
-
-        // --- Lógica de Inicialización ---
         window.onload = function() {
-            // Comprobar si hay una sesión guardada para evitar login
             const storedSession = localStorage.getItem('userSession');
             if (storedSession) {
                 setTimeout(() => {
@@ -955,23 +977,22 @@
                 setTimeout(transitionToLogin, SPLASH_DURATION_MS);
             }
 
-            // --- LISTENERS DE FORMULARIO ---
             document.getElementById('login-form').addEventListener('submit', handleLogin);
             document.getElementById('logout-button').addEventListener('click', handleLogout);
             
-            // LISTENERS PARA LOS ENLACES DE AYUDA
-            document.getElementById('register-request-link').addEventListener('click', handleRegisterRequest); 
+            // --- NUEVO: AHORA ABRE EL MODAL EN VEZ DE WHATSAPP ---
+            document.getElementById('register-request-link').addEventListener('click', handleOpenRegisterModal); 
+            document.getElementById('close-register-modal').addEventListener('click', handleCloseRegisterModal);
+            // -----------------------------------------------------
+
             document.getElementById('forgot-password-link').addEventListener('click', handleForgotPassword);
             
-            // NUEVO LISTENER PRINCIPAL: Acceso Staff (Abre el modal)
             document.getElementById('staff-access-link').addEventListener('click', handleStaffAccess); 
             
-            // --- LISTENERS PARA EL MODAL DE SELECCIÓN DE ÁREA ---
             document.getElementById('select-trainer-btn').addEventListener('click', handleSelectTrainer);
             document.getElementById('select-admin-btn').addEventListener('click', handleSelectAdmin);
             document.getElementById('modal-close-btn').addEventListener('click', handleCloseAreaSelectionModal);
 
-            // --- LISTENERS PARA EL MODAL DE SESIÓN ACTIVA (EXISTENTES) ---
             const sessionModal = document.getElementById('active-session-modal');
             const form = document.getElementById('force-logout-form');
             const options = document.getElementById('modal-options');
@@ -998,8 +1019,6 @@
             form.addEventListener('submit', handleForceLogout);
             document.getElementById('force-dob').addEventListener('input', (e) => formatDateInput(e.target));
             
-            
-            // 🚩 NUEVO LISTENER: Previene cerrar el modal de bloqueo con ESC
             const blockModal = document.getElementById('block-modal');
             document.addEventListener('keydown', function(event) {
                 if (blockModal && event.key === "Escape" && !blockModal.classList.contains('hidden')) {
@@ -1011,7 +1030,3 @@
     </script>
 </body>
 </html>
-
-
-
-
