@@ -865,63 +865,52 @@
     e.preventDefault();
     const btn = e.target.querySelector('button[type="submit"]');
     
-    // Captura de datos desde los IDs del modal de registro
     const data = {
         name: document.getElementById('reg-name').value,
         last_name: document.getElementById('reg-lastname').value,
         email: document.getElementById('reg-email').value,
         password: document.getElementById('reg-password').value
-        // Nota: Quitamos force_blocked: true de aquí porque el backend 
-        // ahora asume el bloqueo por defecto por máxima seguridad.
     };
 
-    // Feedback visual en el botón
     const originalText = 'Crear Cuenta';
     btn.disabled = true;
     btn.textContent = 'PROCESANDO...';
 
     try {
-        // Petición POST a tu API en PythonAnywhere
         const response = await fetch(`${API_BASE_URL}/api/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
 
-        // --- NUEVO: INTERCEPTAMOS EL ERROR 429 DE ABUSO ---
-        if (response.status === 429) {
-            showMessage('Alerta: Has excedido el límite de registros permitidos. Por medidas de seguridad, tu capacidad para crear nuevas cuentas ha sido bloqueada temporalmente.', 'error');
-            
-            e.target.reset(); // Limpia los campos del formulario
-            
-            // Restaurar estado del botón antes de salir
-            btn.disabled = false;
-            btn.textContent = originalText;
-            return; // Detenemos la ejecución aquí
-        }
-        // --------------------------------------------------
-
+        // Extraemos el JSON siempre para obtener el mensaje de error del backend
         const res = await response.json();
-        
+
+        // Verificamos si el servidor devolvió el error de límite (429)
+        if (response.status === 429) {
+            // Usamos el mensaje que viene del servidor o uno personalizado
+            showMessage(res.error || 'Alerta: Has excedido el límite de registros permitidos.', 'error');
+            
+            // IMPORTANTE: No ejecutamos e.target.reset() aquí para que el mensaje persista
+            return; 
+        }
+
         if (res.success) {
-            // Mantenemos tu notificación original de WhatsApp
             showMessage('¡Registro exitoso! Escríbenos por WhatsApp para activar tu acceso.', 'success');
             
-            // Función para cerrar el modal visualmente
             if (typeof handleCloseRegisterModal === 'function') {
                 handleCloseRegisterModal();
             }
             
-            e.target.reset(); // Limpia los campos del formulario
+            e.target.reset(); // Solo reseteamos si la cuenta se creó de verdad
         } else {
-            // Muestra el error específico del backend (ej: "Email ya registrado")
             showMessage(res.error || 'Error al registrar.', 'error');
         }
+
     } catch (err) {
         console.error('Error en registro:', err);
-        showMessage('Error de conexión con el servidor.', 'error');
+        showMessage('Error de conexión con el servidor o límite de tráfico excedido.', 'error');
     } finally {
-        // Restaurar estado del botón
         btn.disabled = false;
         btn.textContent = originalText;
     }
