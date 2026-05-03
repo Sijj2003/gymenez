@@ -461,36 +461,37 @@
                 <div class="flex-grow border-t border-gray-600"></div>
             </div>
 
-            <!-- Formulario de Registro Estándar -->
-            <form id="register-form">
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label for="reg-name" class="block text-sm font-medium text-white mb-2">Nombre</label>
-                        <input type="text" id="reg-name" class="w-full px-4 py-3 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" required>
-                    </div>
-                    <div>
-                        <label for="reg-lastname" class="block text-sm font-medium text-white mb-2">Apellido</label>
-                        <input type="text" id="reg-lastname" class="w-full px-4 py-3 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" required>
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <label for="reg-email" class="block text-sm font-medium text-white mb-2">Correo Electrónico</label>
-                    <input type="email" id="reg-email" class="w-full px-4 py-3 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" required>
-                </div>
-                <div class="mb-8">
-                    <label for="reg-password" class="block text-sm font-medium text-white mb-2">Contraseña</label>
-                    <input type="password" id="reg-password" class="w-full px-4 py-3 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" required>
-                </div>
+           <!-- Formulario de Registro Estándar -->
+<form id="register-form" onsubmit="handleRegister(event)">
+    <!-- CONTENEDOR DE MENSAJES (Nuevo) -->
+    <div id="register-message" class="hidden mb-6 p-4 rounded-lg text-sm font-medium text-center border"></div>
 
-                <button type="submit" class="neon-button w-full py-3 rounded-lg bg-gray-800 text-emerald-400 font-bold text-lg hover:bg-gray-700 uppercase border-2 border-emerald-400/50">
-                    Crear Cuenta
-                </button>
-                <button type="button" id="close-register-modal" class="mt-4 w-full py-3 text-sm rounded-lg bg-transparent text-gray-400 hover:text-white transition duration-300">
-                    Cancelar
-                </button>
-            </form>
+    <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+            <label for="reg-name" class="block text-sm font-medium text-white mb-2">Nombre</label>
+            <input type="text" id="reg-name" class="w-full px-4 py-3 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" required>
+        </div>
+        <div>
+            <label for="reg-lastname" class="block text-sm font-medium text-white mb-2">Apellido</label>
+            <input type="text" id="reg-lastname" class="w-full px-4 py-3 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" required>
         </div>
     </div>
+    <div class="mb-4">
+        <label for="reg-email" class="block text-sm font-medium text-white mb-2">Correo Electrónico</label>
+        <input type="email" id="reg-email" class="w-full px-4 py-3 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" required>
+    </div>
+    <div class="mb-8">
+        <label for="reg-password" class="block text-sm font-medium text-white mb-2">Contraseña</label>
+        <input type="password" id="reg-password" class="w-full px-4 py-3 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" required>
+    </div>
+
+    <button type="submit" class="neon-button w-full py-3 rounded-lg bg-gray-800 text-emerald-400 font-bold text-lg hover:bg-gray-700 uppercase border-2 border-emerald-400/50">
+        Crear Cuenta
+    </button>
+    <button type="button" id="close-register-modal" class="mt-4 w-full py-3 text-sm rounded-lg bg-transparent text-gray-400 hover:text-white transition duration-300">
+        Cancelar
+    </button>
+</form>
 
 
     <script>
