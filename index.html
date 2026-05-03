@@ -861,20 +861,21 @@
             btn.textContent = 'INGRESAR';
         }
         
-        async function handleRegister(e) {
+async function handleRegister(e) {
     e.preventDefault();
     const btn = e.target.querySelector('button[type="submit"]');
+    const originalText = 'Crear Cuenta';
     
+    // 1. Indicador gráfico inmediato: Desactivar botón
+    btn.disabled = true;
+    btn.textContent = 'VERIFICANDO...';
+
     const data = {
         name: document.getElementById('reg-name').value,
         last_name: document.getElementById('reg-lastname').value,
         email: document.getElementById('reg-email').value,
         password: document.getElementById('reg-password').value
     };
-
-    const originalText = 'Crear Cuenta';
-    btn.disabled = true;
-    btn.textContent = 'PROCESANDO...';
 
     try {
         const response = await fetch(`${API_BASE_URL}/api/register`, {
@@ -883,84 +884,39 @@
             body: JSON.stringify(data)
         });
 
-        // Extraemos el JSON siempre para obtener el mensaje de error del backend
-        const res = await response.json();
-
-        // Verificamos si el servidor devolvió el error de límite (429)
-        if (response.status === 429) {
-            // Usamos el mensaje que viene del servidor o uno personalizado
-            showMessage(res.error || 'Alerta: Has excedido el límite de registros permitidos.', 'error');
-            
-            // IMPORTANTE: No ejecutamos e.target.reset() aquí para que el mensaje persista
-            return; 
+        let res = {};
+        try {
+            res = await response.json();
+        } catch (jsonErr) {
+            // Si el servidor bloquea la IP, a veces no devuelve JSON, sino texto plano
+            console.warn("No se pudo parsear el JSON de respuesta");
         }
 
-        if (res.success) {
+        // 2. Manejo del bloqueo por exceso de intentos (Error 429)
+        if (response.status === 429) {
+            const msg = res.error || 'Has excedido el límite de registros. Intenta la próxima semana.';
+            showMessage(msg, 'error');
+            return; // Salimos sin resetear para que lean el error
+        }
+
+        // 3. Manejo de éxito o errores comunes (Email duplicado, etc.)
+        if (response.ok && res.success) {
             showMessage('¡Registro exitoso! Escríbenos por WhatsApp para activar tu acceso.', 'success');
-            
-            if (typeof handleCloseRegisterModal === 'function') {
-                handleCloseRegisterModal();
-            }
-            
-            e.target.reset(); // Solo reseteamos si la cuenta se creó de verdad
+            e.target.reset();
+            if (typeof handleCloseRegisterModal === 'function') setTimeout(handleCloseRegisterModal, 2000);
         } else {
-            showMessage(res.error || 'Error al registrar.', 'error');
+            showMessage(res.error || 'No se pudo completar el registro.', 'error');
         }
 
     } catch (err) {
-        console.error('Error en registro:', err);
-        showMessage('Error de conexión con el servidor o límite de tráfico excedido.', 'error');
+        console.error('Error:', err);
+        showMessage('Error crítico: Conexión rechazada o límite de tráfico alcanzado.', 'error');
     } finally {
+        // 4. Restaurar el indicador gráfico del botón
         btn.disabled = false;
         btn.textContent = originalText;
     }
 }
-        async function handleForceLogout(e) {
-            e.preventDefault();
-            const email = document.getElementById('force-email').value;
-            const password = document.getElementById('login-password').value; 
-            const name = document.getElementById('force-name').value;
-            const dob = document.getElementById('force-dob').value;
-            
-            const phoneInput = document.getElementById('force-phone').value;
-            const phone = phoneInput.replace(/\D/g, ''); 
-            
-            const ciInput = document.getElementById('force-ci').value;
-            const ci = ciInput.replace(/\D/g, ''); 
-
-            const btn = document.getElementById('force-logout-btn');
-            const modal = document.getElementById('active-session-modal');
-
-            btn.disabled = true;
-            btn.textContent = 'VERIFICANDO DATOS...';
-            showForceLogoutMessage(''); 
-
-            const response = await apiForceLogout(email, password, localDeviceId, name, dob, phone, ci);
-
-            if (response.success) {
-                const delayMs = 7000;
-                        
-                modal.classList.add('hidden');
-                
-                const successMessage = `Proceso completado. La sesión anterior ha sido cerrada exitosamente. Por favor, inicie sesión nuevamente para acceder.`;
-                showCenteredMessage(successMessage, delayMs); 
-
-                localStorage.removeItem('userSession');
-                CURRENT_USER_SESSION = null; 
-                
-                setTimeout(() => {
-                    navigateTo('login-screen');
-                    document.getElementById('login-password').value = '';
-                    
-                }, delayMs); 
-
-            } else {
-                showForceLogoutMessage('Verificación fallida: Los datos introducidos son incorrectos o la contraseña es inválida.', 'error');
-            }
-            
-            btn.disabled = false;
-            btn.textContent = 'Cerrar Sesión Activa';
-        }
 
 
         async function handleLogout() {
