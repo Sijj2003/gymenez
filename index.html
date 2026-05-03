@@ -919,6 +919,44 @@ async function handleRegister(e) {
     }
 }
 
+        async function handleForceLogout(event) {
+    event.preventDefault();
+    
+    const formData = {
+        email: document.getElementById('force-email').value,
+        password: document.getElementById('login-password').value, // Usa la pass del intento de login
+        deviceId: localStorage.getItem('deviceId'),
+        name: document.getElementById('force-name').value,
+        dob: document.getElementById('force-dob').value,
+        phone: document.getElementById('force-phone').value,
+        ci: document.getElementById('force-ci').value
+    };
+
+    try {
+        const response = await fetch('https://sijj2003.pythonanywhere.com/api/force_logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // Mostrar mensaje de éxito y limpiar modal
+            document.getElementById('active-session-modal').classList.add('hidden');
+            showTempMessage("Sesión anterior cerrada. Ya puedes ingresar.");
+        } else {
+            document.getElementById('force-logout-message').textContent = result.error;
+            document.getElementById('force-logout-message').classList.remove('hidden');
+        }
+    } catch (error) {
+        console.error("Error en force logout:", error);
+    }
+}
+
+// Asegúrate de vincular el evento al formulario
+document.getElementById('force-logout-form').addEventListener('submit', handleForceLogout);
+
 
         async function handleLogout() {
             const btn = document.getElementById('logout-button');
