@@ -92,18 +92,18 @@
 
         /* Estilos para el mensaje de estado (Mantiene el mensaje superior para errores/éxito genérico) */
         #message-box {
-            position: fixed;
-            top: 1rem;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 1rem 1.5rem;
-            border-radius: 0.75rem;
-            font-weight: 600;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-            pointer-events: none;
-        }
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    z-index: 9999; /* ¡CAMBIO AQUÍ! Asegura que esté por encima de todo */
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    pointer-events: none;
+}
         .message-success { background-color: #10b981; color: white; } 
         .message-error { background-color: #ef4444; color: white; } 
         
@@ -629,19 +629,19 @@
         const body = document.body;
 
         function showMessage(message, type = 'success') {
-            messagebox.textContent = message;
-            messagebox.className = ''; 
-            messagebox.classList.add('transition-none');
-            messagebox.classList.add('message-' + type);
-            messagebox.style.opacity = '1';
-            messagebox.style.transform = 'translateX(-50%) translateY(0)';
-            
-            setTimeout(() => {
-                messagebox.style.style = '';
-                messagebox.style.opacity = '0';
-                messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
-            }, 3000);
-        }
+    messagebox.textContent = message;
+    messagebox.className = ''; 
+    messagebox.classList.add('transition-none');
+    messagebox.classList.add('message-' + type);
+    messagebox.style.opacity = '1';
+    messagebox.style.transform = 'translateX(-50%) translateY(0)';
+    
+    setTimeout(() => {
+        messagebox.removeAttribute('style'); // ¡CORRECCIÓN AQUÍ!
+        messagebox.style.opacity = '0';
+        messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
+    }, 3000);
+}
         
         function showCenteredMessage(message, durationMs) {
             const modal = document.getElementById('temp-message-modal');
