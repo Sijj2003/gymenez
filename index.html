@@ -870,8 +870,9 @@
         name: document.getElementById('reg-name').value,
         last_name: document.getElementById('reg-lastname').value,
         email: document.getElementById('reg-email').value,
-        password: document.getElementById('reg-password').value,
-        force_blocked: true // El usuario se crea bloqueado por defecto para aprobación manual
+        password: document.getElementById('reg-password').value
+        // Nota: Quitamos force_blocked: true de aquí porque el backend 
+        // ahora asume el bloqueo por defecto por máxima seguridad.
     };
 
     // Feedback visual en el botón
@@ -887,10 +888,23 @@
             body: JSON.stringify(data)
         });
 
+        // --- NUEVO: INTERCEPTAMOS EL ERROR 429 DE ABUSO ---
+        if (response.status === 429) {
+            showMessage('Alerta: Has excedido el límite de registros permitidos. Por medidas de seguridad, tu capacidad para crear nuevas cuentas ha sido bloqueada temporalmente.', 'error');
+            
+            e.target.reset(); // Limpia los campos del formulario
+            
+            // Restaurar estado del botón antes de salir
+            btn.disabled = false;
+            btn.textContent = originalText;
+            return; // Detenemos la ejecución aquí
+        }
+        // --------------------------------------------------
+
         const res = await response.json();
         
         if (res.success) {
-            // Notificación de éxito y cierre de modal
+            // Mantenemos tu notificación original de WhatsApp
             showMessage('¡Registro exitoso! Escríbenos por WhatsApp para activar tu acceso.', 'success');
             
             // Función para cerrar el modal visualmente
