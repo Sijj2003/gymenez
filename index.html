@@ -862,63 +862,53 @@
             btn.textContent = 'INGRESAR';
         }
         
-async function handleRegister(e) {
-    e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
-    const originalText = 'Crear Cuenta';
+async function handleRegister(event) {
+    event.preventDefault();
+    const submitBtn = document.getElementById('btn-register');
     
-    // 1. Indicador gráfico inmediato: Desactivar botón
-    btn.disabled = true;
-    btn.textContent = 'VERIFICANDO...';
-
-    const data = {
-        name: document.getElementById('reg-name').value,
-        last_name: document.getElementById('reg-lastname').value,
-        email: document.getElementById('reg-email').value,
-        password: document.getElementById('reg-password').value
-    };
+    // 1. Deshabilitar el botón inmediatamente para evitar clics repetidos
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Procesando...";
 
     try {
-        const response = await fetch(`${API_BASE_URL}/api/register`, {
+        const response = await fetch('https://sijj2003.pythonanywhere.com/api/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
+            body: JSON.stringify(userData)
         });
 
-        let res = {};
-        try {
-            res = await response.json();
-        } catch (jsonErr) {
-            // Si el servidor bloquea la IP, a veces no devuelve JSON, sino texto plano
-            console.warn("No se pudo parsear el JSON de respuesta");
-        }
+        const result = await response.json();
 
-        // 2. Manejo del bloqueo por exceso de intentos (Error 429)
         if (response.status === 429) {
-            const msg = res.error || 'Has excedido el límite de registros. Intenta la próxima semana.';
-            showMessage(msg, 'error');
-            return; // Salimos sin resetear para que lean el error
+            // 2. Manejo de UX para el bloqueo (Rate Limit)
+            showUXWarning(result.error || "Has superado el límite de intentos permitidos.");[cite: 3]
+            return;
         }
 
-        // 3. Manejo de éxito o errores comunes (Email duplicado, etc.)
-        if (response.ok && res.success) {
-            showMessage('¡Registro exitoso! Escríbenos por WhatsApp para activar tu acceso.', 'success');
-            e.target.reset();
-            if (typeof handleCloseRegisterModal === 'function') setTimeout(handleCloseRegisterModal, 2000);
-        } else {
-            showMessage(res.error || 'No se pudo completar el registro.', 'error');
+        if (result.success) {
+            showSuccess("¡Registro exitoso! Espera la aprobación del administrador.");
         }
 
-    } catch (err) {
-        console.error('Error:', err);
-        showMessage('Error crítico: Conexión rechazada o límite de tráfico alcanzado.', 'error');
+    } catch (error) {
+        console.error("Error de red:", error);
     } finally {
-        // 4. Restaurar el indicador gráfico del botón
-        btn.disabled = false;
-        btn.textContent = originalText;
+        // 3. Reactivar el botón solo si es necesario
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Registrarse";
     }
 }
 
+// Función para mostrar un mensaje elegante en lugar de un alert aburrido
+function showUXWarning(message) {
+    const warningDiv = document.getElementById('error-container'); // Un div que tengas en tu HTML
+    warningDiv.textContent = message;
+    warningDiv.classList.remove('hidden');
+    warningDiv.style.backgroundColor = "#fff3cd"; // Amarillo suave de advertencia
+    warningDiv.style.color = "#856404";
+    
+    // Animación de sacudida (opcional para captar atención)
+    warningDiv.classList.add('shake-animation');
+}
         async function handleForceLogout(event) {
     event.preventDefault();
     
