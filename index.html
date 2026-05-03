@@ -862,52 +862,70 @@
             btn.textContent = 'INGRESAR';
         }
         
-async function handleRegister(event) {
-    event.preventDefault();
-    const submitBtn = document.getElementById('btn-register');
+async function handleRegister(e) {
+    e.preventDefault();
     
-    // 1. Deshabilitar el botón inmediatamente para evitar clics repetidos
-    submitBtn.disabled = true;
-    submitBtn.innerText = "Procesando...";
+    // Cambiamos la selección para que sea más segura
+    // Intentamos buscarlo en el formulario, si no, lo buscamos por ID
+    const btn = e.target.querySelector('button[type="submit"]') || document.getElementById('reg-submit-btn');
+    
+    // Verificación de seguridad para evitar el error "Cannot set properties of null"
+    if (!btn) {
+        console.error("No se encontró el botón de registro en el DOM.");
+        // Si el botón no existe, igual procesamos la data para no romper el flujo
+    }
+
+    const data = {
+        name: document.getElementById('reg-name').value,
+        last_name: document.getElementById('reg-lastname').value,
+        email: document.getElementById('reg-email').value,
+        password: document.getElementById('reg-password').value
+    };
+
+    // Feedback visual inicial
+    const originalText = 'Crear Cuenta';
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'PROCESANDO...';
+    }
 
     try {
-        const response = await fetch('https://sijj2003.pythonanywhere.com/api/register', {
+        const response = await fetch(`${API_BASE_URL}/api/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(userData)
+            body: JSON.stringify(data)
         });
 
-        const result = await response.json();
-
+        // --- INTERCEPTAMOS EL ERROR 429 DE ABUSO ---
         if (response.status === 429) {
-            // 2. Manejo de UX para el bloqueo (Rate Limit)
-            showUXWarning(result.error || "Has superado el límite de intentos permitidos.");
-            return;
+            // Este es el mensaje clave para tu UX
+            showMessage('Alerta: Has excedido el límite de registros permitidos (3 por día / 5 por semana). Por seguridad, tu acceso ha sido bloqueado temporalmente.', 'error');
+            
+            e.target.reset(); 
+            return; // El bloque 'finally' se encargará de rehabilitar el botón
         }
 
-        if (result.success) {
-            showSuccess("¡Registro exitoso! Espera la aprobación del administrador.");
+        const res = await response.json();
+        
+        if (res.success) {
+            showMessage('¡Registro exitoso! Escríbenos por WhatsApp para activar tu acceso.', 'success');
+            if (typeof handleCloseRegisterModal === 'function') {
+                handleCloseRegisterModal();
+            }
+            e.target.reset();
+        } else {
+            showMessage(res.error || 'Error al registrar.', 'error');
         }
-
-    } catch (error) {
-        console.error("Error de red:", error);
+    } catch (err) {
+        console.error('Error en registro:', err);
+        showMessage('Error de conexión con el servidor.', 'error');
     } finally {
-        // 3. Reactivar el botón solo si es necesario
-        submitBtn.disabled = false;
-        submitBtn.innerText = "Registrarse";
+        // Restaurar estado del botón siempre, al final de cualquier camino
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
     }
-}
-
-// Función para mostrar un mensaje elegante en lugar de un alert aburrido
-function showUXWarning(message) {
-    const warningDiv = document.getElementById('error-container'); // Un div que tengas en tu HTML
-    warningDiv.textContent = message;
-    warningDiv.classList.remove('hidden');
-    warningDiv.style.backgroundColor = "#fff3cd"; // Amarillo suave de advertencia
-    warningDiv.style.color = "#856404";
-    
-    // Animación de sacudida (opcional para captar atención)
-    warningDiv.classList.add('shake-animation');
 }
         async function handleForceLogout(event) {
     event.preventDefault();
