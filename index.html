@@ -881,7 +881,7 @@ async function handleRegister(event) {
 
         if (response.status === 429) {
             // 2. Manejo de UX para el bloqueo (Rate Limit)
-            showUXWarning(result.error || "Has superado el límite de intentos permitidos.");[cite: 3]
+            showUXWarning(result.error || "Has superado el límite de intentos permitidos.");
             return;
         }
 
