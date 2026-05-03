@@ -865,15 +865,9 @@
 async function handleRegister(e) {
     e.preventDefault();
     
-    // Cambiamos la selección para que sea más segura
-    // Intentamos buscarlo en el formulario, si no, lo buscamos por ID
+    // Selección segura del botón para la UX
     const btn = e.target.querySelector('button[type="submit"]') || document.getElementById('reg-submit-btn');
-    
-    // Verificación de seguridad para evitar el error "Cannot set properties of null"
-    if (!btn) {
-        console.error("No se encontró el botón de registro en el DOM.");
-        // Si el botón no existe, igual procesamos la data para no romper el flujo
-    }
+    const originalText = 'Crear Cuenta';
 
     const data = {
         name: document.getElementById('reg-name').value,
@@ -882,11 +876,9 @@ async function handleRegister(e) {
         password: document.getElementById('reg-password').value
     };
 
-    // Feedback visual inicial
-    const originalText = 'Crear Cuenta';
     if (btn) {
         btn.disabled = true;
-        btn.textContent = 'PROCESANDO...';
+        btn.textContent = 'VERIFICANDO...';
     }
 
     try {
@@ -896,31 +888,39 @@ async function handleRegister(e) {
             body: JSON.stringify(data)
         });
 
-        // --- INTERCEPTAMOS EL ERROR 429 DE ABUSO ---
+        // --- CAPTURA ESPECÍFICA DEL BLOQUEO (ERROR 429) ---
         if (response.status === 429) {
-            // Este es el mensaje clave para tu UX
-            showMessage('Alerta: Has excedido el límite de registros permitidos (3 por día / 5 por semana). Por seguridad, tu acceso ha sido bloqueado temporalmente.', 'error');
+            // Intentamos obtener el mensaje detallado del servidor
+            let errorMsg = 'Acceso restringido: Has superado el límite de registros permitidos por seguridad.';
+            try {
+                const errorData = await response.json();
+                errorMsg = errorData.error; // Usa el mensaje exacto de tu backend: "Has superado el límite de 3 registros..."
+            } catch (e) {
+                // Si no hay JSON, usamos el mensaje por defecto arriba
+            }
+
+            // Mostramos el mensaje en la página usando tu función showMessage
+            showMessage(errorMsg, 'error');
             
-            e.target.reset(); 
-            return; // El bloque 'finally' se encargará de rehabilitar el botón
+            // Opcional: Limpiar el formulario para indicar que el proceso terminó
+            e.target.reset();
+            return; // Salimos para que no intente procesar el éxito
         }
 
         const res = await response.json();
         
         if (res.success) {
             showMessage('¡Registro exitoso! Escríbenos por WhatsApp para activar tu acceso.', 'success');
-            if (typeof handleCloseRegisterModal === 'function') {
-                handleCloseRegisterModal();
-            }
+            if (typeof handleCloseRegisterModal === 'function') handleCloseRegisterModal();
             e.target.reset();
         } else {
             showMessage(res.error || 'Error al registrar.', 'error');
         }
+
     } catch (err) {
         console.error('Error en registro:', err);
-        showMessage('Error de conexión con el servidor.', 'error');
+        showMessage('No se pudo conectar con el servidor.', 'error');
     } finally {
-        // Restaurar estado del botón siempre, al final de cualquier camino
         if (btn) {
             btn.disabled = false;
             btn.textContent = originalText;
