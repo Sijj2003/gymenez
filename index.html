@@ -863,16 +863,22 @@
         }
         
 async function handleRegister(e) {
-    event.preventDefault();
+    // Usamos 'e' que es el parámetro que recibe la función
+    e.preventDefault();
     
     // 1. Selección infalible del botón
     const btn = e.target.querySelector('button[type="submit"]') || document.getElementById('reg-submit-btn');
     const originalText = 'Crear Cuenta';
 
+    // 2. Normalización de datos
+    // .trim() elimina espacios al inicio/final y .toLowerCase() pasa todo a minúsculas
+    const rawEmail = document.getElementById('reg-email').value;
+    const cleanEmail = rawEmail.trim().toLowerCase();
+
     const data = {
-        name: document.getElementById('reg-name').value,
-        last_name: document.getElementById('reg-lastname').value,
-        email: document.getElementById('reg-email').value,
+        name: document.getElementById('reg-name').value.trim(),
+        last_name: document.getElementById('reg-lastname').value.trim(),
+        email: cleanEmail, // Enviamos el correo ya normalizado
         password: document.getElementById('reg-password').value
     };
 
@@ -890,23 +896,17 @@ async function handleRegister(e) {
 
         // --- MANEJO DE BLOQUEO POR LÍMITE (ERROR 429) ---
         if (response.status === 429) {
-            // Leemos la respuesta como texto primero para evitar errores de parseo
             const responseText = await response.text();
             let errorMsg = 'Acceso restringido temporalmente por medidas de seguridad.';
 
             try {
-                // Intentamos convertir el texto a objeto para extraer el error del backend
                 const errorData = JSON.parse(responseText);
                 errorMsg = errorData.error || errorMsg;
             } catch (jsonErr) {
-                // Si el backend envió texto plano, lo usamos directamente
                 if (responseText) errorMsg = responseText; 
             }
 
-            // Notificación visual inmediata para el usuario
             showMessage(errorMsg, 'error');
-            
-            // Limpiamos el formulario para indicar fin del proceso
             e.target.reset(); 
             return; 
         }
@@ -919,7 +919,8 @@ async function handleRegister(e) {
             if (typeof handleCloseRegisterModal === 'function') handleCloseRegisterModal();
             e.target.reset();
         } else {
-            // Maneja errores como "Email ya registrado"
+            // Aquí el backend te dirá "Email ya registrado" porque ahora 
+            // siempre comparará minúsculas contra minúsculas.
             showMessage(res.error || 'No se pudo completar el registro.', 'error');
         }
 
@@ -927,7 +928,6 @@ async function handleRegister(e) {
         console.error('Error en registro:', err);
         showMessage('Error crítico de conexión. Inténtalo más tarde.', 'error');
     } finally {
-        // Restauramos el botón independientemente del resultado
         if (btn) {
             btn.disabled = false;
             btn.textContent = originalText;
