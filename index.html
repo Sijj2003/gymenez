@@ -493,6 +493,34 @@
     </button>
 </form>
 
+            <!-- Modal de Activación de Cuenta -->
+    <div id="activation-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[1200] transition-opacity duration-300">
+        <div class="glass-card p-6 md:p-8 w-full max-w-sm mx-auto rounded-2xl shadow-2xl border-t-2 border-amber-400/50 text-center">
+            <h3 class="text-xl md:text-2xl font-bold mb-4 text-white uppercase">Activa tu Cuenta</h3>
+            <p class="text-sm text-gray-300 mb-6">Hemos enviado un código de 6 dígitos a tu correo. Ingrésalo a continuación:</p>
+
+            <form id="activation-form">
+                <!-- Input oculto para guardar el correo temporalmente -->
+                <input type="hidden" id="activation-email-target" value="">
+                
+                <div class="mb-6">
+                    <input type="text" id="activation-code" placeholder="000000" maxlength="6"
+                           class="w-full px-4 py-3 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-amber-400 text-center text-3xl tracking-[0.5em] font-bold focus:ring-1 focus:ring-amber-400 transition" required>
+                </div>
+                
+                <button type="submit" id="verify-activation-btn"
+                        class="neon-button w-full py-3 rounded-lg bg-gray-800 text-amber-400 font-bold text-lg hover:bg-gray-700 uppercase tracking-wider border-2 border-amber-400/50 mb-4">
+                    Verificar Código
+                </button>
+                
+                <button type="button" id="close-activation-btn"
+                        class="w-full py-3 text-sm rounded-lg bg-gray-600 text-white font-bold hover:bg-gray-700 transition duration-300">
+                    Cancelar
+                </button>
+            </form>
+        </div>
+    </div>
+
             <!-- Modal de Activación por Código -->
     <div id="activation-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[1200] transition-opacity duration-300 opacity-0">
         <div class="glass-card p-6 md:p-8 w-full max-w-sm mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-400/50 text-center">
@@ -560,34 +588,49 @@
 
         const data = await response.json();
 
-        // Si el usuario está bloqueado o hay otra sesión (Error 403)
-        if (response.status === 403) {
-             return { success: false, error: data.error || 'Acceso denegado (403).' };
-        }
-        
-        // 🚩 AJUSTE AQUÍ: Manejo de errores y activación requerida 🚩
+        // 🚩 MANEJO DE RESPUESTAS NO EXITOSAS (Errores 400, 401, 403, etc.)
         if (!response.ok || !data.success) {
-            // Si el backend dice que falta activar la cuenta:
+            
+            // 1. PRIORIDAD: Revisar si el backend solicita activación por código
+            // Lo ponemos primero porque puede venir con un status de error (ej. 400)
             if (data.requires_activation) {
                 return { 
                     success: false, 
                     requires_activation: true, 
-                    email: data.email, 
-                    message: data.message 
+                    email: data.email || email, // Usamos el del data o el que ingresó el usuario
+                    message: data.message || 'Se requiere activación de cuenta.'
                 };
             }
-            // Error genérico de credenciales
-            return { success: false, error: data.error || 'Error de conexión con la API o credenciales inválidas.' };
+
+            // 2. Manejo de errores específicos (Bloqueo o Sesión activa)
+            if (response.status === 403) {
+                return { 
+                    success: false, 
+                    error: data.error || 'Acceso denegado.' 
+                };
+            }
+
+            // 3. Error genérico (Credenciales incorrectas u otros fallos)
+            return { 
+                success: false, 
+                error: data.error || 'Correo o contraseña incorrectos.' 
+            };
         }
 
-        // Si todo sale bien (Success)
+        // ✅ INICIO DE SESIÓN EXITOSO (Status 200)
+        // Guardamos la sesión en el estado global y en el almacenamiento local
         CURRENT_USER_SESSION = data.user;
         localStorage.setItem('userSession', JSON.stringify(data.user)); 
+        
         return { success: true, user: data.user };
 
     } catch (e) {
         console.error("Error en la conexión fetch:", e);
-        return { success: false, error: 'No se pudo conectar con el servidor API REST. Verifica la URL o la política CORS.' };
+        // Simplificamos el mensaje para el usuario final
+        return { 
+            success: false, 
+            error: 'No se pudo conectar con el servidor. Por favor, verifica tu conexión a internet.' 
+        };
     }
 }
         /**
