@@ -1188,98 +1188,68 @@ async function handleRegister(e) {
             }
         }
 
-        window.onload = function() {
-    // 1. GESTIÓN DE SESIÓN Y SPLASH
-    const storedSession = localStorage.getItem('userSession');
-    if (storedSession) {
-        setTimeout(() => {
-            const splash = document.getElementById('splash-screen');
-            if(splash) splash.style.display = 'none';
-            navigateTo('dashboard-screen');
-        }, 100); 
-    } else {
-        setTimeout(transitionToLogin, SPLASH_DURATION_MS);
-    }
+         window.onload = function() {
+            const storedSession = localStorage.getItem('userSession');
+            if (storedSession) {
+                setTimeout(() => {
+                    document.getElementById('splash-screen').style.display = 'none';
+                    navigateTo('dashboard-screen');
+                }, 100); 
+            } else {
+                setTimeout(transitionToLogin, SPLASH_DURATION_MS);
+            }
 
-    // --- FUNCIÓN DE SEGURIDAD PARA EVITAR ERRORES DE "NULL" ---
-    const safeAddListener = (id, event, callback) => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.addEventListener(event, callback);
-        } else {
-            console.warn(`Precaución: El elemento con ID '${id}' no se encontró en el HTML.`);
-        }
-    };
+            document.getElementById('login-form').addEventListener('submit', handleLogin);
+            document.getElementById('logout-button').addEventListener('click', handleLogout);
+            document.getElementById('register-form').addEventListener('submit', handleRegister);
+            
+            // --- NUEVO: AHORA ABRE EL MODAL EN VEZ DE WHATSAPP ---
+            document.getElementById('register-request-link').addEventListener('click', handleOpenRegisterModal); 
+            document.getElementById('close-register-modal').addEventListener('click', handleCloseRegisterModal);
+            // -----------------------------------------------------
 
-    // 2. FORMULARIOS PRINCIPALES
-    safeAddListener('login-form', 'submit', handleLogin);
-    safeAddListener('logout-button', 'click', handleLogout);
-    safeAddListener('register-form', 'submit', handleRegister);
+            document.getElementById('forgot-password-link').addEventListener('click', handleForgotPassword);
+            
+            document.getElementById('staff-access-link').addEventListener('click', handleStaffAccess); 
+            
+            document.getElementById('select-trainer-btn').addEventListener('click', handleSelectTrainer);
+            document.getElementById('select-admin-btn').addEventListener('click', handleSelectAdmin);
+            document.getElementById('modal-close-btn').addEventListener('click', handleCloseAreaSelectionModal);
 
-    // 3. MODAL DE REGISTRO
-    safeAddListener('register-request-link', 'click', handleOpenRegisterModal); 
-    safeAddListener('close-register-modal', 'click', handleCloseRegisterModal);
+            const sessionModal = document.getElementById('active-session-modal');
+            const form = document.getElementById('force-logout-form');
+            const options = document.getElementById('modal-options');
+            const loginEmailInput = document.getElementById('login-email');
+            
+            document.getElementById('modal-cancel-btn').addEventListener('click', () => {
+                sessionModal.classList.add('hidden');
+                showForceLogoutMessage(''); 
+            });
+            
+            document.getElementById('modal-confirm-btn').addEventListener('click', () => {
+                options.classList.add('hidden');
+                form.classList.remove('hidden');
+                document.getElementById('force-email').value = loginEmailInput.value;
+            });
+            
+            document.getElementById('force-logout-cancel').addEventListener('click', () => {
+                sessionModal.classList.add('hidden');
+                showForceLogoutMessage('');
+                options.classList.remove('hidden');
+                form.classList.add('hidden');
+            });
 
-    // 4. NUEVOS LISTENERS DEL MODAL DE ACTIVACIÓN (IDs CORREGIDOS)
-    // Cambiamos 'activation-form' por 'final-activation-form' para que coincida con tu nuevo HTML
-    safeAddListener('final-activation-form', 'submit', handleVerifyActivation);
-    safeAddListener('close-activation-modal', 'click', () => {
-        const modal = document.getElementById('activation-modal');
-        if (modal) modal.classList.add('hidden');
-    });
-
-    // 5. LINKS ADICIONALES
-    safeAddListener('forgot-password-link', 'click', handleForgotPassword);
-    safeAddListener('staff-access-link', 'click', handleStaffAccess); 
-    
-    // 6. SELECCIÓN DE ÁREA / STAFF
-    safeAddListener('select-trainer-btn', 'click', handleSelectTrainer);
-    safeAddListener('select-admin-btn', 'click', handleSelectAdmin);
-    safeAddListener('modal-close-btn', 'click', handleCloseAreaSelectionModal);
-
-    // 7. GESTIÓN DE SESIÓN ACTIVA Y CIERRE FORZADO
-    const sessionModal = document.getElementById('active-session-modal');
-    const forceForm = document.getElementById('force-logout-form');
-    const options = document.getElementById('modal-options');
-    const loginEmailInput = document.getElementById('login-email');
-    
-    safeAddListener('modal-cancel-btn', 'click', () => {
-        if (sessionModal) sessionModal.classList.add('hidden');
-        if (typeof showForceLogoutMessage === 'function') showForceLogoutMessage(''); 
-    });
-    
-    safeAddListener('modal-confirm-btn', 'click', () => {
-        if (options) options.classList.add('hidden');
-        if (forceForm) forceForm.classList.remove('hidden');
-        const forceEmailInput = document.getElementById('force-email');
-        if (forceEmailInput && loginEmailInput) {
-            forceEmailInput.value = loginEmailInput.value;
-        }
-    });
-    
-    safeAddListener('force-logout-cancel', 'click', () => {
-        if (sessionModal) sessionModal.classList.add('hidden');
-        if (typeof showForceLogoutMessage === 'function') showForceLogoutMessage('');
-        if (options) options.classList.remove('hidden');
-        if (forceForm) forceForm.classList.add('hidden');
-    });
-
-    if (forceForm) forceForm.addEventListener('submit', handleForceLogout);
-    
-    const forceDob = document.getElementById('force-dob');
-    if (forceDob) {
-        forceDob.addEventListener('input', (e) => formatDateInput(e.target));
-    }
-    
-    // 8. SEGURIDAD MODAL DE BLOQUEO (ESC Key)
-    const blockModal = document.getElementById('block-modal');
-    document.addEventListener('keydown', function(event) {
-        if (blockModal && event.key === "Escape" && !blockModal.classList.contains('hidden')) {
-            event.preventDefault(); 
-            event.stopPropagation();
-        }
-    }, true); 
-}; // Cierra window.onload
-</script> 
+            form.addEventListener('submit', handleForceLogout);
+            document.getElementById('force-dob').addEventListener('input', (e) => formatDateInput(e.target));
+            
+            const blockModal = document.getElementById('block-modal');
+            document.addEventListener('keydown', function(event) {
+                if (blockModal && event.key === "Escape" && !blockModal.classList.contains('hidden')) {
+                    event.preventDefault(); 
+                    event.stopPropagation();
+                }
+            }, true); 
+        };
+    </script>
 </body>
 </html>
