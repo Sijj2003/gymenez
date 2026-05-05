@@ -879,6 +879,8 @@ if (response.error && response.error.includes('bloqueada')) {
 }
 
 return;
+        } // <--- ESTA ES LA LLAVE QUE FALTA
+} // <--- Y ESTA CIERRA LA FUNCIÓN handleLogin
         
 async function handleRegister(e) {
     // Usamos 'e' que es el parámetro que recibe la función
