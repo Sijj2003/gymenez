@@ -145,7 +145,7 @@
             }
         }
 
-        document.getElementById('activation-form').addEventListener('submit', handleVerifyActivation);
+        const code = document.getElementById('activation-code').value.trim();
         
         // Verificación básica si el email no está presente en la URL
         window.onload = () => {
