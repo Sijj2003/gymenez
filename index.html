@@ -870,13 +870,16 @@
         btn.disabled = false;
         btn.textContent = 'INGRESAR';
 
-        // 🚩 LÓGICA ACTUALIZADA: Redirección a página externa de activación 🚩
+        // 🚩 NUEVA LÓGICA: Si el usuario necesita activación por código 🚩
         if (response.requires_activation) {
-            // Obtenemos el correo que respondió el servidor o el que se ingresó en el input
-            const userEmail = response.email || email;
+            // Guardamos el email en el campo oculto del modal de activación
+            document.getElementById('activation-email').value = response.email || email;
             
-            // Redirigimos a la nueva página pasando el email como parámetro en la URL
-            window.location.href = `act-code.html?email=${encodeURIComponent(userEmail)}`;
+            // Abrimos el modal de ingreso de código
+            openActivationModal();
+            
+            // Mostramos un mensaje informativo (en verde para indicar que el login fue correcto pero falta un paso)
+            showMessage('Revisa tu correo para el código de seguridad.', 'success');
             return;
         }
         
