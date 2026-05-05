@@ -919,7 +919,7 @@
             document.getElementById('activation-email').value = response.email || email;
             
             // Abrimos el modal de ingreso de código
-            openActivationModal();
+            document.getElementById('activation-modal').classList.remove('hidden');
             
             // Mostramos un mensaje informativo (en verde para indicar que el login fue correcto pero falta un paso)
             showMessage('Revisa tu correo para el código de seguridad.', 'success');
