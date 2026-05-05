@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -493,37 +494,33 @@
     </button>
 </form>
 
-            <!-- Modal de Activación de Cuenta (ÚNICO Y CORREGIDO) -->
-<div id="activation-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[1200] transition-opacity duration-300">
-    <div class="glass-card p-6 md:p-8 w-full max-w-sm mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-400/50 text-center">
-        
-        <svg class="w-16 h-16 mx-auto mb-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-        </svg>
-        
-        <h3 class="text-xl md:text-2xl font-bold mb-2 text-white uppercase">Activación</h3>
-        <p class="text-sm text-gray-400 mb-6">Ingresa el código de 6 dígitos que enviamos a tu correo.</p>
-        
-        <form id="final-activation-form">
-            <!-- ID único para el email -->
-            <input type="hidden" id="activation-email-field">
+            <!-- Modal de Activación por Código -->
+    <div id="activation-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[1200] transition-opacity duration-300 opacity-0">
+        <div class="glass-card p-6 md:p-8 w-full max-w-sm mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-400/50 text-center">
             
-            <div class="mb-6 flex justify-center">
-                <input type="text" id="activation-code-input" maxlength="6" placeholder="000000"
-                       class="w-48 px-4 py-3 text-center text-3xl tracking-[0.5em] rounded-lg bg-gray-800/50 text-sky-400 border border-gray-500 focus:border-sky-400 focus:ring-1 focus:ring-sky-400 font-bold transition duration-300" required>
-            </div>
+            <svg class="w-16 h-16 mx-auto mb-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
             
-            <button type="submit" id="verify-btn"
-                    class="neon-button w-full py-3 rounded-lg bg-gray-800 text-sky-400 font-bold text-lg hover:bg-gray-700 uppercase tracking-wider border-2 border-sky-400/50">
-                VERIFICAR
-            </button>
+            <h3 class="text-xl md:text-2xl font-bold mb-2 text-white uppercase">Activación</h3>
+            <p class="text-sm text-gray-400 mb-6">Ingresa el código de 6 dígitos que acabamos de enviar a tu correo.</p>
             
-            <button type="button" id="close-activation-modal" class="mt-4 w-full py-3 text-sm rounded-lg bg-transparent text-gray-400 hover:text-white transition duration-300">
-                Cancelar
-            </button>
-        </form>
+            <form id="activation-form">
+                <input type="hidden" id="activation-email">
+                <div class="mb-6 flex justify-center">
+                    <input type="text" id="activation-code" maxlength="6" placeholder="000000"
+                           class="w-48 px-4 py-3 text-center text-3xl tracking-[0.5em] rounded-lg bg-gray-800/50 text-sky-400 border border-gray-500 focus:border-sky-400 focus:ring-1 focus:ring-sky-400 font-bold transition duration-300" required>
+                </div>
+                <button type="submit" id="verify-btn"
+                        class="neon-button w-full py-3 rounded-lg bg-gray-800 text-sky-400 font-bold text-lg hover:bg-gray-700 uppercase tracking-wider border-2 border-sky-400/50">
+                    VERIFICAR
+                </button>
+                <button type="button" id="close-activation-modal" class="mt-4 w-full py-3 text-sm rounded-lg bg-transparent text-gray-400 hover:text-white transition duration-300">
+                    Cancelar
+                </button>
+            </form>
+        </div>
     </div>
-</div>
 
 
     <script>
@@ -564,49 +561,34 @@
 
         const data = await response.json();
 
-        // 🚩 MANEJO DE RESPUESTAS NO EXITOSAS (Errores 400, 401, 403, etc.)
+        // Si el usuario está bloqueado o hay otra sesión (Error 403)
+        if (response.status === 403) {
+             return { success: false, error: data.error || 'Acceso denegado (403).' };
+        }
+        
+        // 🚩 AJUSTE AQUÍ: Manejo de errores y activación requerida 🚩
         if (!response.ok || !data.success) {
-            
-            // 1. PRIORIDAD: Revisar si el backend solicita activación por código
-            // Lo ponemos primero porque puede venir con un status de error (ej. 400)
+            // Si el backend dice que falta activar la cuenta:
             if (data.requires_activation) {
                 return { 
                     success: false, 
                     requires_activation: true, 
-                    email: data.email || email, // Usamos el del data o el que ingresó el usuario
-                    message: data.message || 'Se requiere activación de cuenta.'
+                    email: data.email, 
+                    message: data.message 
                 };
             }
-
-            // 2. Manejo de errores específicos (Bloqueo o Sesión activa)
-            if (response.status === 403) {
-                return { 
-                    success: false, 
-                    error: data.error || 'Acceso denegado.' 
-                };
-            }
-
-            // 3. Error genérico (Credenciales incorrectas u otros fallos)
-            return { 
-                success: false, 
-                error: data.error || 'Correo o contraseña incorrectos.' 
-            };
+            // Error genérico de credenciales
+            return { success: false, error: data.error || 'Error de conexión con la API o credenciales inválidas.' };
         }
 
-        // ✅ INICIO DE SESIÓN EXITOSO (Status 200)
-        // Guardamos la sesión en el estado global y en el almacenamiento local
+        // Si todo sale bien (Success)
         CURRENT_USER_SESSION = data.user;
         localStorage.setItem('userSession', JSON.stringify(data.user)); 
-        
         return { success: true, user: data.user };
 
     } catch (e) {
         console.error("Error en la conexión fetch:", e);
-        // Simplificamos el mensaje para el usuario final
-        return { 
-            success: false, 
-            error: 'No se pudo conectar con el servidor. Por favor, verifica tu conexión a internet.' 
-        };
+        return { success: false, error: 'No se pudo conectar con el servidor API REST. Verifica la URL o la política CORS.' };
     }
 }
         /**
@@ -884,45 +866,26 @@
     btn.textContent = 'VERIFICANDO SESIÓN...';
 
     const response = await apiLogin(email, password, localDeviceId);
-            console.log("Respuesta de la API:", response);
     
     if (!response.success) {
         btn.disabled = false;
         btn.textContent = 'INGRESAR';
 
-      // 🚩 NUEVA LÓGICA: Si el usuario necesita activación por código 🚩
-    // Verificamos ambas posibilidades de respuesta del servidor (booleano o status)
-    if (response.requires_activation || response.status === 'requires_activation') {
-        
-        // 1. Guardamos el email en el campo oculto del modal de activación (ID corregido)
-        const emailField = document.getElementById('activation-email-field');
-        if (emailField) {
-            emailField.value = response.email || email;
-        }
-
-        // 2. Cerramos el modal de login actual para que no bloquee la vista
-        const loginModal = document.getElementById('login-modal'); // Asegúrate de que este sea el ID de tu modal de login
-        if (loginModal) loginModal.classList.add('hidden');
-
-        // 3. Abrimos el modal de ingreso de código
-        const activationModal = document.getElementById('activation-modal');
-        if (activationModal) {
-            activationModal.classList.remove('hidden');
-            activationModal.classList.add('flex'); // Forzamos flex para centrarlo si usas Tailwind
+        // 🚩 NUEVA LÓGICA: Si el usuario necesita activación por código 🚩
+        if (response.requires_activation) {
+            // Guardamos el email en el campo oculto del modal de activación
+            document.getElementById('activation-email').value = response.email || email;
+            
+            // Abrimos el modal de ingreso de código
+            openActivationModal();
+            
+            // Mostramos un mensaje informativo (en verde para indicar que el login fue correcto pero falta un paso)
+            showMessage('Revisa tu correo para el código de seguridad.', 'success');
+            return;
         }
         
-        // 4. Notificamos al usuario
-        showMessage('Revisa tu correo para el código de seguridad.', 'success');
-        
-        // 5. IMPORTANTE: Restaurar el botón por si el usuario cierra el modal y quiere reintentar
-        btn.disabled = false;
-        btn.textContent = 'INGRESAR';
-        return;
-    }
-    
-    // --- Manejo de errores existentes ---
-    if (response.error) {
-        if (response.error.includes('bloqueada')) {
+        // --- Manejo de errores existentes ---
+        if (response.error && response.error.includes('bloqueada')) {
             blockModal.classList.remove('hidden'); 
             showMessage('Acceso Restringido.', 'error');
             
@@ -930,7 +893,7 @@
                 blockModal.classList.add('hidden');
             }, 10000); 
         
-        } else if (response.error.includes('Ya hay una sesión activa')) {
+        } else if (response.error && response.error.includes('Ya hay una sesión activa')) {
             sessionModal.classList.remove('hidden');
             showMessage('Sesión activa detectada.', 'error');
             
@@ -942,22 +905,16 @@
             showMessage(response.error, 'error');
         }
         
-        // Restaurar botón en caso de error
-        btn.disabled = false;
-        btn.textContent = 'INGRESAR';
         return;
     } 
     
-    // --- Si el login es exitoso y el usuario ya está activo ---
+    // Si el login es exitoso y el usuario ya está activo
     showMessage('¡Inicio de sesión exitoso!', 'success');
-    
-    // Limpieza de interfaz
+    navigateTo('dashboard-screen');
     sessionModal.classList.add('hidden'); 
+    
     btn.disabled = false;
     btn.textContent = 'INGRESAR';
-    
-    // Redirección
-    navigateTo('dashboard-screen');
 }
         
 async function handleRegister(e) {
@@ -1188,7 +1145,7 @@ async function handleRegister(e) {
             }
         }
 
-         window.onload = function() {
+        window.onload = function() {
             const storedSession = localStorage.getItem('userSession');
             if (storedSession) {
                 setTimeout(() => {
@@ -1207,6 +1164,10 @@ async function handleRegister(e) {
             document.getElementById('register-request-link').addEventListener('click', handleOpenRegisterModal); 
             document.getElementById('close-register-modal').addEventListener('click', handleCloseRegisterModal);
             // -----------------------------------------------------
+
+            // --- LISTENERS DEL MODAL DE ACTIVACIÓN ---
+            document.getElementById('activation-form').addEventListener('submit', handleVerifyActivation);
+            document.getElementById('close-activation-modal').addEventListener('click', closeActivationModal);
 
             document.getElementById('forgot-password-link').addEventListener('click', handleForgotPassword);
             
