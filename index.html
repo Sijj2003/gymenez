@@ -1097,7 +1097,11 @@ async function handleRegister(e) {
         // --- FUNCIONES DEL MODAL DE ACTIVACIÓN ---
 function openActivationModal() {
     const modal = document.getElementById('activation-modal');
-    const loginEmail = document.getElementById('email').value; // Captura el correo del login
+    
+    // CORRECCIÓN: Usamos 'login-email' que es el ID definido en tu formulario de login
+    const loginEmailElement = document.getElementById('login-email');
+    const loginEmail = loginEmailElement ? loginEmailElement.value : ''; 
+    
     const activationEmailInput = document.getElementById('activation-email');
     const activationCodeInput = document.getElementById('activation-code');
 
@@ -1106,13 +1110,13 @@ function openActivationModal() {
         activationEmailInput.value = loginEmail;
     }
 
-    // 2. Limpiar el código anterior
+    // 2. Limpiar el código anterior por seguridad
     activationCodeInput.value = '';
 
-    // 3. Mostrar el modal rompiendo el flujo de renderizado (Reflow)
+    // 3. Mostrar el modal con efecto visual
     modal.classList.remove('hidden');
     
-    // Forzamos el "reflow" para que la transición de opacidad ocurra sí o sí
+    // Forzamos el "reflow" para que la transición de opacidad se ejecute correctamente
     void modal.offsetWidth; 
     
     modal.style.opacity = '1';
@@ -1123,7 +1127,7 @@ function closeActivationModal() {
     const modal = document.getElementById('activation-modal');
     modal.style.opacity = '0';
     
-    // Esperamos a que termine la transición de CSS (300ms) antes de ocultarlo del DOM
+    // Esperamos a que termine la transición de CSS (300ms) antes de ocultarlo
     setTimeout(() => {
         modal.classList.add('hidden');
     }, 300);
@@ -1144,6 +1148,7 @@ async function handleVerifyActivation(e) {
     btn.textContent = 'VERIFICANDO...';
 
     try {
+        // Realizamos la petición a tu API de Flask
         const response = await fetch(`${API_BASE_URL}/api/verify-activation`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1158,8 +1163,9 @@ async function handleVerifyActivation(e) {
             // Cerramos el modal primero
             closeActivationModal();
             
-            // Pequeña espera para que la animación de cierre termine antes de loguear
+            // Esperamos a que la animación de cierre termine antes de re-intentar el login
             setTimeout(() => {
+                // Hacemos clic programático en el botón de login para procesar la entrada activa
                 document.getElementById('login-btn').click(); 
             }, 350);
             
