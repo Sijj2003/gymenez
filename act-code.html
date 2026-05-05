@@ -2,92 +2,158 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Verificar Cuenta</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activación - GYMENEZ</title>
+    <link rel="icon" type="image/png" href="mini_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0d1a;
+            background-image: url('FONDO.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #e5e7eb; 
+            text-shadow: -0.5px -0.5px 0 #000, 0.5px -0.5px 0 #000, -0.5px 0.5px 0 #000, 0.5px 0.5px 0 #000;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .neon-button {
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px #38bdf8, 0 0 20px #38bdf8; 
+        }
+        .neon-button:hover {
+            box-shadow: 0 0 15px #7dd3fc, 0 0 30px #7dd3fc;
+            transform: scale(1.02);
+        }
+
+        #message-box {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            pointer-events: none;
+        }
+        .message-success { background-color: #10b981; color: white; } 
+        .message-error { background-color: #ef4444; color: white; } 
+    </style>
 </head>
-<body class="bg-black text-white flex items-center justify-center min-h-screen">
+<body class="min-h-screen flex items-center justify-center p-4">
 
-    <div class="bg-zinc-900 p-8 rounded-2xl shadow-2xl w-full max-w-md border border-zinc-800">
-        <h2 class="text-2xl font-bold mb-2 text-center">Verifica tu código</h2>
-        <p class="text-zinc-400 text-sm text-center mb-6">
-            Hemos enviado un código al correo: <br>
-            <span id="display-email" class="text-blue-400 font-medium"></span>
-        </p>
+    <div id="message-box"></div>
 
-        <!-- Formulario de Verificación -->
-        <form id="verify-form" class="space-y-4">
-            <input type="hidden" id="auth-email">
-            <input type="text" id="code-input" placeholder="000000" required
-                   class="w-full bg-zinc-800 border border-zinc-700 p-3 rounded-lg text-center text-2xl tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <div class="glass-card p-8 w-full max-w-lg mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-500/30 text-center">
+        <img src="LOGIN_LOGO.png" alt="Logo GYMENEZ" class="mx-auto mb-6" style="width: 225px;">
+        
+        <svg class="w-16 h-16 mx-auto mb-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+        </svg>
+        
+        <h3 class="text-2xl font-bold mb-2 text-white uppercase tracking-wider">Verificación de Cuenta</h3>
+        <p class="text-sm text-gray-400 mb-6">Ingresa el código de 6 dígitos enviado a tu correo.</p>
+        
+        <form id="activation-form">
+            <div class="mb-6">
+                <input type="text" id="activation-code" maxlength="6" placeholder="000000"
+                       class="w-full px-4 py-3 text-center text-4xl tracking-[0.5em] rounded-lg bg-gray-800/50 text-sky-400 border border-gray-500 focus:border-sky-400 focus:ring-1 focus:ring-sky-400 font-bold transition duration-300" required>
+            </div>
             
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-bold transition">
-                Verificar ahora
+            <button type="submit" id="verify-btn"
+                    class="neon-button w-full py-3 rounded-lg bg-gray-800 text-sky-400 font-bold text-lg hover:bg-gray-700 uppercase tracking-wider border-2 border-sky-400/50">
+                VERIFICAR CÓDIGO
             </button>
+            
+            <a href="index.html" class="mt-4 block text-sm text-gray-400 hover:text-white transition duration-300">
+                Volver al inicio
+            </a>
         </form>
-
-        <div class="mt-6 text-center">
-            <p class="text-zinc-500 text-sm">¿No recibiste nada?</p>
-            <button id="resend-btn" class="text-blue-400 hover:underline text-sm font-medium mt-1">
-                Reenviar nuevo código
-            </button>
-        </div>
     </div>
 
     <script>
-        // 1. Obtener el email de la URL al cargar
+        const API_BASE_URL = 'https://sijj2003.pythonanywhere.com';[cite: 6]
+        const messagebox = document.getElementById('message-box');
+
+        // Obtener el email desde los parámetros de la URL
         const urlParams = new URLSearchParams(window.location.search);
-        const email = urlParams.get('email');
-        
-        if (email) {
-            document.getElementById('display-email').innerText = email;
-            document.getElementById('auth-email').value = email;
-        } else {
-            // Si no hay email, algo salió mal, regresamos al index
-            window.location.href = 'index.html';
+        const userEmail = urlParams.get('email');
+
+        function showMessage(message, type = 'success') {
+            messagebox.textContent = message;
+            messagebox.className = 'message-' + type;
+            messagebox.style.opacity = '1';
+            messagebox.style.transform = 'translateX(-50%) translateY(0)';
+            
+            setTimeout(() => {
+                messagebox.style.opacity = '0';
+                messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
+            }, 3000);
         }
 
-        // 2. Lógica para reenviar código
-        document.getElementById('resend-btn').addEventListener('click', async () => {
-            const btn = document.getElementById('resend-btn');
+        async function handleVerifyActivation(e) {
+            e.preventDefault();
+            if (!userEmail) {
+                showMessage('Error: No se encontró el correo de activación.', 'error');
+                return;
+            }
+
+            const code = document.getElementById('activation-code').value;
+            const btn = document.getElementById('verify-btn');
+
             btn.disabled = true;
-            btn.innerText = "Enviando...";
+            btn.textContent = 'VERIFICANDO...';
 
             try {
-                const response = await fetch('/api/resend-code', {
+                // Llamada al endpoint de verificación
+                const response = await fetch(`${API_BASE_URL}/api/verify-activation`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: email })
+                    body: JSON.stringify({ email: userEmail, code: code })
                 });
-                
-                if (response.ok) {
-                    alert("Nuevo código enviado.");
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showMessage('¡Cuenta activada! Redirigiendo...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                } else {
+                    showMessage(data.error || 'Código inválido o expirado.', 'error');
                 }
-            } catch (error) {
-                console.error("Error al reenviar:", error);
+            } catch (err) {
+                showMessage('Error de conexión con el servidor.', 'error');
             } finally {
                 btn.disabled = false;
-                btn.innerText = "Reenviar nuevo código";
+                btn.textContent = 'VERIFICAR CÓDIGO';
             }
-        });
+        }
 
-        // 3. Lógica para verificar el código
-        document.getElementById('verify-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const code = document.getElementById('code-input').value;
-
-            const response = await fetch('/api/verify-activation', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: email, code: code })
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                window.location.href = '/dashboard.html'; // O a donde vaya tras activar
-            } else {
-                alert("Código incorrecto o expirado.");
+        document.getElementById('activation-form').addEventListener('submit', handleVerifyActivation);
+        
+        // Verificación básica si el email no está presente en la URL
+        window.onload = () => {
+            if (!userEmail) {
+                showMessage('Acceso no autorizado. Por favor intenta loguearte.', 'error');
+                setTimeout(() => window.location.href = 'index.html', 3000);
             }
-        });
+        };
     </script>
 </body>
 </html>
