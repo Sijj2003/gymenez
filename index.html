@@ -893,7 +893,7 @@
         // 🚩 NUEVA LÓGICA: Si el usuario necesita activación por código 🚩
         if (response.requires_activation) {
             // Guardamos el email en el campo oculto del modal de activación
-            document.getElementById('activation-email').value = response.email || email;
+            document.getElementById('activation-email-field').value = response.email || email;
             
             // Abrimos el modal de ingreso de código
             document.getElementById('activation-modal').classList.remove('hidden');
