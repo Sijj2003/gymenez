@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -867,21 +866,22 @@
 
     const response = await apiLogin(email, password, localDeviceId);
     
-    // 🚩 CAMBIO AQUÍ: Ahora el backend envía success: true para la redirección
-    // pero incluimos la validación de requires_activation primero.
-    if (response.requires_activation) {
-        btn.disabled = false;
-        btn.textContent = 'INGRESAR';
-        
-        // Redirigimos a la nueva página usando la URL que envía el backend
-        // Esto llevará al usuario a: act-code.html?email=usuario@correo.com
-        window.location.href = response.redirect_url; 
-        return;
-    }
-
     if (!response.success) {
         btn.disabled = false;
         btn.textContent = 'INGRESAR';
+
+        // 🚩 NUEVA LÓGICA: Si el usuario necesita activación por código 🚩
+        if (response.requires_activation) {
+            // Guardamos el email en el campo oculto del modal de activación
+            document.getElementById('activation-email').value = response.email || email;
+            
+            // Abrimos el modal de ingreso de código
+            openActivationModal();
+            
+            // Mostramos un mensaje informativo (en verde para indicar que el login fue correcto pero falta un paso)
+            showMessage('Revisa tu correo para el código de seguridad.', 'success');
+            return;
+        }
         
         // --- Manejo de errores existentes ---
         if (response.error && response.error.includes('bloqueada')) {
