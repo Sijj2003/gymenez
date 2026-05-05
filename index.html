@@ -908,6 +908,7 @@
     btn.textContent = 'VERIFICANDO SESIÓN...';
 
     const response = await apiLogin(email, password, localDeviceId);
+            console.log("Respuesta de la API:", response);
     
     if (!response.success) {
         btn.disabled = false;
