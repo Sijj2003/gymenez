@@ -878,15 +878,18 @@
 
             // 1. Caso: Usuario requiere activación por código
             if (response.requires_activation) {
-                const activationEmailField = document.getElementById('activation-email');
-                if (activationEmailField) {
-                    activationEmailField.value = response.email || email;
-                }
-                
-                openActivationModal();
-                showMessage('Revisa tu correo para el código de seguridad.', 'success');
-                return;
-            }
+    // Codificamos el email para que sea seguro pasarlo por la URL
+    const emailParam = encodeURIComponent(response.email || email);
+    
+    // Mostramos mensaje breve y redirigimos
+    showMessage('Verificación requerida. Redirigiendo...', 'success');
+    
+    setTimeout(() => {
+        window.location.href = `act-code.html?email=${emailParam}`;
+    }, 1000);
+    
+    return;
+}
             
             // 2. Caso: Cuenta bloqueada (is_blocked)[cite: 2, 3]
             if (response.error && response.error.includes('bloqueada')) {
