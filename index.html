@@ -566,19 +566,19 @@
         }
         
         // 🚩 AJUSTE AQUÍ: Manejo de errores y activación requerida 🚩
-        if (!response.ok || !data.success) {
-            // Si el backend dice que falta activar la cuenta:
-            if (data.requires_activation) {
-                return { 
-                    success: false, 
-                    requires_activation: true, 
-                    email: data.email, 
-                    message: data.message 
-                };
-            }
-            // Error genérico de credenciales
-            return { success: false, error: data.error || 'Error de conexión con la API o credenciales inválidas.' };
-        }
+        // Dentro de tu función de login (apiLogin o similar)
+if (!response.ok || !data.success) {
+    if (data.requires_activation) {
+        // Retornamos el flag y el email que viene del backend
+        return { 
+            success: false, 
+            requires_activation: true, 
+            email: data.email, 
+            message: data.message 
+        };
+    }
+    return { success: false, error: data.error || 'Credenciales inválidas.' };
+}
 
         // Si todo sale bien (Success)
         CURRENT_USER_SESSION = data.user;
