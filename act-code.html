@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Verificar Cuenta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-black text-white flex items-center justify-center min-h-screen">
+
+    <div class="bg-zinc-900 p-8 rounded-2xl shadow-2xl w-full max-w-md border border-zinc-800">
+        <h2 class="text-2xl font-bold mb-2 text-center">Verifica tu código</h2>
+        <p class="text-zinc-400 text-sm text-center mb-6">
+            Hemos enviado un código al correo: <br>
+            <span id="display-email" class="text-blue-400 font-medium"></span>
+        </p>
+
+        <!-- Formulario de Verificación -->
+        <form id="verify-form" class="space-y-4">
+            <input type="hidden" id="auth-email">
+            <input type="text" id="code-input" placeholder="000000" required
+                   class="w-full bg-zinc-800 border border-zinc-700 p-3 rounded-lg text-center text-2xl tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500">
+            
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-bold transition">
+                Verificar ahora
+            </button>
+        </form>
+
+        <div class="mt-6 text-center">
+            <p class="text-zinc-500 text-sm">¿No recibiste nada?</p>
+            <button id="resend-btn" class="text-blue-400 hover:underline text-sm font-medium mt-1">
+                Reenviar nuevo código
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 1. Obtener el email de la URL al cargar
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('email');
+        
+        if (email) {
+            document.getElementById('display-email').innerText = email;
+            document.getElementById('auth-email').value = email;
+        } else {
+            // Si no hay email, algo salió mal, regresamos al index
+            window.location.href = 'index.html';
+        }
+
+        // 2. Lógica para reenviar código
+        document.getElementById('resend-btn').addEventListener('click', async () => {
+            const btn = document.getElementById('resend-btn');
+            btn.disabled = true;
+            btn.innerText = "Enviando...";
+
+            try {
+                const response = await fetch('/api/resend-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                });
+                
+                if (response.ok) {
+                    alert("Nuevo código enviado.");
+                }
+            } catch (error) {
+                console.error("Error al reenviar:", error);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Reenviar nuevo código";
+            }
+        });
+
+        // 3. Lógica para verificar el código
+        document.getElementById('verify-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const code = document.getElementById('code-input').value;
+
+            const response = await fetch('/api/verify-activation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, code: code })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                window.location.href = '/dashboard.html'; // O a donde vaya tras activar
+            } else {
+                alert("Código incorrecto o expirado.");
+            }
+        });
+    </script>
+</body>
+</html>
