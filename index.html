@@ -1086,56 +1086,6 @@ async function handleRegister(e) {
             document.getElementById('area-selection-modal').classList.add('hidden');
         }
 
-        // --- FUNCIONES DEL MODAL DE ACTIVACIÓN ---
-        function openActivationModal() {
-            const modal = document.getElementById('activation-modal');
-            document.getElementById('activation-code').value = '';
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.style.opacity = '1', 10);
-        }
-
-        function closeActivationModal() {
-            const modal = document.getElementById('activation-modal');
-            modal.style.opacity = '0';
-            setTimeout(() => modal.classList.add('hidden'), 300);
-        }
-
-        async function handleVerifyActivation(e) {
-            e.preventDefault();
-            const email = document.getElementById('activation-email').value;
-            const code = document.getElementById('activation-code').value;
-            const btn = document.getElementById('verify-btn');
-
-            btn.disabled = true;
-            btn.textContent = 'VERIFICANDO...';
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/verify-activation`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, code })
-                });
-
-                const data = await response.json();
-
-                if (response.ok && data.success) {
-                    showMessage('¡Cuenta activada! Ingresando al sistema...', 'success');
-                    closeActivationModal();
-                    
-                    // Como ya se activó, simulamos un click en "INGRESAR" para que inicie sesión de una vez
-                    document.getElementById('login-btn').click(); 
-                    
-                } else {
-                    showMessage(data.error || 'Código inválido o expirado.', 'error');
-                }
-            } catch (err) {
-                showMessage('Error al verificar el código de activación.', 'error');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'VERIFICAR';
-            }
-        }
-
         window.onload = function() {
             const storedSession = localStorage.getItem('userSession');
             if (storedSession) {
@@ -1201,6 +1151,7 @@ async function handleRegister(e) {
                     event.stopPropagation();
                 }
             }, true); 
+        };
     </script>
 </body>
 </html>
