@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -494,7 +495,7 @@
 </form>
 
             <!-- Modal de Activación por Código -->
-    <div id="activation-modal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-[9999] transition-opacity duration-300">
+    <div id="activation-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[1200] transition-opacity duration-300 opacity-0">
         <div class="glass-card p-6 md:p-8 w-full max-w-sm mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-400/50 text-center">
             
             <svg class="w-16 h-16 mx-auto mb-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1095,90 +1096,54 @@ async function handleRegister(e) {
         }
 
         // --- FUNCIONES DEL MODAL DE ACTIVACIÓN ---
-function openActivationModal() {
-    const modal = document.getElementById('activation-modal');
-    
-    // CORRECCIÓN: Usamos 'login-email' que es el ID definido en tu formulario de login
-    const loginEmailElement = document.getElementById('login-email');
-    const loginEmail = loginEmailElement ? loginEmailElement.value : ''; 
-    
-    const activationEmailInput = document.getElementById('activation-email');
-    const activationCodeInput = document.getElementById('activation-code');
-
-    // 1. Sincronizar el email para que el usuario no tenga que escribirlo de nuevo
-    if (loginEmail) {
-        activationEmailInput.value = loginEmail;
-    }
-
-    // 2. Limpiar el código anterior por seguridad
-    activationCodeInput.value = '';
-
-    // 3. Mostrar el modal con efecto visual
-    modal.classList.remove('hidden');
-    
-    // Forzamos el "reflow" para que la transición de opacidad se ejecute correctamente
-    void modal.offsetWidth; 
-    
-    modal.style.opacity = '1';
-    console.log("Modal de activación desplegado correctamente.");
-}
-
-function closeActivationModal() {
-    const modal = document.getElementById('activation-modal');
-    modal.style.opacity = '0';
-    
-    // Esperamos a que termine la transición de CSS (300ms) antes de ocultarlo
-    setTimeout(() => {
-        modal.classList.add('hidden');
-    }, 300);
-}
-
-async function handleVerifyActivation(e) {
-    e.preventDefault();
-    const email = document.getElementById('activation-email').value;
-    const code = document.getElementById('activation-code').value;
-    const btn = document.getElementById('verify-btn');
-
-    if (!code) {
-        showMessage('Por favor, ingresa el código de activación.', 'error');
-        return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = 'VERIFICANDO...';
-
-    try {
-        // Realizamos la petición a tu API de Flask
-        const response = await fetch(`${API_BASE_URL}/api/verify-activation`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, code })
-        });
-
-        const data = await response.json();
-
-        if (response.ok && data.success) {
-            showMessage('¡Cuenta activada! Ingresando...', 'success');
-            
-            // Cerramos el modal primero
-            closeActivationModal();
-            
-            // Esperamos a que la animación de cierre termine antes de re-intentar el login
-            setTimeout(() => {
-                // Hacemos clic programático en el botón de login para procesar la entrada activa
-                document.getElementById('login-btn').click(); 
-            }, 350);
-            
-        } else {
-            showMessage(data.error || 'Código inválido o expirado.', 'error');
+        function openActivationModal() {
+            const modal = document.getElementById('activation-modal');
+            document.getElementById('activation-code').value = '';
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.style.opacity = '1', 10);
         }
-    } catch (err) {
-        showMessage('Error de conexión al verificar el código.', 'error');
-    } finally {
-        btn.disabled = false;
-        btn.textContent = 'VERIFICAR';
-    }
-}
+
+        function closeActivationModal() {
+            const modal = document.getElementById('activation-modal');
+            modal.style.opacity = '0';
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        async function handleVerifyActivation(e) {
+            e.preventDefault();
+            const email = document.getElementById('activation-email').value;
+            const code = document.getElementById('activation-code').value;
+            const btn = document.getElementById('verify-btn');
+
+            btn.disabled = true;
+            btn.textContent = 'VERIFICANDO...';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/verify-activation`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, code })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showMessage('¡Cuenta activada! Ingresando al sistema...', 'success');
+                    closeActivationModal();
+                    
+                    // Como ya se activó, simulamos un click en "INGRESAR" para que inicie sesión de una vez
+                    document.getElementById('login-btn').click(); 
+                    
+                } else {
+                    showMessage(data.error || 'Código inválido o expirado.', 'error');
+                }
+            } catch (err) {
+                showMessage('Error al verificar el código de activación.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'VERIFICAR';
+            }
+        }
 
         window.onload = function() {
             const storedSession = localStorage.getItem('userSession');
