@@ -436,47 +436,69 @@
     </div>
 
     <!-- Modal de Registro -->
-<div id="register-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[1100] transition-opacity duration-300 opacity-0">
-    <div class="glass-card p-6 md:p-8 w-full max-w-lg mx-auto rounded-2xl shadow-2xl border-t-2 border-emerald-400/50">
-        
+<div id="register-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[1100] transition-opacity duration-300 opacity-0 overflow-y-auto py-10">
+    <div class="glass-card p-6 md:p-8 w-full max-w-2xl mx-auto rounded-2xl shadow-2xl border-t-2 border-emerald-400/50 my-auto">
         <div class="text-center mb-6">
-            <h2 class="text-2xl font-bold text-white uppercase tracking-wider mb-2">Crear Cuenta</h2>
-            <p class="text-gray-400 text-sm">Únete a GYMENEZ hoy mismo.</p>
+            <h2 class="text-2xl font-bold text-white uppercase tracking-wider mb-2">Crear Perfil Completo</h2>
+            <p class="text-gray-400 text-sm">Completa todos los campos para unirte a GYMENEZ.</p>
         </div>
 
-        <!-- Formulario de Registro Estándar -->
-        <form id="register-form">
-            <!-- CONTENEDOR DE MENSAJES -->
-            <div id="register-message" class="hidden mb-6 p-4 rounded-lg text-sm font-medium text-center border"></div>
-
-            <div class="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label for="reg-name" class="block text-sm font-medium text-white mb-2">Nombre</label>
-                    <input type="text" id="reg-name" class="w-full px-4 py-3 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" required>
-                </div>
-                <div>
-                    <label for="reg-lastname" class="block text-sm font-medium text-white mb-2">Apellido</label>
-                    <input type="text" id="reg-lastname" class="w-full px-4 py-3 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" required>
-                </div>
+        <form id="register-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="md:col-span-2 border-b border-gray-700 pb-2 mb-2">
+                <span class="text-emerald-400 text-xs font-bold uppercase">Información de Acceso</span>
             </div>
-            <div class="mb-4">
-                <label for="reg-email" class="block text-sm font-medium text-white mb-2">Correo Electrónico</label>
-                <input type="email" id="reg-email" class="w-full px-4 py-3 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" required>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Correo Electrónico</label>
+                <input type="email" id="reg-email" class="w-full px-4 py-2 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" placeholder="ejemplo@correo.com" required>
             </div>
-            <div class="mb-8">
-                <label for="reg-password" class="block text-sm font-medium text-white mb-2">Contraseña</label>
-                <input type="password" id="reg-password" class="w-full px-4 py-3 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" required>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Contraseña</label>
+                <input type="password" id="reg-password" class="w-full px-4 py-2 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" required>
             </div>
 
-            <button type="submit" class="neon-button w-full py-3 rounded-lg bg-gray-800 text-emerald-400 font-bold text-lg hover:bg-gray-700 uppercase border-2 border-emerald-400/50">
-                Crear Cuenta
-            </button>
-            <button type="button" id="close-register-modal" class="mt-4 w-full py-3 text-sm rounded-lg bg-transparent text-gray-400 hover:text-white transition duration-300">
-                Cancelar
-            </button>
+            <div class="md:col-span-2 border-b border-gray-700 pb-2 mt-2 mb-2">
+                <span class="text-emerald-400 text-xs font-bold uppercase">Datos del Perfil</span>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Nombre(s)</label>
+                <input type="text" id="reg-name" class="w-full px-4 py-2 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition uppercase" required>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Apellido(s)</label>
+                <input type="text" id="reg-lastname" class="w-full px-4 py-2 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition uppercase" required>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Cédula (V/E-XXXXXXX)</label>
+                <input type="text" id="reg-ci" class="w-full px-4 py-2 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" placeholder="Sin puntos" required>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Teléfono (04XXXXXXXXX)</label>
+                <input type="text" id="reg-phone" class="w-full px-4 py-2 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" placeholder="Ej: 04141234567" required>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Fecha Nacimiento (DD/MM/YYYY)</label>
+                <input type="text" id="reg-dob" maxlength="10" class="w-full px-4 py-2 rounded-lg bg-gray-800/50 text-white border border-gray-500 focus:border-emerald-400 transition" placeholder="28/04/2003" required>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Sexo</label>
+                <select id="reg-sex" class="w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-500 focus:border-emerald-400 transition">
+                    <option value="Masculino">Masculino</option>
+                    <option value="Femenino">Femenino</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+
+            <div class="md:col-span-2 pt-4">
+                <button type="submit" id="reg-submit-btn" class="neon-button w-full py-3 rounded-lg bg-gray-800 text-emerald-400 font-bold text-lg hover:bg-gray-700 uppercase border-2 border-emerald-400/50">
+                    Completar Registro
+                </button>
+                <button type="button" id="close-register-modal" class="mt-2 w-full py-2 text-sm text-gray-500 hover:text-white transition duration-300">
+                    Cancelar
+                </button>
+            </div>
         </form>
     </div>
-</div> <!-- FIN MODAL REGISTRO -->
+</div>
 
 <!-- Modal de Activación por Código (MOVIDO AFUERA) -->
 <div id="activation-modal" class="hidden fixed inset-0 z-[1200] flex items-center justify-center p-4">
@@ -925,28 +947,31 @@
 }
         
 async function handleRegister(e) {
-    // Usamos 'e' que es el parámetro que recibe la función
     e.preventDefault();
     
-    // 1. Selección infalible del botón
+    // 1. Selección del botón y feedback visual
     const btn = e.target.querySelector('button[type="submit"]') || document.getElementById('reg-submit-btn');
-    const originalText = 'Crear Cuenta';
+    const originalText = btn ? btn.textContent : 'Crear Cuenta';
 
-    // 2. Normalización de datos
-    // .trim() elimina espacios al inicio/final y .toLowerCase() pasa todo a minúsculas
-    const rawEmail = document.getElementById('reg-email').value;
-    const cleanEmail = rawEmail.trim().toLowerCase();
-
+    // 2. Recolección de datos (Incluyendo los nuevos campos de Perfil)
     const data = {
+        // Datos de cuenta
+        email: document.getElementById('reg-email').value.trim().toLowerCase(),
+        password: document.getElementById('reg-password').value,
+        
+        // Datos personales para la colección 'profiles'
         name: document.getElementById('reg-name').value.trim(),
         last_name: document.getElementById('reg-lastname').value.trim(),
-        email: cleanEmail, // Enviamos el correo ya normalizado
-        password: document.getElementById('reg-password').value
+        id_number: document.getElementById('reg-ci').value.trim(),
+        phone_number: document.getElementById('reg-phone').value.trim(),
+        dob: document.getElementById('reg-dob').value.trim(), // Formato DD/MM/YYYY
+        sex: document.getElementById('reg-sex').value
     };
 
+    // 3. Estado de carga
     if (btn) {
         btn.disabled = true;
-        btn.textContent = 'VERIFICANDO...';
+        btn.textContent = 'PROCESANDO PERFIL...';
     }
 
     try {
@@ -959,38 +984,38 @@ async function handleRegister(e) {
         // --- MANEJO DE BLOQUEO POR LÍMITE (ERROR 429) ---
         if (response.status === 429) {
             const responseText = await response.text();
-            let errorMsg = 'Acceso restringido temporalmente por medidas de seguridad.';
-
+            let errorMsg = 'Acceso restringido temporalmente por seguridad.';
             try {
                 const errorData = JSON.parse(responseText);
                 errorMsg = errorData.error || errorMsg;
             } catch (jsonErr) {
                 if (responseText) errorMsg = responseText; 
             }
-
             showMessage(errorMsg, 'error');
-            e.target.reset(); 
             return; 
         }
 
-        // --- MANEJO DE RESPUESTAS ESTÁNDAR ---
+        // --- MANEJO DE RESPUESTAS ---
         const res = await response.json();
         
         if (response.ok && res.success) {
-            // CAMBIO: Mensaje adaptado al nuevo flujo automático
-            showMessage('¡Registro exitoso! Revisa tu correo e inicia sesión para activar tu cuenta.', 'success');
-            if (typeof handleCloseRegisterModal === 'function') handleCloseRegisterModal();
-            e.target.reset();
+            // Éxito: El perfil ya está lleno en la base de datos
+            showMessage('¡Perfil creado! Revisa tu correo e inicia sesión para activar tu cuenta.', 'success');
+            
+            if (typeof handleCloseRegisterModal === 'function') {
+                handleCloseRegisterModal();
+            }
+            e.target.reset(); // Limpia el formulario
         } else {
-            // Aquí el backend te dirá "Email ya registrado" porque ahora 
-            // siempre comparará minúsculas contra minúsculas.
-            showMessage(res.error || 'No se pudo completar el registro.', 'error');
+            // Error: Ejemplo "El correo ya existe" o "Datos incompletos"
+            showMessage(res.error || 'No se pudo completar el perfil.', 'error');
         }
 
     } catch (err) {
         console.error('Error en registro:', err);
-        showMessage('Error crítico de conexión. Inténtalo más tarde.', 'error');
+        showMessage('Error de conexión. Inténtalo más tarde.', 'error');
     } finally {
+        // 4. Restaurar estado del botón
         if (btn) {
             btn.disabled = false;
             btn.textContent = originalText;
