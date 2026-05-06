@@ -972,7 +972,16 @@ async function handleRegister(e) {
     const btn = e.target.querySelector('button[type="submit"]') || document.getElementById('reg-submit-btn');
     const originalText = btn ? btn.textContent : 'Crear Cuenta';
 
-    // 2. Recolección de datos (Incluyendo los nuevos campos de Perfil)
+    // --- CONSTRUCCIÓN DE VALORES COMPUESTOS ---
+    const ciType = document.getElementById('reg-ci-type').value;
+    const ciNumber = document.getElementById('reg-ci').value.trim();
+    const fullCI = `${ciType}-${ciNumber}`; // Ejemplo: V-20.123.456
+
+    const phonePrefix = document.getElementById('reg-phone-prefix').value;
+    const phoneNum = document.getElementById('reg-phone-num').value.trim();
+    const fullPhone = `${phonePrefix}-${phoneNum}`; // Ejemplo: 0414-3543922
+
+    // 2. Recolección de datos (Usando las variables compuestas)
     const data = {
         // Datos de cuenta
         email: document.getElementById('reg-email').value.trim().toLowerCase(),
@@ -981,8 +990,8 @@ async function handleRegister(e) {
         // Datos personales para la colección 'profiles'
         name: document.getElementById('reg-name').value.trim(),
         last_name: document.getElementById('reg-lastname').value.trim(),
-        id_number: document.getElementById('reg-ci').value.trim(),
-        phone_number: document.getElementById('reg-phone').value.trim(),
+        id_number: fullCI,        // Enviado como V-00.000.000
+        phone_number: fullPhone,  // Enviado como 04XX-0000000
         dob: document.getElementById('reg-dob').value.trim(), // Formato DD/MM/YYYY
         sex: document.getElementById('reg-sex').value
     };
