@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GYMENEZ - Métricas e Historial</title>
+    <title>GYMENEZ - Registro de Métricas</title>
     <link rel="icon" type="image/png" href="mini_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0d0d1a;
@@ -18,236 +17,149 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
             color: #e5e7eb;
-            margin: 0;
         }
-
         .glass-effect {
             background-color: rgba(13, 13, 26, 0.7);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
-
         .custom-input {
             background-color: #1a1a2e;
             border: 1px solid #3d3d5c;
             color: #e5e7eb;
-            padding: 0.75rem;
+            padding: 0.6rem;
             border-radius: 0.5rem;
-            transition: all 0.3s;
+            width: 100%;
         }
-
-        .custom-input:focus {
-            border-color: #6366f1;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-        }
-
-        .logo-text {
-            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-        }
+        .logo-text { text-shadow: -1px -1px 0 #000, 1px 1px 0 #000; }
         .logo-yellow { color: #facc15; }
-        .logo-white { color: #ffffff; }
-
-        /* Scrollbar personalizada para la lista de usuarios */
-        .custom-scroll::-webkit-scrollbar { width: 6px; }
-        .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #3d3d5c; border-radius: 10px; }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen pb-10">
 
-    <header class="glass-effect fixed top-0 left-0 right-0 z-50 px-6 py-3 flex justify-between items-center">
-        <h1 class="text-2xl font-extrabold logo-text tracking-wider">
-            <span class="logo-yellow">GYM</span><span class="logo-white">ENEZ</span>
+    <header class="glass-effect fixed top-0 w-full z-50 px-6 py-3 flex justify-between items-center">
+        <h1 class="text-2xl font-extrabold logo-text">
+            <span class="logo-yellow">GYM</span>ENEZ <span class="text-sm font-normal text-gray-400 ml-2">| Control de Medidas</span>
         </h1>
-        <button onclick="window.location.href='administration.html'" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition">
-            Volver al Panel
-        </button>
+        <button onclick="window.location.href='administration.html'" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg text-sm">Volver</button>
     </header>
 
-    <main class="pt-24 pb-12 px-4 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+    <main class="pt-24 px-4 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
         
-        <div class="md:col-span-1 space-y-6">
-            <div class="glass-effect p-6 rounded-2xl">
-                <h2 class="text-xl font-bold text-indigo-400 mb-4">Seleccionar Usuario</h2>
-                <input type="text" id="user-search" class="custom-input w-full mb-4" placeholder="Buscar por nombre o CI...">
-                
-                <div id="users-list" class="space-y-2 max-h-[500px] overflow-y-auto custom-scroll">
-                    <p class="text-gray-500 text-center py-4">Cargando usuarios...</p>
-                </div>
-            </div>
+        <div class="lg:col-span-1 glass-effect p-4 rounded-xl h-fit">
+            <input type="text" id="user-search" class="custom-input mb-4" placeholder="Buscar cliente...">
+            <div id="users-list" class="space-y-2 max-h-[60vh] overflow-y-auto pr-2"></div>
         </div>
 
-        <div class="md:col-span-2">
-            <div id="metrics-panel" class="glass-effect p-8 rounded-2xl hidden">
-                <div class="flex justify-between items-center mb-8 border-b border-gray-700 pb-4">
-                    <div>
-                        <h2 id="selected-user-name" class="text-3xl font-bold text-white">Nombre del Usuario</h2>
-                        <p id="selected-user-email" class="text-indigo-400">correo@ejemplo.com</p>
-                    </div>
-                    <div class="text-right text-sm text-gray-400">
-                        ID: <span id="selected-user-id">---</span>
-                    </div>
+        <div class="lg:col-span-3">
+            <div id="empty-state" class="glass-effect p-20 rounded-xl text-center">
+                <p class="text-gray-500 italic">Selecciona un usuario para registrar sus medidas corporales.</p>
+            </div>
+
+            <form id="metrics-form" class="glass-effect p-6 rounded-xl hidden">
+                <div class="mb-6 border-b border-gray-700 pb-4">
+                    <h2 id="selected-user-name" class="text-2xl font-bold text-white">---</h2>
+                    <p id="selected-user-id-display" class="text-indigo-400 text-sm">Selecciona un perfil</p>
                 </div>
 
-                <form id="metrics-form" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-300">Peso Actual (kg)</label>
-                        <input type="number" step="0.1" name="weight" class="custom-input w-full" placeholder="70.5">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-300">Estatura (cm)</label>
-                        <input type="number" step="1" name="stature" class="custom-input w-full" placeholder="175">
-                    </div>
+                <h3 class="text-indigo-400 font-bold mb-4 uppercase text-xs tracking-widest">Composición General</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div><label class="block text-xs mb-1">Peso (kg)</label><input type="text" name="peso" class="custom-input"></div>
+                    <div><label class="block text-xs mb-1">Estatura (cm)</label><input type="text" name="estatura" class="custom-input"></div>
+                    <div><label class="block text-xs mb-1">% Grasa</label><input type="text" name="grasa" class="custom-input"></div>
+                    <div><label class="block text-xs mb-1">% Muscular</label><input type="text" name="muscular" class="custom-input"></div>
+                </div>
 
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-300">% Grasa Corporal</label>
-                        <input type="number" step="0.1" name="fat_percentage" class="custom-input w-full" placeholder="15.2">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-300">% Masa Muscular</label>
-                        <input type="number" step="0.1" name="muscle_percentage" class="custom-input w-full" placeholder="40.5">
-                    </div>
+                <h3 class="text-indigo-400 font-bold mb-4 uppercase text-xs tracking-widest">Tren Superior</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+                    <div><label class="block text-xs mb-1">Pecho (cm)</label><input type="text" name="pecho" class="custom-input"></div>
+                    <div><label class="block text-xs mb-1">Cintura (cm)</label><input type="text" name="cintura" class="custom-input"></div>
+                    <div><label class="block text-xs mb-1">Cuello (cm)</label><input type="text" name="cuello" class="custom-input"></div>
+                    <div><label class="block text-xs mb-1">Brazo Izq (cm)</label><input type="text" name="brazo_izquierdo" class="custom-input"></div>
+                    <div><label class="block text-xs mb-1">Brazo Der (cm)</label><input type="text" name="brazo_derecho" class="custom-input"></div>
+                </div>
 
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-300">Cintura (cm)</label>
-                        <input type="number" step="0.1" name="waist" class="custom-input w-full" placeholder="80">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-300">Cuello (cm)</label>
-                        <input type="number" step="0.1" name="neck" class="custom-input w-full" placeholder="38">
-                    </div>
+                <h3 class="text-indigo-400 font-bold mb-4 uppercase text-xs tracking-widest">Tren Inferior</h3>
+                <div class="grid grid-cols-2 md:grid-cols-2 gap-4 mb-8">
+                    <div><label class="block text-xs mb-1">Pierna Izq (cm)</label><input type="text" name="pierna_izquierda" class="custom-input"></div>
+                    <div><label class="block text-xs mb-1">Pierna Der (cm)</label><input type="text" name="pierna_derecha" class="custom-input"></div>
+                </div>
 
-                    <div class="sm:col-span-2 space-y-2">
-                        <label class="text-sm font-medium text-gray-300">Patologías o Limitaciones</label>
-                        <textarea name="pathologies" rows="3" class="custom-input w-full" placeholder="Ej: Lesión en rodilla derecha, Hipertensión..."></textarea>
-                    </div>
+                <h3 class="text-indigo-400 font-bold mb-4 uppercase text-xs tracking-widest">Información Adicional</h3>
+                <div class="space-y-4">
+                    <div><label class="block text-xs mb-1">Patologías / Observaciones</label>
+                    <textarea name="patologias" rows="2" class="custom-input"></textarea></div>
+                    <div><label class="block text-xs mb-1">Notas de Progreso</label>
+                    <textarea name="notas_progreso" rows="2" class="custom-input"></textarea></div>
+                </div>
 
-                    <div class="sm:col-span-2 space-y-2">
-                        <label class="text-sm font-medium text-gray-300">Notas de Progreso</label>
-                        <textarea name="progress_notes" rows="3" class="custom-input w-full" placeholder="Observaciones del entrenador..."></textarea>
-                    </div>
-
-                    <div class="sm:col-span-2 mt-4">
-                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg transition transform hover:scale-[1.02]">
-                            Guardar Métricas Personalizadas
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <div id="empty-state" class="glass-effect p-12 rounded-2xl text-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <h3 class="text-xl font-bold text-gray-400">No se ha seleccionado un usuario</h3>
-                <p class="text-gray-500">Selecciona un cliente de la lista para ver o editar sus métricas físicas.</p>
-            </div>
+                <button type="submit" class="w-full mt-8 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition shadow-lg">
+                    Actualizar Métricas Personalizadas
+                </button>
+            </form>
         </div>
     </main>
 
     <script>
         const API_BASE_URL = "https://sijj2003.pythonanywhere.com";
         let allUsers = [];
-        let currentSelectedUserId = null;
+        let currentUserId = null;
 
-        // Cargar usuarios al iniciar
         async function loadUsers() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/admin/users`);
-                const data = await response.json();
-                if (data.success) {
-                    allUsers = data.users;
-                    renderUsersList(allUsers);
-                }
-            } catch (error) {
-                console.error("Error cargando usuarios:", error);
+            const res = await fetch(`${API_BASE_URL}/api/admin/users`);
+            const data = await res.json();
+            if (data.success) {
+                allUsers = data.users;
+                renderUsers(allUsers);
             }
         }
 
-        function renderUsersList(users) {
-            const listContainer = document.getElementById('users-list');
-            listContainer.innerHTML = '';
-            
-            users.forEach(user => {
-                const btn = document.createElement('button');
-                btn.className = "w-full text-left p-4 rounded-xl border border-transparent hover:bg-indigo-600/20 hover:border-indigo-600/50 transition flex flex-col";
-                btn.innerHTML = `
-                    <span class="font-bold text-white">${user.full_name || user.name}</span>
-                    <span class="text-xs text-gray-400">${user.id_number || 'Sin CI'}</span>
-                `;
-                btn.onclick = () => selectUser(user);
-                listContainer.appendChild(btn);
-            });
+        function renderUsers(users) {
+            const container = document.getElementById('users-list');
+            container.innerHTML = users.map(u => `
+                <button onclick="selectUser('${u.id}', '${u.full_name || u.name}')" class="w-full text-left p-3 rounded-lg hover:bg-indigo-600/30 text-sm border border-transparent hover:border-indigo-500/50 transition">
+                    ${u.full_name || u.name} <br> <span class="text-xs text-gray-500">${u.id_number || ''}</span>
+                </button>
+            `).join('');
         }
 
-        // Seleccionar un usuario y cargar sus métricas
-        async function selectUser(user) {
-            currentSelectedUserId = user.id;
+        async function selectUser(id, name) {
+            currentUserId = id;
             document.getElementById('empty-state').classList.add('hidden');
-            document.getElementById('metrics-panel').classList.remove('hidden');
-            
-            // Llenar info básica
-            document.getElementById('selected-user-name').textContent = user.full_name || user.name;
-            document.getElementById('selected-user-email').textContent = user.email;
-            document.getElementById('selected-user-id').textContent = user.id;
-
-            // Resetear formulario
             const form = document.getElementById('metrics-form');
+            form.classList.remove('hidden');
+            document.getElementById('selected-user-name').textContent = name;
+            document.getElementById('selected-user-id-display').textContent = `ID: ${id}`;
+            
             form.reset();
-
-            // Cargar métricas desde la colección 'metricas'
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/metrics/${user.id}`);
-                const data = await response.json();
-                
-                if (data.success && data.metrics) {
-                    // Llenar inputs con los datos existentes
-                    Object.keys(data.metrics).forEach(key => {
-                        const input = form.querySelector(`[name="${key}"]`);
-                        if (input) input.value = data.metrics[key];
-                    });
-                }
-            } catch (error) {
-                console.error("Error cargando métricas:", error);
+            // Cargar datos actuales desde el endpoint de métricas
+            const res = await fetch(`${API_BASE_URL}/api/metrics/${id}`);
+            const data = await res.json();
+            if (data.success && data.metrics) {
+                Object.keys(data.metrics).forEach(key => {
+                    const input = form.querySelector(`[name="${key}"]`);
+                    if (input) input.value = data.metrics[key];
+                });
             }
         }
 
-        // Guardar métricas
         document.getElementById('metrics-form').onsubmit = async (e) => {
             e.preventDefault();
-            if (!currentSelectedUserId) return;
-
-            const formData = new FormData(e.target);
-            const metricsData = Object.fromEntries(formData.entries());
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/metrics/${currentSelectedUserId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(metricsData)
-                });
-
-                const result = await response.json();
-                if (result.success) {
-                    alert("¡Métricas actualizadas exitosamente!");
-                } else {
-                    alert("Error: " + result.error);
-                }
-            } catch (error) {
-                alert("Error de conexión con el servidor.");
-            }
+            const formData = Object.fromEntries(new FormData(e.target));
+            
+            const res = await fetch(`${API_BASE_URL}/api/metrics/${currentUserId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+            
+            const result = await res.json();
+            alert(result.success ? "Métricas guardadas correctamente" : "Error al guardar");
         };
 
-        // Buscador
         document.getElementById('user-search').oninput = (e) => {
             const term = e.target.value.toLowerCase();
-            const filtered = allUsers.filter(u => 
-                (u.full_name && u.full_name.toLowerCase().includes(term)) || 
-                (u.id_number && u.id_number.includes(term))
-            );
-            renderUsersList(filtered);
+            renderUsers(allUsers.filter(u => (u.full_name || u.name).toLowerCase().includes(term)));
         };
 
         window.onload = loadUsers;
