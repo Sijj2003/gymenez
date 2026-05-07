@@ -31,7 +31,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* Estilo para las tablas de métricas dentro del modal */
+        /* Estilos específicos para el formulario de métricas */
         .metrics-input {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -43,7 +43,6 @@
         .metrics-input:focus {
             outline: none;
             border-color: #FFC300;
-            background: rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
@@ -79,27 +78,26 @@
                             <th class="p-4 text-center">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="users-table-body">
-                        </tbody>
+                    <tbody id="users-table-body"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
     <div id="user-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center z-40 p-4">
-        <div class="bg-[#1a1a2e] border border-white/10 w-full max-w-md rounded-2xl p-6">
-            <h2 id="modal-title" class="text-2xl font-bold GYM-YELLOW mb-6">NUEVO USUARIO</h2>
+        <div class="bg-[#1a1a2e] border border-white/10 w-full max-w-md rounded-2xl p-6 shadow-2xl">
+            <h2 id="modal-title" class="text-2xl font-bold GYM-YELLOW mb-6 italic">NUEVO USUARIO</h2>
             <form id="user-form" class="space-y-4">
                 <input type="hidden" id="user-id">
                 <div class="grid grid-cols-2 gap-4">
-                    <input type="text" id="user-name" placeholder="Nombre" class="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white" required>
-                    <input type="text" id="user-last-name" placeholder="Apellido" class="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white" required>
+                    <input type="text" id="user-name" placeholder="Nombre" class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-GYM-YELLOW outline-none" required>
+                    <input type="text" id="user-last-name" placeholder="Apellido" class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-GYM-YELLOW outline-none" required>
                 </div>
-                <input type="email" id="user-email" placeholder="Correo Electrónico" class="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white" required>
-                <input type="text" id="user-ci" placeholder="Cédula (Ej: 28.123.456)" class="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white" required>
+                <input type="email" id="user-email" placeholder="Correo Electrónico" class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-GYM-YELLOW outline-none" required>
+                <input type="text" id="id-number" placeholder="Cédula (Ej: 28.123.456)" class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-GYM-YELLOW outline-none" required>
                 <div class="flex gap-4 pt-4">
-                    <button type="submit" class="flex-1 bg-GYM-YELLOW text-black font-bold p-3 rounded-xl">GUARDAR</button>
-                    <button type="button" id="close-modal-btn" class="px-6 bg-white/10 rounded-xl">CANCELAR</button>
+                    <button type="submit" class="flex-1 bg-GYM-YELLOW text-black font-bold p-3 rounded-xl hover:bg-yellow-500 transition-all">GUARDAR</button>
+                    <button type="button" id="close-modal-btn" class="px-6 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors">CANCELAR</button>
                 </div>
             </form>
         </div>
@@ -108,75 +106,65 @@
     <div id="metrics-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
         <div class="bg-[#1a1a2e] border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl">
             <div class="p-6 border-b border-white/10 flex justify-between items-center sticky top-0 bg-[#1a1a2e] z-10">
-                <h2 class="text-2xl font-bold GYM-YELLOW">MÉTRICAS CORPORALES</h2>
-                <button onclick="closeMetricsModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                <h2 class="text-2xl font-bold GYM-YELLOW italic">MÉTRICAS CORPORALES</h2>
+                <button onclick="closeMetricsModal()" class="text-gray-400 hover:text-white text-3xl">&times;</button>
             </div>
-            
-            <form id="metrics-form" class="p-6 space-y-8 text-sm">
+            <form id="metrics-form" class="p-6 space-y-8">
                 <input type="hidden" id="metrics-user-id">
-                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="space-y-6">
                         <section>
-                            <h3 class="text-emerald-400 font-bold mb-3 uppercase tracking-wider">1. Rasgos Generales</h3>
-                            <div class="grid grid-cols-3 gap-3">
-                                <div><label class="text-[10px] text-gray-500 block mb-1">ESTATURA (CM)</label><input type="number" id="field-estatura" class="metrics-input"></div>
+                            <h3 class="text-emerald-400 font-bold mb-4 border-b border-white/5 pb-1 uppercase text-sm">1. Rasgos Generales</h3>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div><label class="text-[10px] text-gray-500 block mb-1">ESTATURA</label><input type="number" id="field-estatura" class="metrics-input"></div>
                                 <div><label class="text-[10px] text-gray-500 block mb-1">PESO (KG)</label><input type="number" step="0.1" id="field-peso" class="metrics-input"></div>
                                 <div><label class="text-[10px] text-gray-500 block mb-1">EDAD</label><input type="number" id="field-edad" class="metrics-input"></div>
                             </div>
                         </section>
-
                         <section>
-                            <h3 class="text-emerald-400 font-bold mb-3 uppercase tracking-wider">2. Medidas Superiores</h3>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div><label class="text-[10px] text-gray-500">CUELLO</label><input type="number" id="field-cuello" class="metrics-input"></div>
-                                <div><label class="text-[10px] text-gray-500">ESPALDA</label><input type="number" id="field-espalda" class="metrics-input"></div>
-                                <div><label class="text-[10px] text-gray-500">TÓRAX</label><input type="number" id="field-torax" class="metrics-input"></div>
-                                <div><label class="text-[10px] text-gray-500">ABDOMEN</label><input type="number" id="field-abdomen" class="metrics-input"></div>
-                                <div><label class="text-[10px] text-blue-400">BRAZO DER.</label><input type="number" id="field-brazo_derecho" class="metrics-input"></div>
-                                <div><label class="text-[10px] text-blue-400">BRAZO IZQ.</label><input type="number" id="field-brazo_izquierdo" class="metrics-input"></div>
-                                <div><label class="text-[10px] text-amber-400">ANTEBRAZO DER.</label><input type="number" id="field-antebrazo_derecho" class="metrics-input"></div>
-                                <div><label class="text-[10px] text-amber-400">ANTEBRAZO IZQ.</label><input type="number" id="field-antebrazo_izquierdo" class="metrics-input"></div>
+                            <h3 class="text-emerald-400 font-bold mb-4 border-b border-white/5 pb-1 uppercase text-sm">2. Medidas Superiores</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="number" id="field-cuello" placeholder="Cuello" class="metrics-input">
+                                <input type="number" id="field-espalda" placeholder="Espalda" class="metrics-input">
+                                <input type="number" id="field-torax" placeholder="Tórax" class="metrics-input">
+                                <input type="number" id="field-abdomen" placeholder="Abdomen" class="metrics-input">
+                                <input type="number" id="field-brazo_derecho" placeholder="Brazo Der" class="metrics-input border-blue-500/30">
+                                <input type="number" id="field-brazo_izquierdo" placeholder="Brazo Izq" class="metrics-input border-blue-500/30">
+                                <input type="number" id="field-antebrazo_derecho" placeholder="Antebr Der" class="metrics-input border-amber-500/30">
+                                <input type="number" id="field-antebrazo_izquierdo" placeholder="Antebr Izq" class="metrics-input border-amber-500/30">
                             </div>
                         </section>
                     </div>
-
                     <div class="space-y-6">
                         <section>
-                            <h3 class="text-emerald-400 font-bold mb-3 uppercase tracking-wider">3. Medidas Inferiores</h3>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div class="col-span-2"><label class="text-[10px] text-gray-500">CINTURA</label><input type="number" id="field-cintura" class="metrics-input"></div>
-                                <div><label class="text-[10px] text-gray-500">FÉMUR DER.</label><input type="number" id="field-femur_derecho" class="metrics-input"></div>
-                                <div><label class="text-[10px] text-gray-500">FÉMUR IZQ.</label><input type="number" id="field-femur_izquierdo" class="metrics-input"></div>
-                                <div><label class="text-[10px] text-purple-400">TIBIA DER.</label><input type="number" id="field-tibia_derecha" class="metrics-input"></div>
-                                <div><label class="text-[10px] text-purple-400">TIBIA IZQ.</label><input type="number" id="field-tibia_izquierda" class="metrics-input"></div>
+                            <h3 class="text-emerald-400 font-bold mb-4 border-b border-white/5 pb-1 uppercase text-sm">3. Medidas Inferiores</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="col-span-2"><input type="number" id="field-cintura" placeholder="Cintura" class="metrics-input"></div>
+                                <input type="number" id="field-femur_derecho" placeholder="Fémur Der" class="metrics-input">
+                                <input type="number" id="field-femur_izquierdo" placeholder="Fémur Izq" class="metrics-input">
+                                <input type="number" id="field-tibia_derecha" placeholder="Tibia Der" class="metrics-input border-purple-500/30">
+                                <input type="number" id="field-tibia_izquierda" placeholder="Tibia Izq" class="metrics-input border-purple-500/30">
                             </div>
                         </section>
-
                         <section>
-                            <h3 class="text-red-400 font-bold mb-3 uppercase tracking-wider">4. Salud y Observaciones</h3>
-                            <div class="space-y-3">
-                                <div><label class="text-[10px] text-gray-500">ALERGIAS</label><textarea id="field-alergias" class="metrics-input h-14 resize-none"></textarea></div>
-                                <div><label class="text-[10px] text-gray-500">ENFERMEDADES CRÓNICAS</label><textarea id="field-enfermedades_cronicas" class="metrics-input h-14 resize-none"></textarea></div>
-                                <div><label class="text-[10px] text-gray-500">OTROS</label><textarea id="field-otros" class="metrics-input h-14 resize-none"></textarea></div>
-                            </div>
+                            <h3 class="text-red-400 font-bold mb-4 border-b border-white/5 pb-1 uppercase text-sm">4. Salud</h3>
+                            <textarea id="field-alergias" placeholder="Alergias..." class="metrics-input h-16 mb-4"></textarea>
+                            <textarea id="field-enfermedades_cronicas" placeholder="Enfermedades crónicas..." class="metrics-input h-16"></textarea>
                         </section>
                     </div>
                 </div>
-
                 <div class="pt-6 flex gap-4">
-                    <button type="submit" class="flex-1 bg-GYM-YELLOW text-black font-bold p-4 rounded-2xl hover:scale-[1.02] transition-transform shadow-lg shadow-yellow-500/20">GUARDAR MÉTRICAS</button>
-                    <button type="button" onclick="closeMetricsModal()" class="px-8 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-colors">CANCELAR</button>
+                    <button type="submit" class="flex-1 bg-GYM-YELLOW text-black font-bold p-4 rounded-2xl hover:scale-[1.02] transition-all">ACTUALIZAR MÉTRICAS</button>
+                    <button type="button" onclick="closeMetricsModal()" class="px-8 bg-white/10 rounded-2xl">CANCELAR</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        const API_BASE_URL = 'http://127.0.0.1:5000'; // Ajusta esto a tu URL real
+        const API_BASE_URL = 'http://127.0.0.1:5000';
         let allUsers = [];
 
-        // --- CARGAR USUARIOS ---
         async function fetchAllUsers() {
             try {
                 const response = await fetch(`${API_BASE_URL}/api/users`);
@@ -185,48 +173,43 @@
                     allUsers = data.users;
                     renderUsers(allUsers);
                 }
-            } catch (error) {
-                console.error("Error al cargar usuarios:", error);
-            }
+            } catch (error) { console.error("Error cargando usuarios:", error); }
         }
 
         function renderUsers(users) {
             const tableBody = document.getElementById('users-table-body');
             tableBody.innerHTML = '';
-
             users.forEach(user => {
                 const row = document.createElement('tr');
                 row.className = 'border-b border-white/5 hover:bg-white/5 transition-colors';
-                
                 const blockBtnClass = user.is_blocked ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-amber-600 hover:bg-amber-700';
+                const blockBtnIcon = user.is_blocked ? 
+                    `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>` : 
+                    `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>`;
 
                 row.innerHTML = `
                     <td class="p-4">
                         <div class="font-bold">${user.name} ${user.last_name}</div>
-                        <div class="text-xs text-gray-500">ID: ${user.id}</div>
+                        <div class="text-xs text-gray-500 italic">ID: ${user.id}</div>
                     </td>
                     <td class="p-4">
-                        <div class="text-sm font-mono text-emerald-400">${user.email}</div>
-                        <div class="text-xs text-gray-400">CI: ${user.ci || 'N/A'}</div>
+                        <div class="text-emerald-400 font-mono">${user.email}</div>
+                        <div class="text-gray-400 text-xs italic">CI: ${user.ci || 'N/A'}</div>
                     </td>
                     <td class="p-4 text-center">
-                        <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase ${user.is_blocked ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}">
+                        <span class="px-2 py-1 rounded text-xs ${user.is_blocked ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}">
                             ${user.is_blocked ? 'Bloqueado' : 'Activo'}
                         </span>
                     </td>
                     <td class="p-4">
                         <div class="flex justify-center gap-2">
-                            <button onclick="openModalForEdit('${user.id}')" class="p-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors" title="Editar Datos Básicos">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                            </button>
+                            <button onclick="openModalForEdit('${user.id}')" class="p-2 bg-blue-600 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg></button>
                             
-                            <button onclick="openMetricsModal('${user.id}')" class="p-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors" title="Ver/Editar Métricas">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                            <button onclick="openMetricsModal('${user.id}')" class="p-2 bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors" title="Ver/Editar Métricas">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                             </button>
 
-                            <button onclick="toggleBlockUser('${user.id}', ${user.is_blocked})" class="p-2 ${blockBtnClass} rounded-lg transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>
-                            </button>
+                            <button onclick="handleBlockUser('${user.id}', ${user.is_blocked})" class="p-2 ${blockBtnClass} rounded-lg">${blockBtnIcon}</button>
                         </div>
                     </td>
                 `;
@@ -234,138 +217,108 @@
             });
         }
 
-        // --- LÓGICA DE MÉTRICAS ---
+        // FUNCIONES DE MÉTRICAS (LO NUEVO)
         async function openMetricsModal(userId) {
             document.getElementById('metrics-user-id').value = userId;
             document.getElementById('metrics-form').reset();
             document.getElementById('metrics-modal').classList.remove('hidden');
-            
             try {
-                const response = await fetch(`${API_BASE_URL}/api/metrics/${userId}`);
-                const data = await response.json();
-                
+                const res = await fetch(`${API_BASE_URL}/api/metrics/${userId}`);
+                const data = await res.json();
                 if (data.success && data.metrics) {
-                    const m = data.metrics;
-                    Object.keys(m).forEach(key => {
+                    Object.keys(data.metrics).forEach(key => {
                         const input = document.getElementById(`field-${key}`);
-                        if (input) input.value = m[key];
+                        if (input) input.value = data.metrics[key];
                     });
                 }
-            } catch (e) { console.error("Error al cargar métricas preexistentes"); }
+            } catch (e) { console.log("Sin métricas previas."); }
         }
 
-        function closeMetricsModal() {
-            document.getElementById('metrics-modal').classList.add('hidden');
-        }
+        function closeMetricsModal() { document.getElementById('metrics-modal').classList.add('hidden'); }
 
         document.getElementById('metrics-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const userId = document.getElementById('metrics-user-id').value;
-            const formData = new FormData(e.target);
-            const data = {};
-            
-            // Recoger todos los campos field-xxx
             const inputs = e.target.querySelectorAll('.metrics-input');
-            inputs.forEach(input => {
-                const key = input.id.replace('field-', '');
-                data[key] = input.value;
-            });
-
+            const data = {};
+            inputs.forEach(input => data[input.id.replace('field-', '')] = input.value);
             try {
-                const response = await fetch(`${API_BASE_URL}/api/metrics/${userId}`, {
+                const res = await fetch(`${API_BASE_URL}/api/metrics/${userId}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
-                const res = await response.json();
-                if (res.success) {
-                    alert("¡Métricas actualizadas!");
-                    closeMetricsModal();
-                }
+                if ((await res.json()).success) { alert("Métricas guardadas."); closeMetricsModal(); }
             } catch (err) { alert("Error al guardar."); }
         });
 
-        // --- LÓGICA DE USUARIOS (RECREADA) ---
-        function filterUsersTable(searchTerm) {
-            const term = searchTerm.toLowerCase();
-            const filtered = allUsers.filter(u => 
-                u.name.toLowerCase().includes(term) || 
-                u.last_name.toLowerCase().includes(term) || 
-                u.email.toLowerCase().includes(term)
-            );
-            renderUsers(filtered);
+        // LÓGICA ORIGINAL DE CI Y USUARIOS (MANTENIDA TAL CUAL)
+        function formatIdNumber(v) {
+            v = v.replace(/\D/g, '').slice(0, 8);
+            if (v.length <= 2) return v;
+            if (v.length <= 5) return v.slice(0, v.length - 3) + '.' + v.slice(v.length - 3);
+            return v.slice(0, v.length - 6) + '.' + v.slice(v.length - 6, v.length - 3) + '.' + v.slice(v.length - 3);
         }
 
-        async function toggleBlockUser(userId, currentState) {
-            if (!confirm(`¿Desea ${currentState ? 'desbloquear' : 'bloquear'} a este usuario?`)) return;
+        const idInput = document.getElementById('id-number');
+        idInput.addEventListener('input', function() { this.value = formatIdNumber(this.value); });
+
+        async function handleBlockUser(userId, currentState) {
+            if (!confirm(`¿Desea ${currentState ? 'desbloquear' : 'bloquear'} este usuario?`)) return;
             try {
-                const response = await fetch(`${API_BASE_URL}/api/users/${userId}/block`, {
+                const res = await fetch(`${API_BASE_URL}/api/users/${userId}/block`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ is_blocked: !currentState })
                 });
-                const data = await response.json();
-                if (data.success) fetchAllUsers();
+                if ((await res.json()).success) fetchAllUsers();
             } catch (e) { alert("Error al cambiar estado."); }
         }
 
         function openModalForCreate() {
-            document.getElementById('modal-title').textContent = 'NUEVO USUARIO';
+            document.getElementById('modal-title').innerText = "NUEVO USUARIO";
             document.getElementById('user-id').value = '';
             document.getElementById('user-form').reset();
             document.getElementById('user-modal').classList.remove('hidden');
         }
 
-        function openModalForEdit(userId) {
-            const user = allUsers.find(u => u.id === userId);
+        function openModalForEdit(id) {
+            const user = allUsers.find(u => u.id === id);
             if (!user) return;
-            document.getElementById('modal-title').textContent = 'EDITAR PERFIL';
+            document.getElementById('modal-title').innerText = "EDITAR USUARIO";
             document.getElementById('user-id').value = user.id;
             document.getElementById('user-name').value = user.name;
             document.getElementById('user-last-name').value = user.last_name;
             document.getElementById('user-email').value = user.email;
-            document.getElementById('user-ci').value = user.ci || '';
+            document.getElementById('id-number').value = user.ci || '';
             document.getElementById('user-modal').classList.remove('hidden');
         }
 
         document.getElementById('user-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('user-id').value;
-            const userData = {
+            const payload = {
                 name: document.getElementById('user-name').value,
                 last_name: document.getElementById('user-last-name').value,
                 email: document.getElementById('user-email').value,
-                ci: document.getElementById('user-ci').value
+                ci: document.getElementById('id-number').value
             };
-
             const url = id ? `${API_BASE_URL}/api/users/${id}` : `${API_BASE_URL}/api/users`;
             const method = id ? 'PUT' : 'POST';
-
             try {
                 const res = await fetch(url, {
                     method: method,
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(userData)
+                    body: JSON.stringify(payload)
                 });
-                if ((await res.json()).success) {
-                    document.getElementById('user-modal').classList.add('hidden');
-                    fetchAllUsers();
-                }
-            } catch (err) { alert("Error al procesar usuario."); }
+                if ((await res.json()).success) { document.getElementById('user-modal').classList.add('hidden'); fetchAllUsers(); }
+            } catch (err) { alert("Error al procesar."); }
         });
 
-        // --- FORMATEO DE CI ---
-        document.getElementById('user-ci').addEventListener('input', function(e) {
-            let v = e.target.value.replace(/\D/g, '');
-            if (v.length > 8) v = v.slice(0, 8);
-            let f = "";
-            if (v.length > 0) {
-                if (v.length <= 2) f = v;
-                else if (v.length <= 5) f = v.slice(0, v.length - 3) + '.' + v.slice(v.length - 3);
-                else f = v.slice(0, v.length - 6) + '.' + v.slice(v.length - 6, v.length - 3) + '.' + v.slice(v.length - 3);
-            }
-            e.target.value = f;
-        });
+        function filterUsersTable(term) {
+            const filtered = allUsers.filter(u => u.name.toLowerCase().includes(term.toLowerCase()) || u.last_name.toLowerCase().includes(term.toLowerCase()) || u.email.toLowerCase().includes(term.toLowerCase()));
+            renderUsers(filtered);
+        }
 
         window.onload = () => {
             fetchAllUsers();
