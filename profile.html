@@ -119,19 +119,78 @@
             Cargando datos del perfil...
         </div>
 
-        <div id="profile-content" class="grid grid-cols-1 gap-6 lg:grid-cols-1 xl:grid-cols-3 hidden">
-            
-            <div class="glass-card p-6 rounded-2xl lg:col-span-1">
-                <h3 class="text-xl font-bold mb-4 title-amber-stroke flex items-center">
-                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                    PERFIL
-                </h3>
-                <table id="profile-table" class="profile-table">
-                    </table>
-            </div>
-
-            </div>
+        <div id="profile-content" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 hidden">
+    
+    <div class="glass-card p-6 rounded-2xl">
+        <h3 class="text-xl font-bold mb-4 title-amber-stroke flex items-center">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            PERFIL
+        </h3>
+        <table id="profile-table" class="profile-table w-full">
+            </table>
     </div>
+
+    <div class="glass-card p-6 rounded-2xl">
+        <h3 class="text-xl font-bold mb-4 title-amber-stroke flex items-center">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+            RASGOS GENERALES
+        </h3>
+        <table class="profile-table w-full">
+            <tr><th class="text-left py-2">Estatura</th><td id="m-estatura" class="text-right text-emerald-400 font-mono">--</td></tr>
+            <tr><th class="text-left py-2">Peso</th><td id="m-peso" class="text-right text-emerald-400 font-mono">--</td></tr>
+            <tr><th class="text-left py-2">Edad</th><td id="m-edad" class="text-right text-emerald-400 font-mono">--</td></tr>
+        </table>
+    </div>
+
+    <div class="glass-card p-6 rounded-2xl">
+        <h3 class="text-xl font-bold mb-4 title-amber-stroke flex items-center">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            MEDIDAS SUPERIORES
+        </h3>
+        <table class="profile-table w-full text-sm">
+            <tr><th class="text-left py-1">Cuello</th><td id="m-cuello" class="text-right font-mono">--</td></tr>
+            <tr><th class="text-left py-1">Espalda</th><td id="m-espalda" class="text-right font-mono">--</td></tr>
+            <tr><th class="text-left py-1">Tórax</th><td id="m-torax" class="text-right font-mono">--</td></tr>
+            <tr><th class="text-left py-1">Abdomen</th><td id="m-abdomen" class="text-right font-mono">--</td></tr>
+            <tr><th class="text-left py-1">Brazo (D/I)</th><td class="text-right font-mono"><span id="m-brazo_der">--</span> / <span id="m-brazo_izq">--</span></td></tr>
+            <tr><th class="text-left py-1">Antebrazo (D/I)</th><td class="text-right font-mono"><span id="m-antebrazo_der">--</span> / <span id="m-antebrazo_izq">--</span></td></tr>
+        </table>
+    </div>
+
+    <div class="glass-card p-6 rounded-2xl">
+        <h3 class="text-xl font-bold mb-4 title-amber-stroke flex items-center">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+            MEDIDAS INFERIORES
+        </h3>
+        <table class="profile-table w-full text-sm">
+            <tr><th class="text-left py-2">Cintura</th><td id="m-cintura" class="text-right font-mono">--</td></tr>
+            <tr><th class="text-left py-2">Fémur (D/I)</th><td class="text-right font-mono"><span id="m-femur_der">--</span> / <span id="m-femur_izq">--</span></td></tr>
+            <tr><th class="text-left py-2">Tibia (D/I)</th><td class="text-right font-mono"><span id="m-tibia_der">--</span> / <span id="m-tibia_izq">--</span></td></tr>
+        </table>
+    </div>
+
+    <div class="glass-card p-6 rounded-2xl md:col-span-2 xl:col-span-2">
+        <h3 class="text-xl font-bold mb-4 title-amber-stroke flex items-center">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            PATOLOGÍAS Y OBSERVACIONES
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div class="bg-black/20 p-3 rounded-lg border border-white/5">
+                <p class="text-gray-400 font-bold uppercase text-xs mb-1">Alergias</p>
+                <p id="m-alergias" class="text-white">--</p>
+            </div>
+            <div class="bg-black/20 p-3 rounded-lg border border-white/5">
+                <p class="text-gray-400 font-bold uppercase text-xs mb-1">Enfermedades Crónicas</p>
+                <p id="m-enfermedades" class="text-white">--</p>
+            </div>
+            <div class="bg-black/20 p-3 rounded-lg border border-white/5">
+                <p class="text-gray-400 font-bold uppercase text-xs mb-1">Otros</p>
+                <p id="m-otros" class="text-white">--</p>
+            </div>
+        </div>
+    </div>
+
+</div>
 
 
     <script>
@@ -160,58 +219,39 @@
         }
         
         /**
-         * Llama a la API para obtener el perfil del usuario (solo datos básicos).
+         * Llama a la API para obtener las métricas del usuario.
          */
-        async function apiFetchProfileData(userId) {
-            console.log(`API: Intentando conectar a: ${API_BASE_URL}/api/profile/${userId}`);
-            
+        async function apiFetchMetrics(userId) {
             try {
-                // 1. Intentar la conexión
-                const response = await fetch(`${API_BASE_URL}/api/profile/${userId}`); 
-                
-                // 2. Verificar el estado HTTP
-                if (!response.ok) {
-                    const errorText = await response.text().catch(() => 'No hay cuerpo de respuesta');
-                    console.error(`Error HTTP: ${response.status} - ${response.statusText}`, errorText);
-                    
-                    // Error específico para el usuario
-                    return { 
-                        success: false, 
-                        error: `Error del servidor (HTTP ${response.status} - ${response.statusText}). Revisa tu backend.`,
-                        isServerError: true
-                    };
-                }
-
-                // 3. Procesar la respuesta JSON
-                const data = await response.json();
-                
-                if (!data.success) {
-                    return { success: false, error: data.error || 'Error al obtener datos del perfil (API).' };
-                }
-                
-                return { success: true, profile: data.profile };
-
+                const response = await fetch(`${API_BASE_URL}/api/metrics/${userId}`);
+                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+                return await response.json();
             } catch (e) {
-                // 4. Capturar errores de red (CORS, servidor inactivo, URL incorrecta)
-                console.error("Error en la conexión fetch (Network/CORS):", e);
-                return { 
-                    success: false, 
-                    error: `❌ Error de Conexión: ${e.message}. Revisa la URL, el estado del servidor y la configuración CORS.`,
-                    isNetworkError: true
-                };
+                console.error("Error al obtener métricas:", e);
+                return { success: false, error: e.message };
             }
         }
 
+        /**
+         * Llama a la API para obtener el perfil del usuario (datos básicos).
+         */
+        async function apiFetchProfileData(userId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/profile/${userId}`); 
+                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+                const data = await response.json();
+                return { success: true, profile: data.profile };
+            } catch (e) {
+                console.error("Error en la conexión de perfil:", e);
+                return { success: false, error: e.message };
+            }
+        }
 
         /**
-         * Renderiza la información del perfil en la única tabla.
-         * Ahora incluye: Email, Nombre, Apellido, Fecha de Nacimiento, Sexo, Suscripción y Activo Desde.
+         * Renderiza la información básica del perfil.
          */
         function renderProfile(data) {
-            // --- 1. TABLA PERFIL ---
             const profileTable = document.getElementById('profile-table');
-            
-            // Renderizamos los datos básicos MÁS los nuevos campos
             profileTable.innerHTML = `
                 <tr><th>Email</th><td>${data.email || 'N/A'}</td></tr>
                 <tr><th>Nombre</th><td>${data.name || 'N/A'}</td></tr>
@@ -221,59 +261,80 @@
                 <tr><th>Suscripción</th><td>${data.subscription_level || 'N/A'}</td></tr>
                 <tr><th>Activo Desde</th><td>${data.activo_desde || 'N/A'}</td></tr>
             `;
-
-            // SE ELIMINA LA LÓGICA DE renderProfile para tablas no existentes
         }
 
         /**
-         * Función principal para cargar y mostrar los datos del perfil.
+         * Renderiza los cuatro recuadros de métricas y patologías.
+         */
+        function renderMetrics(m) {
+            // Recuadro 1: Rasgos
+            document.getElementById('m-estatura').textContent = m.estatura ? `${m.estatura} cm` : '--';
+            document.getElementById('m-peso').textContent = m.peso ? `${m.peso} kg` : '--';
+            document.getElementById('m-edad').textContent = m.edad || '--';
+
+            // Recuadro 2: Superiores
+            document.getElementById('m-cuello').textContent = m.cuello ? `${m.cuello} cm` : '--';
+            document.getElementById('m-espalda').textContent = m.espalda ? `${m.espalda} cm` : '--';
+            document.getElementById('m-torax').textContent = m.torax ? `${m.torax} cm` : '--';
+            document.getElementById('m-abdomen').textContent = m.abdomen ? `${m.abdomen} cm` : '--';
+            document.getElementById('m-brazo_der').textContent = m.brazo_derecho || '--';
+            document.getElementById('m-brazo_izq').textContent = m.brazo_izquierdo || '--';
+            document.getElementById('m-antebrazo_der').textContent = m.antebrazo_derecho || '--';
+            document.getElementById('m-antebrazo_izq').textContent = m.antebrazo_izquierdo || '--';
+
+            // Recuadro 3: Inferiores
+            document.getElementById('m-cintura').textContent = m.cintura ? `${m.cintura} cm` : '--';
+            document.getElementById('m-femur_der').textContent = m.femur_derecho || '--';
+            document.getElementById('m-femur_izq').textContent = m.femur_izquierdo || '--';
+            document.getElementById('m-tibia_der').textContent = m.tibia_derecha || '--';
+            document.getElementById('m-tibia_izq').textContent = m.tibia_izquierda || '--';
+
+            // Recuadro 4: Patologías
+            document.getElementById('m-alergias').textContent = m.alergias || 'Ninguna';
+            document.getElementById('m-enfermedades').textContent = m.enfermedades_cronicas || 'Ninguna';
+            document.getElementById('m-otros').textContent = m.otros || 'N/A';
+        }
+
+        /**
+         * Función principal: Carga ambos sets de datos simultáneamente.
          */
         async function loadProfileData() {
-            // 1. Obtener el ID de usuario de localStorage
             const storedSession = localStorage.getItem('userSession');
-            
             if (!storedSession) {
-                loadingSpinner.textContent = '❌ Error: No hay sesión activa. Redirigiendo a Login...';
-                showMessage('No hay sesión activa.', 'error');
-                // Redirigir al index si no hay sesión
-                setTimeout(() => window.location.href = 'index.html', 3000); 
+                window.location.href = 'index.html';
                 return;
             }
             
             try {
                 const userSession = JSON.parse(storedSession);
-                const userId = userSession._id || userSession.id; 
-                
-                if (!userId) {
-                    throw new Error("ID de usuario no encontrado en la sesión.");
+                const userId = userSession._id || userSession.id;
+
+                // Ejecutamos ambas peticiones al mismo tiempo para ganar velocidad
+                const [profileRes, metricsRes] = await Promise.all([
+                    apiFetchProfileData(userId),
+                    apiFetchMetrics(userId)
+                ]);
+
+                if (profileRes.success) {
+                    renderProfile(profileRes.profile);
                 }
 
-                // 2. Llamar a la API
-                const response = await apiFetchProfileData(userId);
-
-                // 3. Procesar respuesta
-                if (response.success && response.profile) {
-                    renderProfile(response.profile);
-                    profileContent.classList.remove('hidden');
-                    loadingSpinner.classList.add('hidden');
-                    showMessage('Datos de perfil cargados con éxito.', 'success');
-                } else {
-                    // Muestra el error más específico devuelto por apiFetchProfileData
-                    loadingSpinner.textContent = '❌ ' + (response.error || 'Error al cargar datos.');
-                    showMessage('Error al cargar datos del perfil.', 'error');
+                if (metricsRes.success) {
+                    renderMetrics(metricsRes.metrics);
                 }
+
+                // Mostrar contenido y ocultar el spinner
+                document.getElementById('profile-content').classList.remove('hidden');
+                document.getElementById('loading-spinner').classList.add('hidden');
 
             } catch (error) {
-                loadingSpinner.textContent = '❌ Error fatal: ' + error.message;
-                showMessage('Error al procesar la sesión o la data.', 'error');
-                console.error("Error en loadProfileData:", error);
+                console.error("Error fatal en la carga:", error);
+                const spinner = document.getElementById('loading-spinner');
+                if (spinner) spinner.textContent = '❌ Error al cargar la información.';
             }
         }
 
-
-        // --- Lógica de Inicialización ---
-        window.onload = function() {
-            loadProfileData();
+        window.onload = loadProfileData;
         };
     </script>
 </body>
