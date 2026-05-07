@@ -10,322 +10,829 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         
-        .GYM-YELLOW { color: #FFC300; }
-        .bg-GYM-YELLOW { background-color: #FFC300; }
-        .border-GYM-YELLOW { border-color: #FFC300; }
+        /* 💡 Define el color de acento amarillo de tu marca */
+        .GYM-YELLOW {
+            color: #FFC300; /* Amarillo */
+        }
+        .bg-GYM-YELLOW {
+            background-color: #FFC300;
+        }
+        .hover\:bg-GYM-YELLOW-dark:hover {
+            background-color: #FFB300; /* Amarillo ligeramente más oscuro para el hover */
+        }
+        .border-GYM-YELLOW {
+            border-color: #FFC300;
+        }
+        .focus\:ring-GYM-YELLOW:focus {
+            --tw-ring-color: #FFC300;
+        }
+        .focus\:border-GYM-YELLOW:focus {
+            border-color: #FFC300;
+        }
 
+
+        /* Estilos base del Administrador */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0d0d1a;
+            background-color: #0d0d1a; /* Negro muy oscuro */
             background-image: url('FONDO.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            color: #e5e7eb;
+            color: #e5e7eb; /* Blanco suave para el texto */
+            min-height: 100vh;
         }
 
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .dashboard-header {
+            background-color: rgba(13, 13, 26, 0.9); /* Fondo oscuro semitransparente */
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
-        /* Estilos específicos para el formulario de métricas */
-        .metrics-input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 0.5rem;
-            color: white;
+        .content-container {
+            background-color: rgba(18, 18, 30, 0.95); /* Contenedor ligeramente más claro que el fondo */
+            backdrop-filter: blur(3px);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        /* Estilo para la tabla */
+        .admin-table {
             width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
         }
-        .metrics-input:focus {
-            outline: none;
-            border-color: #FFC300;
+
+        .admin-table th, .admin-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
+
+        .admin-table th {
+            background-color: #1a1a2e; /* Fondo de encabezado gris oscuro */
+            font-weight: 600;
+            color: #94a3b8; /* Gris claro para las cabeceras */
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        /* Modal backdrop */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.85); /* Fondo modal más oscuro */
+        }
+        
+        /* 🎨 NUEVOS ESTILOS PARA EL MODAL (Incluye scrollbar y max-height) 🎨 */
+        .modal-content {
+            background-color: #1a1a2e;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
+            max-height: calc(100vh - 40px); /* Limita la altura visible en el viewport */
+            overflow-y: auto; /* Permite scroll solo en el contenido si es necesario */
+        }
+        
+        /* Estilo para Scrollbar en Webkit */
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #334155; /* Color del thumb (barra) */
+            border-radius: 10px;
+        }
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        .modal-content::-webkit-scrollbar-track {
+            background: #1a1a2e; /* Color del track (fondo) */
+        }
+        /* 🎨 FIN NUEVOS ESTILOS MODAL 🎨 */
+
+        /* Inputs y Selects */
+        .modal-content input, .modal-content select {
+             /* Estilos personalizados para inputs */
+             background-color: #1a1a2e;
+             border: 1px solid #334155;
+             color: #e5e7eb;
+        }
+        /* Aplica el color amarillo al focus (Se sobreescribe con clases de Tailwind en el HTML) */
+        .modal-content input:focus, .modal-content select:focus {
+            border-color: #FFC300; /* Amarillo */
+            ring: 1px;
+            ring-color: #FFC300; /* Amarillo */
+        }
+
     </style>
 </head>
-<body class="p-4 md:p-8">
-
-    <div class="max-w-6xl mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-            <div class="flex items-center gap-4">
-                <button id="back-btn" class="p-2 hover:bg-white/10 rounded-full transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+<body>
+    
+    <header class="dashboard-header">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-white">
+                <span class="GYM-YELLOW">GYM</span>ENEZ
+            </h1>
+            <nav class="space-x-4">
+                <button id="back-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out">
+                    ← Regresar
                 </button>
-                <h1 class="text-3xl font-black italic tracking-tighter">GESTIÓN DE <span class="GYM-YELLOW">USUARIOS</span></h1>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="content-container mt-8">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-3">
+                <h2 class="text-xl font-semibold text-white">Lista de Usuarios</h2>
+                <button id="add-user-btn" class="bg-GYM-YELLOW hover:bg-GYM-YELLOW-dark text-black font-semibold py-2 px-4 rounded-lg text-sm transition duration-150 ease-in-out">
+                    + Añadir Usuario
+                </button>
             </div>
-            <button id="add-user-btn" class="bg-GYM-YELLOW text-black font-bold px-6 py-2 rounded-full hover:bg-yellow-500 transition-all flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                NUEVO USUARIO
-            </button>
-        </div>
-
-        <div class="mb-6">
-            <input type="text" id="user-search-input" placeholder="Buscar por nombre, apellido o email..." 
-                class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-GYM-YELLOW transition-colors">
-        </div>
-
-        <div class="glass-panel rounded-3xl overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-white/5 text-gray-400 uppercase text-xs font-bold">
+            <div class="mb-6">
+                <input type="text" id="user-search-input" placeholder="Buscar por Nombre, Email o Cédula..." 
+                       class="w-full p-3 rounded-lg bg-[#1a1a2e] border border-gray-700 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-GYM-YELLOW focus:border-GYM-YELLOW transition duration-150">
+            </div>
+            <div class="overflow-x-auto rounded-lg border border-gray-700">
+                <table class="admin-table">
+                    <thead>
                         <tr>
-                            <th class="p-4">Usuario</th>
-                            <th class="p-4">Email / Cédula</th>
-                            <th class="p-4 text-center">Estado</th>
-                            <th class="p-4 text-center">Acciones</th>
+                            <th class="rounded-tl-lg">Nombre Completo</th>
+                            <th>Email</th>
+                            <th>Cédula</th>
+                            <th>Teléfono</th>
+                            <th>Suscripción</th>
+                            <th>Activo Desde</th>
+                            <th class="rounded-tr-lg">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="users-table-body"></tbody>
+                    <tbody id="users-table-body" class="text-sm text-gray-300 divide-y divide-gray-800">
+                        </tbody>
                 </table>
             </div>
         </div>
-    </div>
+    </main>
 
-    <div id="user-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center z-40 p-4">
-        <div class="bg-[#1a1a2e] border border-white/10 w-full max-w-md rounded-2xl p-6 shadow-2xl">
-            <h2 id="modal-title" class="text-2xl font-bold GYM-YELLOW mb-6 italic">NUEVO USUARIO</h2>
-            <form id="user-form" class="space-y-4">
-                <input type="hidden" id="user-id">
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="text" id="user-name" placeholder="Nombre" class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-GYM-YELLOW outline-none" required>
-                    <input type="text" id="user-last-name" placeholder="Apellido" class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-GYM-YELLOW outline-none" required>
-                </div>
-                <input type="email" id="user-email" placeholder="Correo Electrónico" class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-GYM-YELLOW outline-none" required>
-                <input type="text" id="id-number" placeholder="Cédula (Ej: 28.123.456)" class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-GYM-YELLOW outline-none" required>
-                <div class="flex gap-4 pt-4">
-                    <button type="submit" class="flex-1 bg-GYM-YELLOW text-black font-bold p-3 rounded-xl hover:bg-yellow-500 transition-all">GUARDAR</button>
-                    <button type="button" id="close-modal-btn" class="px-6 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors">CANCELAR</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="metrics-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-[#1a1a2e] border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl">
-            <div class="p-6 border-b border-white/10 flex justify-between items-center sticky top-0 bg-[#1a1a2e] z-10">
-                <h2 class="text-2xl font-bold GYM-YELLOW italic">MÉTRICAS CORPORALES</h2>
-                <button onclick="closeMetricsModal()" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+    <div id="user-modal" class="fixed inset-0 bg-black bg-opacity-80 modal-backdrop hidden z-[1010] flex justify-center p-4 overflow-y-auto">
+        
+        <div class="modal-content w-full max-w-2xl p-6 rounded-xl transform transition-all duration-300 scale-100">
+            
+            <div class="flex justify-between items-center border-b border-gray-700 pb-4 mb-6">
+                <h3 id="modal-title" class="text-2xl font-semibold text-white">Añadir Nuevo Usuario</h3>
+                <button id="close-modal-btn" class="text-gray-400 hover:text-GYM-YELLOW text-3xl leading-none transition-colors duration-200">&times;</button>
             </div>
-            <form id="metrics-form" class="p-6 space-y-8">
-                <input type="hidden" id="metrics-user-id">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="space-y-6">
-                        <section>
-                            <h3 class="text-emerald-400 font-bold mb-4 border-b border-white/5 pb-1 uppercase text-sm">1. Rasgos Generales</h3>
-                            <div class="grid grid-cols-3 gap-4">
-                                <div><label class="text-[10px] text-gray-500 block mb-1">ESTATURA</label><input type="number" id="field-estatura" class="metrics-input"></div>
-                                <div><label class="text-[10px] text-gray-500 block mb-1">PESO (KG)</label><input type="number" step="0.1" id="field-peso" class="metrics-input"></div>
-                                <div><label class="text-[10px] text-gray-500 block mb-1">EDAD</label><input type="number" id="field-edad" class="metrics-input"></div>
-                            </div>
-                        </section>
-                        <section>
-                            <h3 class="text-emerald-400 font-bold mb-4 border-b border-white/5 pb-1 uppercase text-sm">2. Medidas Superiores</h3>
-                            <div class="grid grid-cols-2 gap-4">
-                                <input type="number" id="field-cuello" placeholder="Cuello" class="metrics-input">
-                                <input type="number" id="field-espalda" placeholder="Espalda" class="metrics-input">
-                                <input type="number" id="field-torax" placeholder="Tórax" class="metrics-input">
-                                <input type="number" id="field-abdomen" placeholder="Abdomen" class="metrics-input">
-                                <input type="number" id="field-brazo_derecho" placeholder="Brazo Der" class="metrics-input border-blue-500/30">
-                                <input type="number" id="field-brazo_izquierdo" placeholder="Brazo Izq" class="metrics-input border-blue-500/30">
-                                <input type="number" id="field-antebrazo_derecho" placeholder="Antebr Der" class="metrics-input border-amber-500/30">
-                                <input type="number" id="field-antebrazo_izquierdo" placeholder="Antebr Izq" class="metrics-input border-amber-500/30">
-                            </div>
-                        </section>
+
+            <form id="user-form" class="space-y-6">
+                <input type="hidden" id="user-id-field" name="id">
+                <input type="hidden" id="is-edit-mode" value="false">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-300">Nombre(s) <span class="text-red-500">*</span></label>
+                        <input type="text" id="name" name="name" required class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW" placeholder="Se convertirá a MAYÚSCULAS">
                     </div>
-                    <div class="space-y-6">
-                        <section>
-                            <h3 class="text-emerald-400 font-bold mb-4 border-b border-white/5 pb-1 uppercase text-sm">3. Medidas Inferiores</h3>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="col-span-2"><input type="number" id="field-cintura" placeholder="Cintura" class="metrics-input"></div>
-                                <input type="number" id="field-femur_derecho" placeholder="Fémur Der" class="metrics-input">
-                                <input type="number" id="field-femur_izquierdo" placeholder="Fémur Izq" class="metrics-input">
-                                <input type="number" id="field-tibia_derecha" placeholder="Tibia Der" class="metrics-input border-purple-500/30">
-                                <input type="number" id="field-tibia_izquierda" placeholder="Tibia Izq" class="metrics-input border-purple-500/30">
-                            </div>
-                        </section>
-                        <section>
-                            <h3 class="text-red-400 font-bold mb-4 border-b border-white/5 pb-1 uppercase text-sm">4. Salud</h3>
-                            <textarea id="field-alergias" placeholder="Alergias..." class="metrics-input h-16 mb-4"></textarea>
-                            <textarea id="field-enfermedades_cronicas" placeholder="Enfermedades crónicas..." class="metrics-input h-16"></textarea>
-                        </section>
+                    <div>
+                        <label for="last_name" class="block text-sm font-medium text-gray-300">Apellido(s) <span class="text-red-500">*</span></label>
+                        <input type="text" id="last_name" name="last_name" required class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW" placeholder="Se convertirá a MAYÚSCULAS">
                     </div>
                 </div>
-                <div class="pt-6 flex gap-4">
-                    <button type="submit" class="flex-1 bg-GYM-YELLOW text-black font-bold p-4 rounded-2xl hover:scale-[1.02] transition-all">ACTUALIZAR MÉTRICAS</button>
-                    <button type="button" onclick="closeMetricsModal()" class="px-8 bg-white/10 rounded-2xl">CANCELAR</button>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-300">Email <span class="text-red-500">*</span></label>
+                        <input type="email" id="email" name="email" required class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW" placeholder="ejemplo@correo.com">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-300">Contraseña <span id="password-req" class="text-red-500">*</span></label>
+                        <input type="password" id="password" name="password" class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW" required placeholder="Mínimo 6 caracteres (solo requerido en creación)">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label for="id_number_prefix" class="block text-sm font-medium text-gray-300">Cédula <span class="text-red-500">*</span></label>
+                        <div class="flex mt-1 rounded-lg overflow-hidden border border-gray-600 focus-within:border-GYM-YELLOW focus-within:ring-1 focus-within:ring-GYM-YELLOW">
+                            <select id="id_number_prefix" name="id_number_prefix" required class="bg-gray-700/50 p-3 text-white w-20 border-none focus:outline-none focus:ring-0">
+                                <option value="V">V</option>
+                                <option value="E">E</option>
+                            </select>
+                            <input type="text" id="id_number" name="id_number" required class="w-full bg-[#1a1a2e] p-3 text-white border-none focus:outline-none focus:ring-0" placeholder="Ej: 12.345.678">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="phone_prefix" class="block text-sm font-medium text-gray-300">Teléfono <span class="text-red-500">*</span></label>
+                        <div class="flex mt-1 rounded-lg overflow-hidden border border-gray-600 focus-within:border-GYM-YELLOW focus-within:ring-1 focus-within:ring-GYM-YELLOW">
+                            <select id="phone_prefix" name="phone_prefix" required class="bg-gray-700/50 p-3 text-white w-24 sm:w-28 border-none focus:outline-none focus:ring-0">
+                                <option value="0414">0414</option>
+                                <option value="0424">0424</option>
+                                <option value="0412">0412</option>
+                                <option value="0422">0422</option>
+                                <option value="0416">0416</option>
+                                <option value="0426">0426</option>
+                            </select>
+                            <input type="tel" id="phone_number_body" name="phone_number_body" required class="w-full bg-[#1a1a2e] p-3 text-white border-none focus:outline-none focus:ring-0" placeholder="Ej: 1234567">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div>
+                        <label for="dob" class="block text-sm font-medium text-gray-300">Fecha Nacimiento</label>
+                        <input type="date" id="dob" name="dob" class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW">
+                    </div>
+                    <div>
+                        <label for="sex" class="block text-sm font-medium text-gray-300">Sexo</label>
+                        <select id="sex" name="sex" class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW">
+                            <option value="Hombre">Hombre</option>
+                            <option value="Mujer">Mujer</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="subscription_level" class="block text-sm font-medium text-gray-300">Suscripción</label>
+                        <select id="subscription_level" name="subscription_level" class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW">
+                            <option value="STANDARD">STANDARD</option>
+                            <option value="PLUS">PLUS</option>
+                            <option value="ULTRA">ULTRA</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="activo_desde" class="block text-sm font-medium text-gray-300">Activo Desde</label>
+                    <input type="date" id="activo_desde" name="activo_desde" class="mt-1 w-full p-3 border rounded-lg focus:ring-GYM-YELLOW focus:border-GYM-YELLOW">
+                    <p class="text-xs text-gray-500 mt-1">Dejar vacío para usar la fecha de hoy.</p>
+                </div>
+
+                <div class="pt-6 flex justify-end space-x-3 border-t border-gray-700">
+                    <button type="button" id="cancel-modal-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-5 rounded-lg transition duration-200 ease-in-out" onclick="document.getElementById('user-modal').classList.add('hidden')">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="submit-btn" class="bg-GYM-YELLOW hover:bg-GYM-YELLOW-dark text-black font-bold py-2 px-5 rounded-lg transition duration-200 ease-in-out">
+                        Crear Usuario
+                    </button>
                 </div>
             </form>
         </div>
     </div>
-
     <script>
-        const API_BASE_URL = 'http://127.0.0.1:5000';
-        let allUsers = [];
+        // =============================================================
+        // 🚨 URL DE LA API: Usando tu dominio de PythonAnywhere
+        // =============================================================
+        const API_BASE_URL = 'https://sijj2003.pythonanywhere.com/api/admin/user'; 
 
-        async function fetchAllUsers() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/users`);
-                const data = await response.json();
-                if (data.success) {
-                    allUsers = data.users;
-                    renderUsers(allUsers);
-                }
-            } catch (error) { console.error("Error cargando usuarios:", error); }
+        // Variable para almacenar la lista completa de usuarios
+        let allUsersData = [];
+
+        // =============================================================
+        // FUNCIONES DE FORMATO Y UTILIDAD
+        // =============================================================
+
+        // Función para capitalizar (mayúsculas) nombres y apellidos
+        function formatToUpperCase(inputString) {
+            if (!inputString) return '';
+            // Convierte a mayúsculas
+            return inputString.toUpperCase().trim();
         }
 
-        function renderUsers(users) {
+        // Función para formatear la cédula con puntos (ej: 12.345.678)
+        function formatIdNumber(value) {
+            // 1. Eliminar todo lo que no sea dígito
+            const digits = value.replace(/\D/g, '');
+            if (digits.length === 0) return '';
+            
+            // 2. Insertar puntos cada 3 dígitos desde la derecha
+            let formatted = '';
+            let count = 0;
+            // Recorre los dígitos de derecha a izquierda
+            for (let i = digits.length - 1; i >= 0; i--) {
+                formatted = digits[i] + formatted;
+                count++;
+                // Si ya van 3 dígitos y no es el inicio del string, añade un punto
+                if (count % 3 === 0 && i !== 0) {
+                    formatted = '.' + formatted;
+                }
+            }
+            return formatted;
+        }
+
+        // Función auxiliar para convertir 'YYYY-MM-DD' de HTML Input a 'DD/MM/YYYY' para el backend
+        function formatDateForBackend(dateValue) {
+            if (!dateValue) return '';
+            const parts = dateValue.split('-'); // [YYYY, MM, DD]
+            if (parts.length === 3) {
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+            return dateValue;
+        }
+
+        // =============================================================
+        // LÓGICA DE LA TABLA (READ - Leer)
+        // =============================================================
+
+        async function fetchAllUsers() {
             const tableBody = document.getElementById('users-table-body');
-            tableBody.innerHTML = '';
-            users.forEach(user => {
-                const row = document.createElement('tr');
-                row.className = 'border-b border-white/5 hover:bg-white/5 transition-colors';
-                const blockBtnClass = user.is_blocked ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-amber-600 hover:bg-amber-700';
-                const blockBtnIcon = user.is_blocked ? 
-                    `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>` : 
-                    `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>`;
+            tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 GYM-YELLOW">Cargando datos...</td></tr>';
+            
+            try {
+                // Se usa la ruta /api/admin/users
+                const response = await fetch(API_BASE_URL.replace('/user', '/users'), { 
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
 
-                row.innerHTML = `
-                    <td class="p-4">
-                        <div class="font-bold">${user.name} ${user.last_name}</div>
-                        <div class="text-xs text-gray-500 italic">ID: ${user.id}</div>
-                    </td>
-                    <td class="p-4">
-                        <div class="text-emerald-400 font-mono">${user.email}</div>
-                        <div class="text-gray-400 text-xs italic">CI: ${user.ci || 'N/A'}</div>
-                    </td>
-                    <td class="p-4 text-center">
-                        <span class="px-2 py-1 rounded text-xs ${user.is_blocked ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}">
-                            ${user.is_blocked ? 'Bloqueado' : 'Activo'}
-                        </span>
-                    </td>
-                    <td class="p-4">
-                        <div class="flex justify-center gap-2">
-                            <button onclick="openModalForEdit('${user.id}')" class="p-2 bg-blue-600 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg></button>
-                            
-                            <button onclick="openMetricsModal('${user.id}')" class="p-2 bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors" title="Ver/Editar Métricas">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                            </button>
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Error HTTP: ${response.status} - ${errorText.substring(0, 100)}...`);
+                }
 
-                            <button onclick="handleBlockUser('${user.id}', ${user.is_blocked})" class="p-2 ${blockBtnClass} rounded-lg">${blockBtnIcon}</button>
-                        </div>
-                    </td>
-                `;
-                tableBody.appendChild(row);
+                const data = await response.json();
+                
+                if (data.success && data.users) {
+                    // 🚨 Almacenar la lista completa de usuarios
+                    allUsersData = data.users; 
+                    // Llama a filterUsersTable para manejar la búsqueda activa, aunque el campo de búsqueda esté vacío
+                    const userSearchInput = document.getElementById('user-search-input');
+                    filterUsersTable(userSearchInput ? userSearchInput.value : '');
+                } else {
+                    tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-red-400">Error al cargar: ${data.error || 'Desconocido'}</td></tr>`;
+                    allUsersData = []; // Limpiar si falla
+                }
+
+            } catch (error) {
+                console.error("Error de red al obtener usuarios:", error);
+                tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-red-400">Error de conexión. 🔑 **Revisa la configuración CORS en api_server.py**.</td></tr>';
+                allUsersData = []; // Limpiar si falla
+            }
+        }
+
+        // MODIFICADA: Implementa el botón de Bloqueo/Desbloqueo dinámico
+        function renderUsersTable(usersToRender) {
+            const tableBody = document.getElementById('users-table-body');
+            tableBody.innerHTML = ''; 
+
+            if (usersToRender.length === 0) {
+                // Mensaje de "No se encontraron resultados" si la búsqueda no encuentra nada
+                const searchTerm = document.getElementById('user-search-input').value;
+                const message = searchTerm.trim() !== '' 
+                    ? `No se encontraron resultados para "${searchTerm}".` 
+                    : 'No hay usuarios registrados.';
+
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-gray-400">${message}</td></tr>`;
+                return;
+            }
+
+            usersToRender.forEach(user => {
+                const row = tableBody.insertRow();
+                row.classList.add('hover:bg-gray-800/50'); 
+                
+                // Formato de fecha para la tabla (ya viene en DD/MM/YYYY desde el backend)
+                function displayDate(dateValue) {
+                    if (!dateValue || dateValue === 'N/A') return 'N/A';
+                    return String(dateValue).split('T')[0]; // Simple string display
+                }
+                
+                // Celdas de información
+                row.insertCell().textContent = user.full_name || 'N/A';
+                row.insertCell().textContent = user.email || 'N/A';
+                row.insertCell().textContent = user.id_number || 'N/A'; 
+                row.insertCell().textContent = user.phone_number || 'N/A';
+                
+                // Celda de Suscripción con estilo
+                const subCell = row.insertCell();
+                subCell.textContent = user.subscription_level || 'STANDARD';
+                subCell.classList.add('font-semibold');
+                subCell.style.color = (user.subscription_level === 'PLUS' || user.subscription_level === 'ULTRA') ? '#FFC300' : '#E5E7EB';
+
+                row.insertCell().textContent = displayDate(user.activo_desde);
+
+                // Celda de Acciones
+                const actionsCell = row.insertCell();
+                actionsCell.classList.add('whitespace-nowrap', 'text-sm', 'text-gray-500');
+                
+                // Usamos un contenedor flex para alinear los botones
+                const divContainer = document.createElement('div');
+                divContainer.classList.add('flex', 'space-x-2', 'items-center');
+
+                // --- Bloquear/Desbloquear Button (NUEVA LÓGICA) ---
+                const blockBtn = document.createElement('button');
+                // 🟢 CRÍTICO: Leer el estado is_blocked desde el backend 🟢
+                // Usamos user.is_blocked === true para asegurar que es un booleano (si es undefined/null, será false)
+                const isBlocked = user.is_blocked === true; 
+                
+                // Texto y color dinámico
+                blockBtn.textContent = isBlocked ? 'Desbloquear' : 'Bloquear';
+                blockBtn.classList.add('font-semibold', 'text-sm', 'transition', 'duration-150', 'ease-in-out', 'p-1', 'rounded');
+
+                if (isBlocked) {
+                    // Usuario BLOQUEADO -> Mostrar botón DESBLOQUEAR (Verde)
+                    blockBtn.classList.add('text-white', 'bg-green-600', 'hover:bg-green-500');
+                } else {
+                    // Usuario DESBLOQUEADO -> Mostrar botón BLOQUEAR (Rojo)
+                    blockBtn.classList.add('text-white', 'bg-red-600', 'hover:bg-red-500');
+                }
+                
+                // 🚩 Asignar el listener: Envía el estado ACTUAL del botón 🚩
+                // Llama a handleBlockUser con el ID del usuario y su estado ACTUAL
+                blockBtn.addEventListener('click', () => handleBlockUser(user.id, isBlocked));
+
+                divContainer.appendChild(blockBtn);
+                // --- FIN Bloquear/Desbloquear Button ---
+
+
+                // --- Botón Editar ---
+                const editBtn = document.createElement('button');
+                editBtn.textContent = 'Editar';
+                editBtn.classList.add('GYM-YELLOW', 'hover:text-yellow-400', 'font-semibold', 'text-sm', 'transition', 'duration-150', 'ease-in-out');
+                editBtn.onclick = () => openModalForEdit(user);
+                divContainer.appendChild(editBtn);
+
+                // --- Botón Eliminar ---
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Eliminar';
+                deleteBtn.classList.add('text-red-500', 'hover:text-red-400', 'font-semibold', 'text-sm', 'transition', 'duration-150', 'ease-in-out', 'ml-2');
+                deleteBtn.onclick = () => deleteUser(user.id, user.full_name);
+                divContainer.appendChild(deleteBtn);
+                
+                actionsCell.appendChild(divContainer);
             });
         }
 
-        // FUNCIONES DE MÉTRICAS (LO NUEVO)
-        async function openMetricsModal(userId) {
-            document.getElementById('metrics-user-id').value = userId;
-            document.getElementById('metrics-form').reset();
-            document.getElementById('metrics-modal').classList.remove('hidden');
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/metrics/${userId}`);
-                const data = await res.json();
-                if (data.success && data.metrics) {
-                    Object.keys(data.metrics).forEach(key => {
-                        const input = document.getElementById(`field-${key}`);
-                        if (input) input.value = data.metrics[key];
-                    });
-                }
-            } catch (e) { console.log("Sin métricas previas."); }
+        // =============================================================
+        // 🔍 LÓGICA DE BÚSQUEDA AÑADIDA 🔍
+        // =============================================================
+
+        function filterUsersTable(searchTerm) {
+            const normalizedSearch = searchTerm.toLowerCase().trim();
+
+            if (normalizedSearch === '') {
+                // Si la búsqueda está vacía, mostrar todos los usuarios
+                renderUsersTable(allUsersData);
+                return;
+            }
+
+            const filteredUsers = allUsersData.filter(user => {
+                // Criterios de búsqueda
+                const fullName = (user.full_name || '').toLowerCase();
+                const email = (user.email || '').toLowerCase();
+                const idNumber = (user.id_number || '').toLowerCase(); // Incluye V-12.345.678
+                
+                // Búsqueda flexible (busca la coincidencia en cualquiera de los campos)
+                return fullName.includes(normalizedSearch) || 
+                       email.includes(normalizedSearch) || 
+                       idNumber.includes(normalizedSearch);
+            });
+
+            renderUsersTable(filteredUsers);
         }
 
-        function closeMetricsModal() { document.getElementById('metrics-modal').classList.add('hidden'); }
-
-        document.getElementById('metrics-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const userId = document.getElementById('metrics-user-id').value;
-            const inputs = e.target.querySelectorAll('.metrics-input');
-            const data = {};
-            inputs.forEach(input => data[input.id.replace('field-', '')] = input.value);
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/metrics/${userId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                if ((await res.json()).success) { alert("Métricas guardadas."); closeMetricsModal(); }
-            } catch (err) { alert("Error al guardar."); }
-        });
-
-        // LÓGICA ORIGINAL DE CI Y USUARIOS (MANTENIDA TAL CUAL)
-        function formatIdNumber(v) {
-            v = v.replace(/\D/g, '').slice(0, 8);
-            if (v.length <= 2) return v;
-            if (v.length <= 5) return v.slice(0, v.length - 3) + '.' + v.slice(v.length - 3);
-            return v.slice(0, v.length - 6) + '.' + v.slice(v.length - 6, v.length - 3) + '.' + v.slice(v.length - 3);
-        }
-
-        const idInput = document.getElementById('id-number');
-        idInput.addEventListener('input', function() { this.value = formatIdNumber(this.value); });
-
-        async function handleBlockUser(userId, currentState) {
-            if (!confirm(`¿Desea ${currentState ? 'desbloquear' : 'bloquear'} este usuario?`)) return;
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/users/${userId}/block`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ is_blocked: !currentState })
-                });
-                if ((await res.json()).success) fetchAllUsers();
-            } catch (e) { alert("Error al cambiar estado."); }
-        }
+        // =============================================================
+        // LÓGICA DEL MODAL (CREATE/UPDATE - Crear/Actualizar)
+        // =============================================================
 
         function openModalForCreate() {
-            document.getElementById('modal-title').innerText = "NUEVO USUARIO";
-            document.getElementById('user-id').value = '';
-            document.getElementById('user-form').reset();
+            const form = document.getElementById('user-form');
+            form.reset(); 
+            document.getElementById('modal-title').textContent = 'Añadir Nuevo Usuario';
+            document.getElementById('user-id-field').value = '';
+            document.getElementById('is-edit-mode').value = 'false';
+            document.getElementById('submit-btn').textContent = 'Crear Usuario';
+            
+            // Configurar campos por defecto o requeridos
+            document.getElementById('email').removeAttribute('disabled');
+            document.getElementById('password').required = true;
+            document.getElementById('password-req').classList.remove('hidden');
+            document.getElementById('password').placeholder = 'Mínimo 6 caracteres (solo requerido en creación)';
+            document.getElementById('id_number').value = ''; 
+            document.getElementById('phone_number_body').value = '';
+            // Valores por defecto para select
+            document.getElementById('id_number_prefix').value = 'V';
+            document.getElementById('phone_prefix').value = '0414';
+            // La suscripción por defecto será STANDARD (primer elemento en HTML)
+
+
             document.getElementById('user-modal').classList.remove('hidden');
         }
 
-        function openModalForEdit(id) {
-            const user = allUsers.find(u => u.id === id);
-            if (!user) return;
-            document.getElementById('modal-title').innerText = "EDITAR USUARIO";
-            document.getElementById('user-id').value = user.id;
-            document.getElementById('user-name').value = user.name;
-            document.getElementById('user-last-name').value = user.last_name;
-            document.getElementById('user-email').value = user.email;
-            document.getElementById('id-number').value = user.ci || '';
+        function openModalForEdit(user) {
+            const form = document.getElementById('user-form');
+            form.reset(); 
+            
+            document.getElementById('modal-title').textContent = `Editar Usuario: ${user.full_name || user.email}`;
+            document.getElementById('user-id-field').value = user.id;
+            document.getElementById('is-edit-mode').value = 'true';
+            document.getElementById('submit-btn').textContent = 'Guardar Cambios';
+
+            // El email se deshabilita para evitar conflictos de autenticación de terceros
+            document.getElementById('email').value = user.email || '';
+            document.getElementById('email').setAttribute('disabled', 'true'); // Deshabilitar edición de email
+
+            document.getElementById('password').required = false;
+            document.getElementById('password-req').classList.add('hidden');
+            document.getElementById('password').placeholder = 'Dejar vacío para no cambiar';
+
+            // Llenar campos con datos del usuario
+            document.getElementById('name').value = user.name || '';
+            document.getElementById('last_name').value = user.last_name || '';
+            document.getElementById('sex').value = user.sex || 'Otro';
+            // Suscripción: Usa STANDARD como fallback
+            document.getElementById('subscription_level').value = user.subscription_level || 'STANDARD';
+
+            // --- Manejo de Cédula (V-12.345.678) ---
+            if (user.id_number && user.id_number.includes('-')) {
+                const [prefix, number] = user.id_number.split('-');
+                document.getElementById('id_number_prefix').value = prefix || 'V';
+                document.getElementById('id_number').value = number || ''; 
+            } else {
+                // Caso fallback si el formato es antiguo o inválido
+                document.getElementById('id_number_prefix').value = 'V';
+                document.getElementById('id_number').value = user.id_number || '';
+            }
+            
+            // --- Manejo de Teléfono (0414-1234567) ---
+            if (user.phone_number && user.phone_number.includes('-')) {
+                const [prefix, number] = user.phone_number.split('-');
+                document.getElementById('phone_prefix').value = prefix || '0414';
+                document.getElementById('phone_number_body').value = number || '';
+            } else {
+                // Caso fallback
+                document.getElementById('phone_prefix').value = '0414';
+                document.getElementById('phone_number_body').value = user.phone_number || '';
+            }
+
+            // --- Manejo de Fechas (DD/MM/YYYY a YYYY-MM-DD) ---
+            function formatStringDateToInput(dateStr) {
+                if (!dateStr || dateStr === 'N/A') return '';
+                // Espera DD/MM/YYYY
+                const parts = dateStr.split('/'); 
+                if (parts.length === 3) {
+                    return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+                }
+                return dateStr.split('T')[0]; 
+            }
+            
+            document.getElementById('dob').value = formatStringDateToInput(user.dob);
+            document.getElementById('activo_desde').value = formatStringDateToInput(user.activo_desde);
+
+            // Forzar formateo de cédula en modo edición al abrir el modal (por si el valor guardado no tiene puntos)
+            const idNumberInput = document.getElementById('id_number');
+            idNumberInput.value = formatIdNumber(idNumberInput.value);
+
             document.getElementById('user-modal').classList.remove('hidden');
         }
 
-        document.getElementById('user-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('user-id').value;
-            const payload = {
-                name: document.getElementById('user-name').value,
-                last_name: document.getElementById('user-last-name').value,
-                email: document.getElementById('user-email').value,
-                ci: document.getElementById('id-number').value
+        // Manejador del Formulario (Crear y Editar)
+        async function handleUserFormSubmit(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const isEditMode = document.getElementById('is-edit-mode').value === 'true';
+            const userId = document.getElementById('user-id-field').value;
+
+            // --- Aplicar formatos de entrada ---
+            const name = formatToUpperCase(form.name.value);
+            const lastName = formatToUpperCase(form.last_name.value);
+            
+            // Cédula: V-12.345.678
+            const idNumberPrefix = form.id_number_prefix.value;
+            const idNumberFormatted = formatIdNumber(form.id_number.value); // Ya tiene los puntos
+            const fullIdNumber = idNumberPrefix + '-' + idNumberFormatted; 
+
+            // Teléfono: 0414-1234567
+            const phonePrefix = form.phone_prefix.value;
+            const phoneNumberBody = form.phone_number_body.value.replace(/\D/g, ''); // Solo dígitos para el cuerpo
+            const fullPhoneNumber = phonePrefix + '-' + phoneNumberBody;
+
+            // Recoger datos del formulario
+            const formData = {
+                id: userId,
+                name: name,
+                last_name: lastName,
+                full_name: `${name} ${lastName}`, // Se crea el full_name en el frontend (en MAYÚSCULAS)
+                email: form.email.value,
+                password: form.password.value,
+                // Valores formateados
+                id_number: fullIdNumber, 
+                phone_number: fullPhoneNumber,
+                // Otros campos
+                sex: form.sex.value,
+                subscription_level: form.subscription_level.value,
+                
+                // Formatear fechas a DD/MM/YYYY para el backend de Flask
+                dob: formatDateForBackend(form.dob.value), 
+                activo_desde: formatDateForBackend(form.activo_desde.value)
             };
-            const url = id ? `${API_BASE_URL}/api/users/${id}` : `${API_BASE_URL}/api/users`;
-            const method = id ? 'PUT' : 'POST';
+            
+            // Si estamos editando, eliminamos el email de los datos a enviar
+            if (isEditMode) {
+                 delete formData.email; 
+            }
+
+            // Si estamos editando y el password está vacío, no lo enviamos
+            if (isEditMode && !formData.password) {
+                delete formData.password;
+            }
+            
+            // Validar que en modo creación la contraseña no esté vacía
+            if (!isEditMode && !formData.password) {
+                alert("La contraseña es obligatoria para crear un nuevo usuario.");
+                return;
+            }
+
+            const method = isEditMode ? 'PUT' : 'POST';
+            const url = isEditMode ? `${API_BASE_URL}/${userId}` : API_BASE_URL;
+
             try {
-                const res = await fetch(url, {
+                const response = await fetch(url, {
                     method: method,
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(formData)
                 });
-                if ((await res.json()).success) { document.getElementById('user-modal').classList.add('hidden'); fetchAllUsers(); }
-            } catch (err) { alert("Error al procesar."); }
-        });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    // Limitar el error para la alerta
+                    const errorMessage = errorText.includes('error') ? JSON.parse(errorText).error : errorText.substring(0, 150) + '...';
+                    throw new Error(`Error HTTP: ${response.status} - ${errorMessage}`);
+                }
 
-        function filterUsersTable(term) {
-            const filtered = allUsers.filter(u => u.name.toLowerCase().includes(term.toLowerCase()) || u.last_name.toLowerCase().includes(term.toLowerCase()) || u.email.toLowerCase().includes(term.toLowerCase()));
-            renderUsers(filtered);
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`${isEditMode ? 'Edición' : 'Creación'} de usuario exitosa: ${data.message}`);
+                    document.getElementById('user-modal').classList.add('hidden');
+                    fetchAllUsers(); // Recargar la tabla
+                } else {
+                    alert(`Error al ${isEditMode ? 'editar' : 'crear'} usuario: ${data.error}`);
+                }
+            } catch (error) {
+                alert(`Error de red al procesar el usuario: ${error.message}`);
+                console.error(error);
+            }
+        }
+        
+        // =============================================================
+        // LÓGICA DE ELIMINACIÓN (DELETE)
+        // =============================================================
+
+        async function deleteUser(userId, fullName) {
+            if (!confirm(`¿Está seguro de que desea ELIMINAR permanentemente a ${fullName}? Esta acción es irreversible.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/${userId}`, { 
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Error HTTP: ${response.status} - ${errorText.substring(0, 100)}...`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`Usuario ${fullName} eliminado con éxito!`);
+                    fetchAllUsers();
+                } else {
+                    alert(`Error al eliminar: ${data.error}`);
+                }
+            } catch (error) {
+                alert(`Error de red al eliminar el usuario.`);
+            }
         }
 
-        window.onload = () => {
+        // =============================================================
+        // 🚫 LÓGICA DE BLOQUEO / DESBLOQUEO (TOGGLE BLOCK) 🚫
+        // =============================================================
+
+        async function handleBlockUser(userId, currentState) {
+            // El nuevo estado es el opuesto del actual (de false a true, o de true a false)
+            const newBlockedState = !currentState;
+            const action = newBlockedState ? 'bloquear' : 'desbloquear';
+            
+            // Console log para debuggear el click (si fuera necesario)
+            console.log(`[BLOCK ACTION] Usuario: ${userId}, Estado Actual: ${currentState}, Nuevo Estado a enviar: ${newBlockedState}`);
+
+            // Confirmación al usuario
+            if (!confirm(`¿Está seguro que desea ${action} al usuario ID: ${userId}?`)) {
+                return;
+            }
+
+            try {
+                // Llama a la ruta PUT /api/admin/user/block/{userId}
+                const response = await fetch(`${API_BASE_URL}/block/${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    // CRÍTICO: Envía el nuevo estado booleano
+                    body: JSON.stringify({ is_blocked: newBlockedState }),
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    const errorMessage = errorText.includes('error') ? JSON.parse(errorText).error : errorText.substring(0, 150) + '...';
+                    throw new Error(`Error HTTP: ${response.status} - ${errorMessage}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(`Usuario ${action} con éxito. El nuevo estado es: ${data.is_blocked ? 'BLOQUEADO' : 'DESBLOQUEADO'}`);
+                    // 🟢 Recargar la tabla para mostrar el botón con el nuevo estado y color
+                    fetchAllUsers(); 
+                } else {
+                    alert(`Error al ${action}: ${data.error}`);
+                }
+            } catch (error) {
+                console.error(`Error al ${action} usuario:`, error);
+                alert(`Error de red al intentar ${action}: ${error.message}`);
+            }
+        }
+
+
+        // =============================================================
+        // 🚩 LÓGICA DE NAVEGACIÓN (REGRESAR) 🚩
+        // =============================================================
+
+        function handleNavigateBack() {
+            // Simplemente redirige a la página de administración sin cerrar la sesión
+            window.location.href = 'administration.html'; 
+        }
+
+
+        // --- INICIALIZACIÓN ---
+        window.onload = function() {
+            const storedSession = localStorage.getItem('adminSession');
+            
+            if (!storedSession) {
+                // Si no hay sesión, aún redirigir al login
+                window.location.href = 'administration.html'; 
+                return;
+            }
+
+            // =============================================================
+            // ⭐️ CORRECCIÓN DEL CURSOR EN TIEMPO REAL (Cédula) ⭐️
+            // =============================================================
+            const idNumberInput = document.getElementById('id_number');
+            if (idNumberInput) {
+                idNumberInput.addEventListener('input', function() {
+                    const oldFormattedValue = this.value;
+                    const oldCursorPos = this.selectionStart;
+                    
+                    // 1. Limpiar el valor a solo dígitos y formatearlo
+                    const rawValue = oldFormattedValue.replace(/\D/g, '');
+                    const newFormattedValue = formatIdNumber(rawValue);
+                    
+                    // 2. Contar los caracteres no dígitos (puntos) antes de la actualización
+                    const oldNonDigitCount = (oldFormattedValue.match(/\./g) || []).length;
+                    // 3. Contar los caracteres no dígitos (puntos) después de la actualización
+                    const newNonDigitCount = (newFormattedValue.match(/\./g) || []).length;
+                    
+                    // 4. Calcular la diferencia neta (puntos añadidos o eliminados)
+                    const netDotChange = newNonDigitCount - oldNonDigitCount;
+                    
+                    // 5. Actualizar el valor del input
+                    this.value = newFormattedValue;
+                    
+                    // 6. Ajustar la posición del cursor: moverlo por el cambio neto de puntos
+                    const newCursorPos = oldCursorPos + netDotChange;
+                    
+                    // 7. Aplicar la nueva posición del cursor
+                    this.setSelectionRange(newCursorPos, newCursorPos);
+                });
+                
+                // Forzar formato inicial si ya tiene valor 
+                idNumberInput.value = formatIdNumber(idNumberInput.value);
+            }
+            // =============================================================
+
             fetchAllUsers();
-            document.getElementById('back-btn').onclick = () => window.location.href = 'administration.html';
-            document.getElementById('add-user-btn').onclick = openModalForCreate;
-            document.getElementById('close-modal-btn').onclick = () => document.getElementById('user-modal').classList.add('hidden');
-            document.getElementById('user-search-input').oninput = (e) => filterUsersTable(e.target.value);
+
+            // LISTENERS GLOBALES
+            // 🚩 Nuevo listener para el botón de Regresar 🚩
+            document.getElementById('back-btn').addEventListener('click', handleNavigateBack);
+            document.getElementById('add-user-btn').addEventListener('click', openModalForCreate);
+            document.getElementById('close-modal-btn').addEventListener('click', () => {
+                document.getElementById('user-modal').classList.add('hidden');
+            });
+            document.getElementById('user-form').addEventListener('submit', handleUserFormSubmit);
+            
+            // 🔍 Listener para el campo de búsqueda de usuarios 🔍
+            const userSearchInput = document.getElementById('user-search-input');
+            if (userSearchInput) {
+                userSearchInput.addEventListener('input', (event) => {
+                    filterUsersTable(event.target.value);
+                });
+            }
+
         };
     </script>
 </body>
