@@ -279,6 +279,67 @@
             </form>
         </div>
     </div>
+
+    <div id="metrics-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+    <div class="bg-[#1a1a2e] border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl">
+        <div class="p-6 border-b border-white/10 flex justify-between items-center sticky top-0 bg-[#1a1a2e] z-10">
+            <h2 class="text-2xl font-bold GYM-YELLOW">ACTUALIZAR MÉTRICAS CORPORALES</h2>
+            <button onclick="closeMetricsModal()" class="text-gray-400 hover:text-white">&times;</button>
+        </div>
+        
+        <form id="metrics-form" class="p-6 space-y-8">
+            <input type="hidden" id="metrics-user-id">
+            
+            <section>
+                <h3 class="text-emerald-400 font-bold mb-4 border-b border-emerald-400/20 pb-1">1. RASGOS GENERALES</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div><label class="block text-xs text-gray-400">ESTATURA (CM)</label><input type="number" id="field-estatura" class="w-full bg-white/5 border border-white/10 rounded p-2 text-white"></div>
+                    <div><label class="block text-xs text-gray-400">PESO (KG)</label><input type="number" step="0.1" id="field-peso" class="w-full bg-white/5 border border-white/10 rounded p-2 text-white"></div>
+                    <div><label class="block text-xs text-gray-400">EDAD</label><input type="number" id="field-edad" class="w-full bg-white/5 border border-white/10 rounded p-2 text-white"></div>
+                </div>
+            </section>
+
+            <section>
+                <h3 class="text-emerald-400 font-bold mb-4 border-b border-emerald-400/20 pb-1">2. MEDIDAS SUPERIORES (CM)</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div><label class="text-xs">CUELLO</label><input type="number" id="field-cuello" class="w-full bg-white/5 border border-white/10 rounded p-1 text-white"></div>
+                    <div><label class="text-xs">ESPALDA</label><input type="number" id="field-espalda" class="w-full bg-white/5 border border-white/10 rounded p-1 text-white"></div>
+                    <div><label class="text-xs">TÓRAX</label><input type="number" id="field-torax" class="w-full bg-white/5 border border-white/10 rounded p-1 text-white"></div>
+                    <div><label class="text-xs">ABDOMEN</label><input type="number" id="field-abdomen" class="w-full bg-white/5 border border-white/10 rounded p-1 text-white"></div>
+                    <div><label class="text-xs text-blue-400">BRAZO DER.</label><input type="number" id="field-brazo_derecho" class="w-full bg-white/5 border border-white/10 rounded p-1 text-white"></div>
+                    <div><label class="text-xs text-blue-400">BRAZO IZQ.</label><input type="number" id="field-brazo_izquierdo" class="w-full bg-white/5 border border-white/10 rounded p-1 text-white"></div>
+                    <div><label class="text-xs text-amber-400">ANTEBRAZO DER.</label><input type="number" id="field-antebrazo_derecho" class="w-full bg-white/5 border border-white/10 rounded p-1 text-white"></div>
+                    <div><label class="text-xs text-amber-400">ANTEBRAZO IZQ.</label><input type="number" id="field-antebrazo_izquierdo" class="w-full bg-white/5 border border-white/10 rounded p-1 text-white"></div>
+                </div>
+            </section>
+
+            <section>
+                <h3 class="text-emerald-400 font-bold mb-4 border-b border-emerald-400/20 pb-1">3. MEDIDAS INFERIORES (CM)</h3>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div><label class="text-xs">CINTURA</label><input type="number" id="field-cintura" class="w-full bg-white/5 border border-white/10 rounded p-1 text-white"></div>
+                    <div><label class="text-xs">FÉMUR DER.</label><input type="number" id="field-femur_derecho" class="w-full bg-white/5 border border-white/10 rounded p-1 text-white"></div>
+                    <div><label class="text-xs">FÉMUR IZQ.</label><input type="number" id="field-femur_izquierdo" class="w-full bg-white/5 border border-white/10 rounded p-1 text-white"></div>
+                    <div><label class="text-xs text-purple-400">TIBIA DER.</label><input type="number" id="field-tibia_derecha" class="w-full bg-white/5 border border-white/10 rounded p-1 text-white"></div>
+                    <div><label class="text-xs text-purple-400">TIBIA IZQ.</label><input type="number" id="field-tibia_izquierda" class="w-full bg-white/5 border border-white/10 rounded p-1 text-white"></div>
+                </div>
+            </section>
+
+            <section>
+                <h3 class="text-red-400 font-bold mb-4 border-b border-red-400/20 pb-1">4. PATOLOGÍAS Y SALUD</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div><label class="text-xs text-gray-400">ALERGIAS</label><textarea id="field-alergias" class="w-full bg-white/5 border border-white/10 rounded p-2 text-white h-20"></textarea></div>
+                    <div><label class="text-xs text-gray-400">ENFERMEDADES CRÓNICAS</label><textarea id="field-enfermedades_cronicas" class="w-full bg-white/5 border border-white/10 rounded p-2 text-white h-20"></textarea></div>
+                    <div><label class="text-xs text-gray-400">OTROS</label><textarea id="field-otros" class="w-full bg-white/5 border border-white/10 rounded p-2 text-white h-20"></textarea></div>
+                </div>
+            </section>
+
+            <div class="pt-4 flex gap-4">
+                <button type="submit" class="flex-1 bg-GYM-YELLOW text-black font-bold p-3 rounded-xl hover:bg-yellow-500 transition-all">GUARDAR MÉTRICAS</button>
+                <button type="button" onclick="closeMetricsModal()" class="px-6 bg-white/10 text-white rounded-xl hover:bg-white/20">CANCELAR</button>
+            </div>
+        </form>
+    </div>
+</div>
     <script>
         // =============================================================
         // 🚨 URL DE LA API: Usando tu dominio de PythonAnywhere
@@ -333,6 +394,82 @@
         // =============================================================
         // LÓGICA DE LA TABLA (READ - Leer)
         // =============================================================
+
+
+        // --- Abrir el modal y cargar datos existentes ---
+async function openMetricsModal(userId) {
+    document.getElementById('metrics-user-id').value = userId;
+    document.getElementById('metrics-modal').classList.remove('hidden');
+    
+    // Intentar cargar datos actuales para que el admin vea qué hay
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/metrics/${userId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const m = data.metrics;
+            // Llenar automáticamente todos los campos del formulario
+            Object.keys(m).forEach(key => {
+                const input = document.getElementById(`field-${key}`);
+                if (input) input.value = m[key] === "N/A" || m[key] === "Ninguna" ? "" : m[key];
+            });
+        }
+    } catch (e) {
+        console.log("No hay métricas previas para este usuario.");
+    }
+}
+
+function closeMetricsModal() {
+    document.getElementById('metrics-modal').classList.add('hidden');
+    document.getElementById('metrics-form').reset();
+}
+
+// --- Manejar el envío del formulario ---
+document.getElementById('metrics-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const userId = document.getElementById('metrics-user-id').value;
+    
+    // Recolectar datos
+    const metricsData = {
+        estatura: document.getElementById('field-estatura').value,
+        peso: document.getElementById('field-peso').value,
+        edad: document.getElementById('field-edad').value,
+        cuello: document.getElementById('field-cuello').value,
+        espalda: document.getElementById('field-espalda').value,
+        torax: document.getElementById('field-torax').value,
+        abdomen: document.getElementById('field-abdomen').value,
+        brazo_derecho: document.getElementById('field-brazo_derecho').value,
+        brazo_izquierdo: document.getElementById('field-brazo_izquierdo').value,
+        antebrazo_derecho: document.getElementById('field-antebrazo_derecho').value,
+        antebrazo_izquierdo: document.getElementById('field-antebrazo_izquierdo').value,
+        cintura: document.getElementById('field-cintura').value,
+        femur_derecho: document.getElementById('field-femur_derecho').value,
+        femur_izquierdo: document.getElementById('field-femur_izquierdo').value,
+        tibia_derecha: document.getElementById('field-tibia_derecha').value,
+        tibia_izquierda: document.getElementById('field-tibia_izquierda').value,
+        alergias: document.getElementById('field-alergias').value,
+        enfermedades_cronicas: document.getElementById('field-enfermedades_cronicas').value,
+        otros: document.getElementById('field-otros').value
+    };
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/metrics/${userId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(metricsData)
+        });
+
+        const res = await response.json();
+        if (res.success) {
+            alert("¡Métricas guardadas con éxito!");
+            closeMetricsModal();
+        } else {
+            alert("Error: " + res.error);
+        }
+    } catch (error) {
+        alert("Error de conexión al guardar métricas.");
+    }
+});
 
         async function fetchAllUsers() {
             const tableBody = document.getElementById('users-table-body');
