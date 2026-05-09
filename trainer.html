@@ -3,277 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GYMENEZ - Entrenadores</title>
+    <title>GYMENEZ - Acceso Entrenadores</title>
     <link rel="icon" type="image/png" href="mini_logo.png">
-    <link rel="shortcut icon" type="image/png" href="mini_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         
-        /* Tema de Fondo Minimalista: Base Oscura (DEFAULT/LOGIN) */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0d0d1a;
-            /* Fondo Inicial (LOGIN) */
             background-image: url('FONDO.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            color: #e5e7eb; 
-            /* Transición para un cambio de fondo suave */
-            transition: background-image 1s ease-in-out; 
-            
-            /* === APLICADO: Borde negro para todas las letras (Text Stroke Effect) === */
-            text-shadow: 
-                -0.5px -0.5px 0 #000,  
-                 0.5px -0.5px 0 #000,
-                -0.5px  0.5px 0 #000,
-                 0.5px  0.5px 0 #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #e5e7eb;
         }
-        
-        /* Estilo específico para el efecto Glassmorphism en las tarjetas */
+
         .glass-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .glass-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        /* Estilo para el botón con efecto NEON (AMARILLO/GRIS) */
-        .neon-button {
+        .input-field {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
-            box-shadow: 0 0 10px #fbbf24, 0 0 20px #fbbf24; 
-        }
-        .neon-button:hover {
-            box-shadow: 0 0 15px #fcd34d, 0 0 30px #fcd34d;
-            transform: scale(1.02);
         }
 
-        /* Estilo específico para el logo del login (50% más grande) */
-        #login-logo-img {
-            width: 225px; 
-            height: auto;
-            margin: 0 auto;
+        .input-field:focus {
+            border-color: #fbbf24;
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
+            outline: none;
         }
 
-        /* Estilos para el mensaje de estado (Mantiene el mensaje superior para errores/éxito genérico) */
-        #message-box {
-            position: fixed;
-            top: 1rem;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 1rem 1.5rem;
-            border-radius: 0.75rem;
-            font-weight: 600;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-            pointer-events: none;
+        .logo-glow {
+            text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
         }
-        .message-success { background-color: #10b981; color: white; } 
-        .message-error { background-color: #ef4444; color: white; } 
-
-        /* Estilo para los enlaces de ayuda (pequeños y pulsables) */
-        .help-link {
-            font-size: 0.875rem; /* text-sm */
-            font-weight: 500;
-            color: #9ca3af; /* gray-400 */
-            transition: color 0.3s ease;
-            cursor: pointer;
-        }
-        .help-link:hover {
-            color: #38bdf8; /* sky-400 */
-            text-shadow: 0 0 5px rgba(56, 189, 248, 0.5); /* Sombra sutil neon azul */
-        }
-
     </style>
-    </head>
-<body class="min-h-screen flex items-center justify-center bg-[#0d0d1a] text-white" style="background-image: url('FONDO.png');">
+</head>
+<body>
 
-    <div id="message-box"></div>
-
-    <div id="login-screen" class="min-h-screen w-full flex items-center justify-center p-4">
-        <div class="glass-card p-6 md:p-8 w-full max-w-sm mx-auto rounded-2xl shadow-2xl border-t-2 border-sky-500/30">
-            
-            <h2 class="text-3xl font-extrabold text-center mb-6 tracking-wider text-amber-400 uppercase">
-                Acceso Entrenadores
-            </h2>
-            
-            <div class="text-center mb-6">
-                <img id="login-logo-img"
-                     src="LOGIN_LOGO.png" 
-                     alt="Logo GYMENEZ" 
-                     class="mx-auto"
-                >
+    <div class="w-full max-w-md p-4">
+        <div class="glass-card rounded-3xl p-8 text-center">
+            <div class="mb-8">
+                <h1 class="text-4xl font-black tracking-tighter logo-glow mb-2">
+                    <span class="text-yellow-400">GYM</span>ENEZ
+                </h1>
+                <p class="text-gray-400 text-sm font-medium uppercase tracking-widest">Panel de Entrenadores</p>
             </div>
 
-            <form id="trainer-login-form">
-                <div class="mb-6">
-                    <label for="login-email" class="block text-sm font-medium text-white mb-2">Correo Electrónico</label>
-                    <input type="email" id="login-email" name="email" value="" placeholder="tu.correo@ejemplo.com"
-                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition duration-300 placeholder-gray-400 text-base" required>
-                </div>
-                <div class="mb-8">
-                    <label for="login-password" class="block text-sm font-medium text-white mb-2">Contraseña</label>
-                     <input type="password" id="login-password" name="password" value="" placeholder=""
-                           class="w-full px-4 py-3 rounded-lg bg-transparent text-white border border-gray-500 focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition duration-300 placeholder-gray-400 text-base" required>
+            <div id="error-alert" class="hidden mb-6 p-3 bg-red-500/20 border border-red-500/50 rounded-xl text-red-200 text-sm"></div>
+
+            <form id="trainer-login-form" class="space-y-5 text-left">
+                <div>
+                    <label class="text-xs font-bold text-gray-400 ml-1 uppercase">Correo Corporativo</label>
+                    <input type="email" id="trainer-email" required 
+                           class="w-full input-field px-4 py-3 rounded-xl mt-1 text-white" 
+                           placeholder="nombre@gymenez.com">
                 </div>
 
-                <button type="submit" id="trainer-login-btn"
-                        class="neon-button w-full py-3 rounded-lg bg-gray-800 text-amber-400 font-bold text-lg hover:bg-gray-700 uppercase tracking-wider border-2 border-amber-400/50">
-                    INGRESAR
+                <div>
+                    <label class="text-xs font-bold text-gray-400 ml-1 uppercase">Contraseña</label>
+                    <input type="password" id="trainer-password" required 
+                           class="w-full input-field px-4 py-3 rounded-xl mt-1 text-white" 
+                           placeholder="••••••••">
+                </div>
+
+                <div class="flex justify-between items-center px-1">
+                    <button type="button" id="forgot-password" class="text-xs text-yellow-500 hover:underline">¿Olvidaste tu clave?</button>
+                </div>
+
+                <button type="submit" 
+                        class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-black py-4 rounded-xl transition-all transform active:scale-95 shadow-lg shadow-yellow-500/20">
+                    INGRESAR AL SISTEMA
                 </button>
             </form>
-            
-            <div class="flex justify-between items-center mt-4 pt-2 border-t border-gray-700/50">
-                <span id="return-to-client-login" class="help-link">
-                    &larr; Volver al Acceso General
-                </span>
-                <span id="forgot-password-link" class="help-link">
-                    Recuperar Contraseña
-                </span>
+
+            <div class="mt-8 pt-6 border-t border-white/5">
+                <button onclick="window.location.href='index.html'" class="text-gray-500 hover:text-white text-xs transition">
+                    Volver al login de clientes
+                </button>
             </div>
-            
         </div>
     </div>
-    
+
     <script>
-        // --- CONFIGURACIÓN DE SEGURIDAD Y SESIÓN (Versión Entrenadores) ---
-        const DEVICE_ID_KEY = 'gymen_trainer_device_id'; // Clave específica para entrenadores
-        let localDeviceId = localStorage.getItem(DEVICE_ID_KEY);
+        const API_URL = "https://sijj2003.pythonanywhere.com";
 
-        if (!localDeviceId) {
-            localDeviceId = crypto.randomUUID();
-            localStorage.setItem(DEVICE_ID_KEY, localDeviceId);
-        }
-        
-        // 🚀 URL BASE DE TU API. SIN LA BARRA FINAL (/)
-        const API_BASE_URL = 'https://sijj2003.pythonanywhere.com'; 
-        
-        // --- CONSTANTES PARA WHATSAPP ---
-        const WHATSAPP_NUMBER = '+584148780392';
-        const WHATSAPP_MESSAGE_RECOVERY = 'Hola quisiera solicitar la recuperación de usuario/contraseña para *Entrenadores*.';
+        document.getElementById('trainer-login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('trainer-email').value;
+            const password = document.getElementById('trainer-password').value;
+            const errorDiv = document.getElementById('error-alert');
 
+            errorDiv.classList.add('hidden');
 
-        // --- Variables y Utilidades Globales ---
-        const messagebox = document.getElementById('message-box');
-
-        // Función para mostrar mensajes de estado (éxito/error) EN LA PARTE SUPERIOR
-        function showMessage(message, type = 'success') {
-            messagebox.textContent = message;
-            messagebox.className = ''; 
-            messagebox.classList.add('transition-none');
-            messagebox.classList.add('message-' + type);
-            messagebox.style.opacity = '1';
-            messagebox.style.transform = 'translateX(-50%) translateY(0)';
-            
-            setTimeout(() => {
-                messagebox.style.style = '';
-                messagebox.style.opacity = '0';
-                messagebox.style.transform = 'translateX(-50%) translateY(-20px)';
-            }, 3000);
-        }
-
-
-        /**
-         * Llama a la API REST para iniciar sesión del entrenador.
-         * *NOTA*: Se asume que habrá un endpoint /api/trainer_login en el backend.
-         */
-        async function apiTrainerLogin(email, password, deviceId) {
-            console.log(`API: Llamada a ${API_BASE_URL}/api/trainer_login para ${email}. Device ID: ${deviceId}`);
-            
             try {
-                // *** CAMBIAR EL ENDPOINT A 'api/trainer_login' ***
-                const response = await fetch(`${API_BASE_URL}/api/trainer_login`, { 
+                const response = await fetch(`${API_URL}/api/trainer/login`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password, deviceId })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
                 });
 
                 const data = await response.json();
 
-                if (!response.ok || !data.success) {
-                    return { success: false, error: data.error || 'Error de conexión con la API, credenciales inválidas o no eres entrenador.' };
+                if (data.success) {
+                    // Guardar sesión específica para entrenadores
+                    localStorage.setItem('trainerSession', JSON.stringify(data.trainer));
+                    // Redirigir al dashboard (que deberemos crear)
+                    window.location.href = 'trainer_dashboard.html';
+                } else {
+                    errorDiv.textContent = data.error || "Acceso denegado";
+                    errorDiv.classList.remove('hidden');
                 }
-
-                // Guardar la sesión del entrenador en localStorage (con una clave distinta)
-                localStorage.setItem('trainerSession', JSON.stringify(data.trainer)); 
-                return { success: true, trainer: data.trainer };
-
-            } catch (e) {
-                console.error("Error en la conexión fetch:", e);
-                return { success: false, error: 'No se pudo conectar con el servidor API REST. Verifica la URL o la política CORS.' };
+            } catch (err) {
+                errorDiv.textContent = "Error de conexión con el servidor.";
+                errorDiv.classList.remove('hidden');
             }
-        }
+        });
 
-        /**
-         * Maneja el login del entrenador.
-         */
-        async function handleTrainerLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            const btn = document.getElementById('trainer-login-btn');
-            
-            btn.disabled = true;
-            btn.textContent = 'INGRESANDO...';
-
-            // Llama a la API de login del entrenador (se asume un endpoint dedicado)
-            const response = await apiTrainerLogin(email, password, localDeviceId);
-
-            if (response.success) {
-                showMessage('¡Acceso de Entrenador exitoso!', 'success');
-                
-                // *** REDIRECCIONAR AL DASHBOARD DEL ENTRENADOR ***
-                // Se asume que tendrás una página "trainer_dashboard.html"
-                window.location.href = 'trainer_dashboard.html'; 
-
-            } else {
-                showMessage(response.error, 'error');
-            }
-            
-            btn.disabled = false;
-            btn.textContent = 'INGRESAR';
-        }
-
-
-        // FUNCIÓN PARA REDIRECCIONAR A WHATSAPP (Recuperación Entrenadores)
-        function handleForgotPassword() {
-            const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE_RECOVERY);
-            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\d+]/g, '')}?text=${encodedMessage}`;
-            window.open(whatsappUrl, '_blank');
-        }
-        
-        // FUNCIÓN PARA VOLVER AL LOGIN GENERAL
-        function handleReturnToClientLogin() {
-            window.location.href = 'index.html';
-        }
-
-
-        // --- Lógica de Inicialización ---
-        window.onload = function() {
-            // Verificar si ya hay una sesión de entrenador guardada para saltar el login
-            const storedSession = localStorage.getItem('trainerSession');
-            if (storedSession) {
-                // *** REDIRECCIONAR AL DASHBOARD DEL ENTRENADOR ***
-                // Asumiendo que existe una página "trainer_dashboard.html"
-                window.location.href = 'trainer_dashboard.html'; 
-                return; // Detener la ejecución para no adjuntar listeners
-            }
-
-            // LISTENERS
-            document.getElementById('trainer-login-form').addEventListener('submit', handleTrainerLogin);
-            document.getElementById('forgot-password-link').addEventListener('click', handleForgotPassword);
-            document.getElementById('return-to-client-login').addEventListener('click', handleReturnToClientLogin);
+        document.getElementById('forgot-password').onclick = () => {
+            const msg = encodeURIComponent("Hola Soporte GYMENEZ, soy entrenador y necesito recuperar mi clave.");
+            window.open(`https://wa.me/584140000000?text=${msg}`, '_blank');
         };
     </script>
 </body>
