@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CULTURA DE HIERRO - GYMENEZ ON</title>
+    <link rel="icon" type="image/png" href="mini_logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0d1a;
+            background-image: url('PROFILE_FONDO.png'); /* Mantiene tu fondo de perfil */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #e5e7eb;
+            text-shadow: -0.5px -0.5px 0 #000, 0.5px -0.5px 0 #000, -0.5px 0.5px 0 #000, 0.5px 0.5px 0 #000;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .episode-card:hover {
+            transform: scale(1.05);
+            border-color: #fbbf24;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(251, 191, 36, 0.2);
+            z-index: 20;
+        }
+
+        .hero-banner {
+            background: linear-gradient(to right, #0d0d1a 20%, transparent 80%), 
+                        linear-gradient(to top, #0d0d1a, transparent 40%),
+                        url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .neon-amber { text-shadow: 0 0 15px rgba(251, 191, 36, 0.6); }
+        
+        /* Ocultar scrollbar pero mantener funcionalidad */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <header class="fixed top-0 w-full z-50 bg-gradient-to-b from-black/90 to-transparent px-8 py-5 flex justify-between items-center">
+        <div class="flex items-center gap-8">
+            <h1 class="text-3xl font-black tracking-tighter">
+                <span class="text-amber-400">GYM</span>ENEZ <span class="text-sky-400 font-light">ON</span>
+            </h1>
+            <nav class="hidden md:flex gap-6 text-sm font-medium text-gray-300">
+                <a href="#" class="hover:text-white transition text-white">Inicio</a>
+                <a href="#" class="hover:text-white transition">Series</a>
+                <a href="#" class="hover:text-white transition">Documentales</a>
+                <a href="#" class="hover:text-white transition">Mi Lista</a>
+            </nav>
+        </div>
+        <a href="index.html" class="px-4 py-1 border border-white/30 rounded text-xs font-bold hover:bg-white hover:text-black transition uppercase">
+            Salir
+        </a>
+    </header>
+
+    <section class="hero-banner h-[85vh] flex items-center px-8 md:px-20 pt-20">
+        <div class="max-w-3xl">
+            <div class="flex items-center gap-2 mb-4">
+                <img src="mini_logo.png" class="w-6 h-6" alt="Logo">
+                <span class="tracking-[0.3em] text-xs font-bold text-gray-300 uppercase">Serie Original</span>
+            </div>
+            <h2 class="text-6xl md:text-8xl font-black mb-4 neon-amber leading-tight">CULTURA DE <br>HIERRO</h2>
+            <p class="text-lg md:text-xl text-gray-200 mb-8 max-w-xl leading-relaxed">
+                Un viaje profundo por el ADN deportivo de Latinoamérica. Desde los gimnasios de barrio en Venezuela hasta los estadios de la MLB, descubre qué nos hace imparables.
+            </p>
+            <div class="flex gap-4">
+                <a href="series/cultura_de_hierro/cap1.html" class="bg-white text-black px-10 py-3 rounded font-black flex items-center gap-2 hover:bg-amber-400 transition">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Reproducir Cap. 1
+                </a>
+                <button class="bg-gray-500/20 backdrop-blur-md border border-white/20 text-white px-10 py-3 rounded font-black hover:bg-white/10 transition">
+                    Más Información
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <main class="px-8 md:px-20 -mt-20 pb-20 relative z-10">
+        <h3 class="text-2xl font-bold mb-8 flex items-center gap-3">
+            <span class="w-2 h-8 bg-amber-400 rounded-full"></span>
+            TEMPORADA 1: EPISODIOS
+        </h3>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <a href="series/cultura_de_hierro/cap1.html" class="episode-card glass-card rounded-xl overflow-hidden group">
+                <div class="aspect-video relative overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=500" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Cap 1">
+                    <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition"></div>
+                    <span class="absolute top-3 left-3 bg-amber-500 text-black text-[10px] font-black px-2 py-1 rounded">EP. 01</span>
+                </div>
+                <div class="p-4">
+                    <h4 class="font-bold text-amber-400 mb-1">Tierra de Campeones</h4>
+                    <p class="text-xs text-gray-400 line-clamp-2">El origen del talento y la mentalidad de acero en Venezuela.</p>
+                </div>
+            </a>
+
+            <a href="series/cultura_de_hierro/cap2.html" class="episode-card glass-card rounded-xl overflow-hidden group">
+                <div class="aspect-video relative overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1508344928928-7165b67de128?q=80&w=500" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Cap 2">
+                    <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition"></div>
+                    <span class="absolute top-3 left-3 bg-amber-500 text-black text-[10px] font-black px-2 py-1 rounded">EP. 02</span>
+                </div>
+                <div class="p-4">
+                    <h4 class="font-bold text-amber-400 mb-1">Diamantes de Exportación</h4>
+                    <p class="text-xs text-gray-400 line-clamp-2">Especial Béisbol: La disciplina detrás del sueño de Grandes Ligas.</p>
+                </div>
+            </a>
+
+            <a href="series/cultura_de_hierro/cap3.html" class="episode-card glass-card rounded-xl overflow-hidden group">
+                <div class="aspect-video relative overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1541534741688-6078c6bd35e5?q=80&w=500" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Cap 3">
+                    <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition"></div>
+                    <span class="absolute top-3 left-3 bg-amber-500 text-black text-[10px] font-black px-2 py-1 rounded">EP. 03</span>
+                </div>
+                <div class="p-4">
+                    <h4 class="font-bold text-amber-400 mb-1">Fuerza Femenina</h4>
+                    <p class="text-xs text-gray-400 line-clamp-2">Mujeres rompiendo mitos en el Powerlifting latinoamericano.</p>
+                </div>
+            </a>
+
+            <a href="series/cultura_de_hierro/cap4.html" class="episode-card glass-card rounded-xl overflow-hidden group">
+                <div class="aspect-video relative overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1594911772125-07fc7a2d8d9f?q=80&w=500" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Cap 4">
+                    <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition"></div>
+                    <span class="absolute top-3 left-3 bg-amber-500 text-black text-[10px] font-black px-2 py-1 rounded">EP. 04</span>
+                </div>
+                <div class="p-4">
+                    <h4 class="font-bold text-amber-400 mb-1">El Gym del Barrio</h4>
+                    <p class="text-xs text-gray-400 line-clamp-2">Calistenia: La calle como el centro de alto rendimiento.</p>
+                </div>
+            </a>
+
+            <a href="series/cultura_de_hierro/cap5.html" class="episode-card glass-card rounded-xl overflow-hidden group">
+                <div class="aspect-video relative overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=500" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Cap 5">
+                    <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition"></div>
+                    <span class="absolute top-3 left-3 bg-amber-500 text-black text-[10px] font-black px-2 py-1 rounded">EP. 05</span>
+                </div>
+                <div class="p-4">
+                    <h4 class="font-bold text-amber-400 mb-1">Estética y Poder</h4>
+                    <p class="text-xs text-gray-400 line-clamp-2">Cultura comercial, salud mental y transformación física real.</p>
+                </div>
+            </a>
+
+            <a href="series/cultura_de_hierro/cap6.html" class="episode-card glass-card rounded-xl overflow-hidden group">
+                <div class="aspect-video relative overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=500" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Cap 6">
+                    <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition"></div>
+                    <span class="absolute top-3 left-3 bg-amber-500 text-black text-[10px] font-black px-2 py-1 rounded">EP. 06</span>
+                </div>
+                <div class="p-4">
+                    <h4 class="font-bold text-amber-400 mb-1">Salto al Mundo</h4>
+                    <p class="text-xs text-gray-400 line-clamp-2">El camino de los atletas olímpicos venezolanos al podio.</p>
+                </div>
+            </a>
+
+            <a href="series/cultura_de_hierro/cap7.html" class="episode-card glass-card rounded-xl overflow-hidden group">
+                <div class="aspect-video relative overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=500" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Cap 7">
+                    <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition"></div>
+                    <span class="absolute top-3 left-3 bg-amber-500 text-black text-[10px] font-black px-2 py-1 rounded">EP. 07</span>
+                </div>
+                <div class="p-4">
+                    <h4 class="font-bold text-amber-400 mb-1">Nutrición con Sabor</h4>
+                    <p class="text-xs text-gray-400 line-clamp-2">Adaptando la dieta deportiva a la comida tropical y criolla.</p>
+                </div>
+            </a>
+
+            <a href="series/cultura_de_hierro/cap8.html" class="episode-card glass-card rounded-xl overflow-hidden group">
+                <div class="aspect-video relative overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=500" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Cap 8">
+                    <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition"></div>
+                    <span class="absolute top-3 left-3 bg-amber-500 text-black text-[10px] font-black px-2 py-1 rounded">EP. 08</span>
+                </div>
+                <div class="p-4">
+                    <h4 class="font-bold text-amber-400 mb-1">La Nueva Era</h4>
+                    <p class="text-xs text-gray-400 line-clamp-2">GYMENEZ: Cómo la tecnología está uniendo el fitness en Latam.</p>
+                </div>
+            </a>
+
+        </div>
+    </main>
+
+    <footer class="py-10 border-t border-white/10 text-center text-gray-500 text-sm">
+        <p>UNA PRODUCCIÓN ORIGINAL DE <span class="font-bold text-white">GYMENEZ ON</span></p>
+        <p class="mt-2">&copy; 2026 Todos los derechos reservados.</p>
+    </footer>
+
+</body>
+</html>
