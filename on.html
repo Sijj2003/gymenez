@@ -3,99 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Función en Desarrollo | GYMENEZ</title>
+    <title>GYMENEZ ON - Streaming</title>
     <link rel="icon" type="image/png" href="mini_logo.png">
-    <link rel="shortcut icon" type="image/png" href="mini_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         
-        /* Tema de Fondo Minimalista: Base Oscura (Tomado de routines.html) */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0d0d1a;
-            /* Usamos el mismo fondo del Dashboard (PROFILE_FONDO) */
             background-image: url('PROFILE_FONDO.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            color: #e5e7eb; 
-            transition: background-image 1s ease-in-out; 
-
-            /* Borde negro para todas las letras (Text Stroke Effect) */
-            text-shadow: 
-                -0.5px -0.5px 0 #000,  
-                 0.5px -0.5px 0 #000,
-                -0.5px  0.5px 0 #000,
-                 0.5px  0.5px 0 #000;
+            color: #e5e7eb;
+            text-shadow: -0.5px -0.5px 0 #000, 0.5px -0.5px 0 #000, -0.5px 0.5px 0 #000, 0.5px 0.5px 0 #000;
         }
-        
-        /* Estilo específico para el efecto Glassmorphism en las tarjetas (Tomado de routines.html) */
+
         .glass-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            /* Cursor no es necesario en esta página, pero lo mantenemos para consistencia */
-            /* cursor: pointer; */ 
-        }
-        
-        /* Sombra/Borde para el texto del Header (Gris) (Tomado de routines.html) */
-        .text-border-gray {
-            text-shadow: 0 0 3px #4b5563; 
+            transition: all 0.3s ease;
         }
 
-        /* Estilos específicos para la tarjeta de 'Próximamente' */
-        .coming-soon-icon {
-            filter: drop-shadow(0 0 5px rgba(250, 202, 25, 0.8));
+        .content-card:hover {
+            transform: scale(1.05);
+            z-index: 10;
+            border-color: #fbbf24;
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
         }
 
+        .hero-section {
+            background: linear-gradient(to top, #0d0d1a, transparent), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            height: 70vh;
+        }
+
+        .neon-text-amber { text-shadow: 0 0 10px #fbbf24; }
+        .neon-text-sky { text-shadow: 0 0 10px #38bdf8; }
+
+        /* Scrollbar personalizada al estilo moderno */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0d0d1a; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #fbbf24; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen pb-12">
 
-    <header class="flex justify-between items-center py-4 px-8 mb-10">
-        <h1 class="text-3xl font-extrabold uppercase tracking-wider text-border-gray">
-            <span class="text-amber-400">GYM</span><span class="text-white">ENEZ</span>
+    <header class="fixed top-0 w-full z-50 bg-gradient-to-b from-black/80 to-transparent px-6 py-4 flex justify-between items-center">
+        <h1 class="text-2xl md:text-3xl font-extrabold uppercase tracking-tighter">
+            <span class="text-amber-400">GYM</span><span class="text-white">ENEZ</span> <span class="text-sky-400 font-light ml-1">ON</span>
         </h1>
-        
-        <div class="flex space-x-4">
-            <a href="index.html" 
-               class="px-4 py-2 text-sm font-semibold rounded-full bg-sky-600 text-white hover:bg-sky-500 transition duration-300">
-                REGRESAR
-            </a>
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-sm font-bold hover:text-amber-400 transition">VOLVER AL PANEL</a>
+            <div class="w-10 h-10 rounded-full bg-amber-600 border-2 border-white flex items-center justify-center font-bold">
+                G
+            </div>
         </div>
     </header>
-    
-    <main class="flex-grow flex items-center justify-center p-4">
-        <div class="max-w-xl w-full">
-            
-            <div class="glass-card p-8 md:p-12 rounded-2xl shadow-2xl text-center border-t-4 border-sky-400">
-                
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20 mx-auto mb-6 text-amber-400 coming-soon-icon" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.707 15.707c-.19.19-.44.293-.707.293s-.517-.103-.707-.293l-3-3c-.39-.39-.39-1.02 0-1.41s1.02-.39 1.41 0L11 15.58V7c0-.55.45-1 1-1s1 .45 1 1v8.58l1.79-1.79c.39-.39 1.02-.39 1.41 0s.39 1.02 0 1.41l-3 3z"/>
-                </svg>
 
+    <section class="hero-section flex items-end pb-12 px-6 md:px-16">
+        <div class="max-w-2xl">
+            <span class="bg-amber-500 text-black text-xs font-black px-2 py-1 rounded mb-4 inline-block uppercase">Nuevo Lanzamiento</span>
+            <h2 class="text-5xl md:text-7xl font-black mb-4 neon-text-amber">EL DESPERTAR <br>DEL TITÁN</h2>
+            <p class="text-lg text-gray-200 mb-6 line-clamp-3">
+                Acompaña a nuestros mejores entrenadores en esta serie documental de 8 episodios donde llevamos el cuerpo humano al límite absoluto. Ciencia, disciplina y sudor.
+            </p>
+            <div class="flex gap-4">
+                <a href="series/titán/capitulo1.html" class="px-8 py-3 bg-white text-black font-bold rounded hover:bg-amber-400 transition flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M4.5 3.5v13L16 10 4.5 3.5z"/></svg>
+                    REPRODUCIR
+                </a>
+                <button class="px-8 py-3 bg-gray-500/30 backdrop-blur-md text-white font-bold rounded border border-white/20 hover:bg-white/10 transition">
+                    MÁS INFO
+                </button>
+            </div>
+        </div>
+    </section>
 
-                <h2 class="text-3xl md:text-4xl font-extrabold mb-4 uppercase text-amber-400">
-                    Función en Desarrollo
-                </h2>
+    <main class="mt-8 px-6 md:px-16 space-y-12">
+        
+        <section>
+            <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                <span class="w-1 h-6 bg-amber-400 inline-block"></span>
+                PROGRAMAS DE ENTRENAMIENTO
+            </h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 
-                <p class="text-lg text-gray-300 mb-6">
-                    Agradecemos tu interés. Estamos trabajando arduamente para brindarte una **experiencia de usuario excepcional** con esta nueva funcionalidad.
-                </p>
-                
-                <p class="text-lg font-semibold text-sky-400">
-                    **¡Próximamente disponible!**
-                </p>
+                <a href="series/hiit_extreme/index.html" class="group">
+                    <div class="glass-card content-card rounded-lg overflow-hidden aspect-video md:aspect-[2/3] relative">
+                        <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition" alt="HIIT">
+                        <div class="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black to-transparent">
+                            <p class="font-bold text-sm">HIIT EXTREME</p>
+                            <p class="text-xs text-amber-400">12 Episodios</p>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="series/powerlifting_101/index.html" class="group">
+                    <div class="glass-card content-card rounded-lg overflow-hidden aspect-video md:aspect-[2/3] relative">
+                        <img src="https://images.unsplash.com/photo-1541534741688-6078c6bd35e5?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition" alt="Power">
+                        <div class="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black to-transparent">
+                            <p class="font-bold text-sm">POWER 101</p>
+                            <p class="text-xs text-amber-400">8 Episodios</p>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="series/yoga_flow/index.html" class="group">
+                    <div class="glass-card content-card rounded-lg overflow-hidden aspect-video md:aspect-[2/3] relative">
+                        <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition" alt="Yoga">
+                        <div class="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black to-transparent">
+                            <p class="font-bold text-sm">ZEN FLOW</p>
+                            <p class="text-xs text-amber-400">15 Sesiones</p>
+                        </div>
+                    </div>
+                </a>
+
+                <div class="glass-card content-card rounded-lg overflow-hidden aspect-video md:aspect-[2/3] relative opacity-50 grayscale">
+                    <div class="w-full h-full flex items-center justify-center border-2 border-dashed border-gray-600">
+                        <span class="text-xs font-bold text-gray-500">PRÓXIMAMENTE</span>
+                    </div>
+                </div>
 
             </div>
-            
-        </div>
+        </section>
+
+        <section>
+            <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                <span class="w-1 h-6 bg-sky-400 inline-block"></span>
+                GYMENEZ EATS: LA COCINA
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <a href="series/recetas_fit/pollo_curry.html" class="group">
+                    <div class="glass-card content-card rounded-2xl overflow-hidden flex flex-col">
+                        <div class="aspect-video relative">
+                            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover" alt="Receta">
+                            <span class="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] px-2 py-1 rounded">12:45</span>
+                        </div>
+                        <div class="p-4">
+                            <h4 class="font-bold group-hover:text-amber-400 transition">Almuerzos Pro en 15 Minutos</h4>
+                            <p class="text-sm text-gray-400 mt-1">Aprende a preparar comidas densas en nutrientes sin perder tiempo.</p>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="series/recetas_fit/batidos.html" class="group">
+                    <div class="glass-card content-card rounded-2xl overflow-hidden flex flex-col">
+                        <div class="aspect-video relative">
+                            <img src="https://images.unsplash.com/photo-1553531384-cc64ac80f931?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover" alt="Batidos">
+                            <span class="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] px-2 py-1 rounded">08:20</span>
+                        </div>
+                        <div class="p-4">
+                            <h4 class="font-bold group-hover:text-amber-400 transition">Guía de Suplementación Natural</h4>
+                            <p class="text-sm text-gray-400 mt-1">Batidos post-entreno según tu objetivo de masa muscular.</p>
+                        </div>
+                    </div>
+                </a>
+
+            </div>
+        </section>
+
     </main>
 
-    </body>
+    <footer class="mt-20 px-6 py-8 border-t border-gray-800 text-center text-gray-500 text-sm">
+        <p>&copy; 2026 GYMENEZ ON. Todos los derechos reservados.</p>
+        <div class="flex justify-center gap-4 mt-4">
+            <a href="#" class="hover:text-white">Términos de uso</a>
+            <a href="#" class="hover:text-white">Privacidad</a>
+            <a href="support_center.html" class="hover:text-white">Soporte</a>
+        </div>
+    </footer>
+
+    <script>
+        // Lógica simple para efectos de carga si los necesitas
+        window.addEventListener('load', () => {
+            console.log('GYMENEZ ON Ready');
+        });
+    </script>
+</body>
 </html>
