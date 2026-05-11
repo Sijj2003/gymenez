@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capítulo 1 - Cultura de Hierro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020205; /* Fondo ultra oscuro para enfoque total */
+            color: #e5e7eb;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .glass-header {
+            background: rgba(5, 5, 10, 0.8);
+            backdrop-filter: blur(25px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        /* Contenedor con brillo ambiental */
+        .video-container {
+            position: relative;
+            box-shadow: 0 0 80px rgba(0, 0, 0, 0.9), 0 0 30px rgba(251, 191, 36, 0.05);
+            border-radius: 1rem;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .neon-text {
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+        }
+
+        /* Efecto de degradado para suavizar la integración del video */
+        .video-overlay-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(to top, #020205, transparent);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <header class="fixed top-0 w-full z-50 glass-header px-8 py-5 flex justify-between items-center">
+        <a href="index.html" class="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-amber-400 transition tracking-widest">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            VOLVER AL PANEL
+        </a>
+        <h1 class="text-xl font-black tracking-tighter">
+            <span class="text-amber-400">GYM</span>ENEZ <span class="text-sky-400 font-light ml-1">ON</span>
+        </h1>
+    </header>
+
+    <main class="pt-28 pb-20 px-4 md:px-12 max-w-7xl mx-auto">
+        
+        <div class="video-container aspect-video">
+            <iframe 
+                class="absolute top-0 left-0 w-full h-full"
+                src="https://www.youtube.com/embed/QN4hjF6FvIw?autoplay=0&controls=1&rel=0&modestbranding=1&iv_load_policy=3" 
+                title="Cultura de Hierro - Episodio 1" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+            </iframe>
+            <div class="video-overlay-bottom"></div>
+        </div>
+
+        <div class="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-12">
+            
+            <div class="lg:col-span-2">
+                <div class="flex items-center gap-4 mb-4">
+                    <span class="px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-500 text-[10px] font-black rounded-full uppercase tracking-widest">
+                        Episodio 1
+                    </span>
+                    <span class="text-gray-500 text-xs font-bold uppercase tracking-widest">Estreno 2026</span>
+                </div>
+                
+                <h2 class="text-4xl md:text-5xl font-black uppercase tracking-tighter neon-text mb-6">
+                    Tierra de Campeones
+                </h2>
+                
+                <p class="text-gray-400 text-lg leading-relaxed mb-8">
+                    Iniciamos este viaje explorando la resiliencia del atleta latinoamericano. En este capítulo, analizamos cómo la cultura del esfuerzo y las raíces deportivas de Venezuela han creado una generación de competidores imparables a nivel global.
+                </p>
+
+                <div class="p-6 rounded-2xl bg-white/[0.02] border border-white/5">
+                    <h4 class="text-sm font-bold text-gray-200 mb-3 uppercase tracking-widest">Destacados del episodio</h4>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 bg-amber-400 rounded-full"></span>
+                            Entrevista exclusiva con referentes del fitness nacional.
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 bg-amber-400 rounded-full"></span>
+                            Análisis de la disciplina y mentalidad de acero.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="lg:col-span-1 space-y-6">
+                <div class="p-8 rounded-2xl bg-gradient-to-br from-amber-500/20 to-transparent border border-amber-500/20 text-center">
+                    <p class="text-xs font-bold text-amber-400 uppercase tracking-widest mb-4">¿Listo para más?</p>
+                    <a href="cap2.html" class="block w-full py-4 bg-white text-black font-black rounded-xl hover:bg-amber-400 transition transform hover:scale-[1.02] active:scale-95 uppercase tracking-tighter">
+                        Siguiente Capítulo
+                    </a>
+                </div>
+
+                <div class="p-6 rounded-2xl border border-white/5 bg-black/40">
+                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Contenido Relacionado</h4>
+                    <div class="flex gap-4 group cursor-pointer opacity-50 hover:opacity-100 transition">
+                        <div class="w-24 h-16 bg-gray-800 rounded-lg overflow-hidden flex-shrink-0">
+                            <div class="w-full h-full bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1508344928928-7165b67de128?q=80&w=200');"></div>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-amber-400 uppercase">Capítulo 2</p>
+                            <p class="text-xs font-bold text-white line-clamp-1">Diamantes de Exportación</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="py-12 border-t border-white/5 text-center">
+        <p class="text-[9px] font-bold text-gray-700 tracking-[0.5em] uppercase">GYMENEZ ON &copy; 2026 ORIGINAL PRODUCTIONS</p>
+    </footer>
+
+</body>
+</html>
