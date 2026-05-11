@@ -31,161 +31,92 @@
 
         .content-card:hover {
             transform: scale(1.05);
-            z-index: 10;
             border-color: #fbbf24;
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+            box-shadow: 0 0 25px rgba(251, 191, 36, 0.2);
         }
 
+        /* Banner Principal enfocado en la serie */
         .hero-section {
-            background: linear-gradient(to top, #0d0d1a, transparent), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop');
+            background: linear-gradient(to top, #0d0d1a 10%, transparent 90%), 
+                        linear-gradient(to right, #0d0d1a 30%, transparent 70%),
+                        url('https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=2070&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
-            height: 70vh;
+            height: 75vh;
         }
 
-        .neon-text-amber { text-shadow: 0 0 10px #fbbf24; }
-        .neon-text-sky { text-shadow: 0 0 10px #38bdf8; }
-
-        /* Scrollbar personalizada al estilo moderno */
+        .neon-text-amber { text-shadow: 0 0 15px rgba(251, 191, 36, 0.6); }
+        
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0d0d1a; }
         ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #fbbf24; }
     </style>
 </head>
-<body class="min-h-screen pb-12">
+<body class="min-h-screen pb-20">
 
-    <header class="fixed top-0 w-full z-50 bg-gradient-to-b from-black/80 to-transparent px-6 py-4 flex justify-between items-center">
-        <h1 class="text-2xl md:text-3xl font-extrabold uppercase tracking-tighter">
-            <span class="text-amber-400">GYM</span><span class="text-white">ENEZ</span> <span class="text-sky-400 font-light ml-1">ON</span>
+    <header class="fixed top-0 w-full z-50 bg-gradient-to-b from-black/90 to-transparent px-8 py-5 flex justify-between items-center">
+        <h1 class="text-3xl font-black tracking-tighter">
+            <span class="text-amber-400">GYM</span>ENEZ <span class="text-sky-400 font-light ml-1">ON</span>
         </h1>
-        <div class="flex items-center gap-4">
-            <a href="index.html" class="text-sm font-bold hover:text-amber-400 transition">VOLVER AL PANEL</a>
-            <div class="w-10 h-10 rounded-full bg-amber-600 border-2 border-white flex items-center justify-center font-bold">
-                G
-            </div>
+        <div class="flex items-center gap-6">
+            <a href="index.html" class="text-xs font-bold border border-white/20 px-4 py-1.5 rounded hover:bg-white hover:text-black transition uppercase tracking-widest">
+                Regresar
+            </a>
         </div>
     </header>
 
-    <section class="hero-section flex items-end pb-12 px-6 md:px-16">
+    <section class="hero-section flex items-center px-8 md:px-20 pt-20">
         <div class="max-w-2xl">
-            <span class="bg-amber-500 text-black text-xs font-black px-2 py-1 rounded mb-4 inline-block uppercase">Nuevo Lanzamiento</span>
-            <h2 class="text-5xl md:text-7xl font-black mb-4 neon-text-amber">EL DESPERTAR <br>DEL TITÁN</h2>
-            <p class="text-lg text-gray-200 mb-6 line-clamp-3">
-                Acompaña a nuestros mejores entrenadores en esta serie documental de 8 episodios donde llevamos el cuerpo humano al límite absoluto. Ciencia, disciplina y sudor.
+            <span class="bg-amber-500 text-black text-[10px] font-black px-2 py-0.5 rounded mb-4 inline-block uppercase tracking-tighter">
+                Serie Original Estreno
+            </span>
+            <h2 class="text-6xl md:text-8xl font-black mb-4 neon-text-amber leading-none uppercase">CULTURA DE <br>HIERRO</h2>
+            <p class="text-lg text-gray-200 mb-8 max-w-lg leading-relaxed">
+                Entrevistas exclusivas con las figuras más influyentes del deporte en Venezuela y Latinoamérica. Descubre la disciplina que forja campeones.
             </p>
             <div class="flex gap-4">
-                <a href="series/titán/capitulo1.html" class="px-8 py-3 bg-white text-black font-bold rounded hover:bg-amber-400 transition flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M4.5 3.5v13L16 10 4.5 3.5z"/></svg>
-                    REPRODUCIR
+                <a href="main/series/CULTURA_DE_HIERRO/index.html" class="px-10 py-3.5 bg-white text-black font-black rounded hover:bg-amber-400 transition flex items-center gap-2">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M4.5 3.5v13L16 10 4.5 3.5z"/></svg>
+                    VER SERIE
                 </a>
-                <button class="px-8 py-3 bg-gray-500/30 backdrop-blur-md text-white font-bold rounded border border-white/20 hover:bg-white/10 transition">
-                    MÁS INFO
-                </button>
             </div>
         </div>
     </section>
 
-    <main class="mt-8 px-6 md:px-16 space-y-12">
-        
-        <section>
-            <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
-                <span class="w-1 h-6 bg-amber-400 inline-block"></span>
-                PROGRAMAS DE ENTRENAMIENTO
-            </h3>
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                
-                <a href="series/hiit_extreme/index.html" class="group">
-                    <div class="glass-card content-card rounded-lg overflow-hidden aspect-video md:aspect-[2/3] relative">
-                        <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition" alt="HIIT">
-                        <div class="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black to-transparent">
-                            <p class="font-bold text-sm">HIIT EXTREME</p>
-                            <p class="text-xs text-amber-400">12 Episodios</p>
-                        </div>
-                    </div>
-                </a>
+    <main class="mt-4 px-8 md:px-20">
+        <h3 class="text-xl font-bold mb-8 flex items-center gap-3 uppercase tracking-widest">
+            <span class="w-1.5 h-6 bg-amber-400 inline-block"></span>
+            Series Disponibles
+        </h3>
 
-                <a href="series/powerlifting_101/index.html" class="group">
-                    <div class="glass-card content-card rounded-lg overflow-hidden aspect-video md:aspect-[2/3] relative">
-                        <img src="https://images.unsplash.com/photo-1541534741688-6078c6bd35e5?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition" alt="Power">
-                        <div class="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black to-transparent">
-                            <p class="font-bold text-sm">POWER 101</p>
-                            <p class="text-xs text-amber-400">8 Episodios</p>
+        <div class="flex flex-wrap gap-6">
+            
+            <a href="main/series/CULTURA_DE_HIERRO/index.html" class="group w-full max-w-[300px]">
+                <div class="glass-card content-card rounded-xl overflow-hidden aspect-[2/3] relative border-2 border-amber-400/20">
+                    <img src="https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=600" class="w-full h-full object-cover group-hover:scale-105 transition duration-700" alt="Cultura de Hierro">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent"></div>
+                    
+                    <div class="absolute bottom-0 left-0 w-full p-5">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-black text-amber-400 uppercase">Temp 1</span>
+                            <span class="text-[10px] font-bold text-gray-400">8 Caps</span>
                         </div>
-                    </div>
-                </a>
-
-                <a href="series/yoga_flow/index.html" class="group">
-                    <div class="glass-card content-card rounded-lg overflow-hidden aspect-video md:aspect-[2/3] relative">
-                        <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition" alt="Yoga">
-                        <div class="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black to-transparent">
-                            <p class="font-bold text-sm">ZEN FLOW</p>
-                            <p class="text-xs text-amber-400">15 Sesiones</p>
-                        </div>
-                    </div>
-                </a>
-
-                <div class="glass-card content-card rounded-lg overflow-hidden aspect-video md:aspect-[2/3] relative opacity-50 grayscale">
-                    <div class="w-full h-full flex items-center justify-center border-2 border-dashed border-gray-600">
-                        <span class="text-xs font-bold text-gray-500">PRÓXIMAMENTE</span>
+                        <p class="font-black text-lg uppercase leading-tight tracking-tighter">CULTURA DE HIERRO</p>
+                        <p class="text-[11px] text-gray-400 mt-1 line-clamp-1">Explorando el ADN deportivo latino.</p>
                     </div>
                 </div>
+            </a>
 
+            <div class="hidden md:flex flex-col items-center justify-center w-full max-w-[300px] aspect-[2/3] border-2 border-dashed border-white/5 rounded-xl">
+                 <p class="text-gray-600 font-bold text-xs uppercase tracking-widest">Próximamente</p>
             </div>
-        </section>
 
-        <section>
-            <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
-                <span class="w-1 h-6 bg-sky-400 inline-block"></span>
-                GYMENEZ EATS: LA COCINA
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                
-                <a href="series/recetas_fit/pollo_curry.html" class="group">
-                    <div class="glass-card content-card rounded-2xl overflow-hidden flex flex-col">
-                        <div class="aspect-video relative">
-                            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover" alt="Receta">
-                            <span class="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] px-2 py-1 rounded">12:45</span>
-                        </div>
-                        <div class="p-4">
-                            <h4 class="font-bold group-hover:text-amber-400 transition">Almuerzos Pro en 15 Minutos</h4>
-                            <p class="text-sm text-gray-400 mt-1">Aprende a preparar comidas densas en nutrientes sin perder tiempo.</p>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="series/recetas_fit/batidos.html" class="group">
-                    <div class="glass-card content-card rounded-2xl overflow-hidden flex flex-col">
-                        <div class="aspect-video relative">
-                            <img src="https://images.unsplash.com/photo-1553531384-cc64ac80f931?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover" alt="Batidos">
-                            <span class="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] px-2 py-1 rounded">08:20</span>
-                        </div>
-                        <div class="p-4">
-                            <h4 class="font-bold group-hover:text-amber-400 transition">Guía de Suplementación Natural</h4>
-                            <p class="text-sm text-gray-400 mt-1">Batidos post-entreno según tu objetivo de masa muscular.</p>
-                        </div>
-                    </div>
-                </a>
-
-            </div>
-        </section>
-
+        </div>
     </main>
 
-    <footer class="mt-20 px-6 py-8 border-t border-gray-800 text-center text-gray-500 text-sm">
-        <p>&copy; 2026 GYMENEZ ON. Todos los derechos reservados.</p>
-        <div class="flex justify-center gap-4 mt-4">
-            <a href="#" class="hover:text-white">Términos de uso</a>
-            <a href="#" class="hover:text-white">Privacidad</a>
-            <a href="support_center.html" class="hover:text-white">Soporte</a>
-        </div>
+    <footer class="mt-32 px-8 py-10 border-t border-white/5 text-center">
+        <p class="text-gray-600 text-[10px] font-bold uppercase tracking-[0.5em]">GYMENEZ ON ORIGINAL PRODUCTIONS</p>
     </footer>
 
-    <script>
-        // Lógica simple para efectos de carga si los necesitas
-        window.addEventListener('load', () => {
-            console.log('GYMENEZ ON Ready');
-        });
-    </script>
 </body>
 </html>
