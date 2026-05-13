@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Capítulo 1 - Cultura de Hierro</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         
@@ -31,7 +33,7 @@
             background: #000;
         }
 
-        /* Personalización de colores para que coincida con GYMENEZ (Ambar) */
+        /* Colores de marca GYMENEZ (Ambar) para el reproductor */
         :root {
             --plyr-color-main: #fbbf24;
             --plyr-video-background: #000;
@@ -57,12 +59,11 @@
     <main class="pt-28 pb-20 px-4 md:px-12 max-w-7xl mx-auto">
         
         <div class="video-container">
-            <video id="player" playsinline controls data-poster="static/img/posters/cap1_poster.jpg">
-                <source src="TU_VIDEO_DIRECTO.mp4" type="video/mp4" />
-            </video>
+            <div id="player" data-plyr-provider="youtube" data-plyr-embed-id="QN4hjF6FvIw"></div>
         </div>
 
         <div class="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-12">
+            
             <div class="lg:col-span-2">
                 <div class="flex items-center gap-4 mb-4">
                     <span class="px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-500 text-[10px] font-black rounded-full uppercase tracking-widest">
@@ -102,6 +103,7 @@
                     </a>
                 </div>
             </div>
+
         </div>
     </main>
 
@@ -111,9 +113,16 @@
 
     <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
     <script>
+        // Configuración para forzar que no se vea el branding de YouTube
         const player = new Plyr('#player', {
             controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
-            tooltips: { controls: true, seek: true }
+            youtube: { 
+                noCookie: true, 
+                rel: 0, 
+                showinfo: 0, 
+                iv_load_policy: 3, 
+                modestbranding: 1 
+            }
         });
     </script>
 </body>
