@@ -6,8 +6,10 @@
     <title>Capítulo 1 - Cultura de Hierro</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@vime/core@latest/themes/default.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@vime/core@latest/dist/vime/vime.esm.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         
@@ -16,7 +18,6 @@
             background-color: #020205; 
             color: #e5e7eb;
             margin: 0;
-            overflow-x: hidden;
         }
 
         .glass-header {
@@ -33,10 +34,11 @@
             background: #000;
         }
 
-        /* Colores de marca GYMENEZ (Ambar) para el reproductor */
-        :root {
-            --plyr-color-main: #fbbf24;
-            --plyr-video-background: #000;
+        /* Personalización de los colores de Vime (Ambar GYMENEZ) */
+        vm-player {
+            --vm-player-theme: #fbbf24;
+            --vm-controls-bg: rgba(0, 0, 0, 0.7);
+            border-radius: 1rem;
         }
 
         .neon-text {
@@ -58,12 +60,16 @@
 
     <main class="pt-28 pb-20 px-4 md:px-12 max-w-7xl mx-auto">
         
-        <div class="video-container">
-            <div id="player" data-plyr-provider="youtube" data-plyr-embed-id="QN4hjF6FvIw"></div>
+        <div class="video-container aspect-video">
+            <vm-player>
+                <vm-youtube video-id="QN4hjF6FvIw"></vm-youtube>
+                
+                <vm-default-ui no-click-to-play>
+                    </vm-default-ui>
+            </vm-player>
         </div>
 
         <div class="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-12">
-            
             <div class="lg:col-span-2">
                 <div class="flex items-center gap-4 mb-4">
                     <span class="px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-500 text-[10px] font-black rounded-full uppercase tracking-widest">
@@ -79,31 +85,16 @@
                 <p class="text-gray-400 text-lg leading-relaxed mb-8">
                     Iniciamos este viaje explorando la resiliencia del atleta latinoamericano. En este capítulo, analizamos cómo la cultura del esfuerzo y las raíces deportivas de Venezuela han creado una generación de competidores imparables a nivel global.
                 </p>
-
-                <div class="p-6 rounded-2xl bg-white/[0.02] border border-white/5">
-                    <h4 class="text-sm font-bold text-gray-200 mb-3 uppercase tracking-widest">Destacados del episodio</h4>
-                    <ul class="space-y-2 text-sm text-gray-500">
-                        <li class="flex items-center gap-2">
-                            <span class="w-1.5 h-1.5 bg-amber-400 rounded-full"></span>
-                            Entrevista exclusiva con referentes del fitness nacional.
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="w-1.5 h-1.5 bg-amber-400 rounded-full"></span>
-                            Análisis de la disciplina y mentalidad de acero.
-                        </li>
-                    </ul>
-                </div>
             </div>
 
-            <div class="lg:col-span-1 space-y-6">
+            <div class="lg:col-span-1">
                 <div class="p-8 rounded-2xl bg-gradient-to-br from-amber-500/20 to-transparent border border-amber-500/20 text-center">
-                    <p class="text-xs font-bold text-amber-400 uppercase tracking-widest mb-4">¿Listo para más?</p>
-                    <a href="cap2.html" class="block w-full py-4 bg-white text-black font-black rounded-xl hover:bg-amber-400 transition transform hover:scale-[1.02] active:scale-95 uppercase tracking-tighter">
-                        Siguiente Capítulo
+                    <p class="text-xs font-bold text-amber-400 uppercase tracking-widest mb-4">Siguiente capítulo</p>
+                    <a href="cap2.html" class="block w-full py-4 bg-white text-black font-black rounded-xl hover:bg-amber-400 transition uppercase tracking-tighter">
+                        Diamantes de Exportación
                     </a>
                 </div>
             </div>
-
         </div>
     </main>
 
@@ -111,19 +102,5 @@
         <p class="text-[9px] font-bold text-gray-700 tracking-[0.5em] uppercase">GYMENEZ ON &copy; 2026 ORIGINAL PRODUCTIONS</p>
     </footer>
 
-    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-    <script>
-        // Configuración para forzar que no se vea el branding de YouTube
-        const player = new Plyr('#player', {
-            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
-            youtube: { 
-                noCookie: true, 
-                rel: 0, 
-                showinfo: 0, 
-                iv_load_policy: 3, 
-                modestbranding: 1 
-            }
-        });
-    </script>
 </body>
 </html>
